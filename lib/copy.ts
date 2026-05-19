@@ -46,26 +46,32 @@ export const approachPoints = [
 
 export const team = [
   {
-    name: "Imogen Hart",
-    role: "Founder · Lead facilitator",
-    bio: "Fifteen years running learning programmes at Microsoft and inside its largest partners.",
+    name: "Jen Wilson",
+    role: "Founder",
+    bio: "Ex-Microsoft. Spent a decade inside the partner programme before starting Illuminate. Leads strategy and the senior cohort sessions.",
   },
   {
-    name: "Daniel Okafor",
-    role: "Head of curriculum",
-    bio: "Designed Copilot enablement for three FTSE 250 rollouts. Former engineering manager.",
+    name: "Ed",
+    role: "Partner · Adoption lead",
+    bio: "Runs the adoption programmes end to end. Specialises in the slow, unglamorous work of making new habits hold.",
   },
   {
-    name: "Priya Shah",
-    role: "Senior facilitator",
-    bio: "Specialises in sales enablement and front-line manager coaching across the MSP channel.",
+    name: "James Wilson",
+    role: "Technical training",
+    bio: "Designs and delivers the technical curriculum. Prompt design, governance and the engineering detail that decides whether a pilot ships.",
   },
   {
-    name: "Marcus Bell",
-    role: "Measurement lead",
-    bio: "Builds the dashboards and the survey instruments. Believes adoption is a data problem.",
+    name: "TBC",
+    role: "Joining soon",
+    bio: "A senior facilitator role currently in conversation. Sales enablement and front-line manager coaching across the MSP channel.",
   },
 ] as const;
+
+export const contact = {
+  email: "hello@illuminate-learning.co.uk",
+  location: "Pembrokeshire",
+  companyNote: "Company no. TBC",
+} as const;
 
 export const stat = {
   hero: "47%",

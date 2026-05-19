@@ -40,8 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# claude code local settings
+.claude/settings.local.json

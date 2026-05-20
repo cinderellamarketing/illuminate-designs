@@ -90,14 +90,14 @@ export function SessionVideo({
         <Placeholder label={labelText} variant={variant} />
       )}
 
-      {/* Soft vignette over video for legibility of overlay content. */}
+      {/* Darkening over the hero video for legibility of overlay content. */}
       {showVideo && variant === "hero" && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 80% at 50% 40%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.75) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.50) 60%, rgba(0,0,0,0.70) 100%)",
           }}
         />
       )}
@@ -111,7 +111,7 @@ export function SessionVideo({
             v.muted = !v.muted;
             setMuted(v.muted);
           }}
-          className="font-ui absolute bottom-5 right-5 z-10 flex items-center gap-2 rounded-full border border-white/30 bg-black/30 px-3.5 py-1.5 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur transition hover:bg-black/50"
+          className="font-ui pointer-events-auto absolute bottom-5 right-5 z-30 flex items-center gap-2 rounded-full border border-white/30 bg-black/30 px-3.5 py-1.5 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur transition hover:bg-black/50"
           aria-pressed={!muted}
           aria-label={muted ? "Unmute session footage" : "Mute session footage"}
         >

@@ -68,8 +68,10 @@ function Hero() {
         className="h-full w-full"
       />
 
-      {/* Overlay content */}
-      <div className="absolute inset-0 z-10 flex flex-col justify-end px-6 pb-14 md:px-10 md:pb-20">
+      {/* Overlay content. The wrapper is non-interactive so the
+          unmute control on the underlying video stays clickable;
+          only the actual CTAs opt back in. */}
+      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-6 pb-14 md:px-10 md:pb-20">
         <div className="max-w-[1400px] mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -116,7 +118,7 @@ function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="mt-10 flex flex-wrap items-center gap-5"
+            className="pointer-events-auto mt-10 flex flex-wrap items-center gap-5"
           >
             <a
               href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}

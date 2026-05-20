@@ -96,14 +96,15 @@ function Hero() {
           Illuminate · Session in progress
         </div>
 
-        {/* The 82% reveal — appears via motion as you arrive. */}
+        {/* The 82% reveal — appears via motion as you arrive.
+            Non-interactive so the unmute control underneath stays clickable. */}
         <motion.div
           style={{
             scale: numberScale,
             opacity: numberOpacity,
             y: numberY,
           }}
-          className="absolute inset-0 z-10 flex items-end justify-center pb-[12vh]"
+          className="pointer-events-none absolute inset-0 z-10 flex items-end justify-center pb-[12vh]"
         >
           <div
             className="font-display text-center leading-[0.78] tracking-tight"
@@ -153,12 +154,7 @@ function SceneRoom() {
 
       <div className="mt-16">
         <SessionVideo
-          clip={{
-            id: "scene-room",
-            src: null,
-            caption: "Wide of the room",
-            context: "Establishing shot",
-          }}
+          clip={media.roomScenes.room}
           variant="scene"
           className="rounded-sm"
           label="Wide of the room to follow"
@@ -179,6 +175,14 @@ function SceneProblem() {
         </span>
       </Statement>
       <Body>{scene.body}</Body>
+      <div className="mt-16">
+        <SessionVideo
+          clip={media.roomScenes.problem}
+          variant="scene"
+          className="rounded-sm"
+          label="The problem in the room"
+        />
+      </div>
     </Scene>
   );
 }
@@ -267,6 +271,15 @@ function SceneResult() {
               {caseStudy.attribution}
             </footer>
           </blockquote>
+        </div>
+
+        <div className="mt-16">
+          <SessionVideo
+            clip={media.roomScenes.result}
+            variant="scene"
+            className="rounded-sm"
+            label="Eight weeks later"
+          />
         </div>
       </div>
     </section>

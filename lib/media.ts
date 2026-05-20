@@ -1,79 +1,81 @@
 // Single source of truth for footage on the site.
 //
-// Real session clips will replace these entries. Until then, every slot
-// except the two hero videos renders the styled placeholder panel
-// (see components/SessionVideo.tsx).
-//
-// When real footage arrives, edit this file only.
+// All clips live in /public. Reassign keys here when new footage
+// arrives — every consuming component reads from this file, so swaps
+// stay a one-file job.
 
 export type MediaClip = {
   id: string;
   // If src is null, SessionVideo renders the styled placeholder.
   src: string | null;
   poster?: string;
-  // What viewers should see captioned alongside the clip.
   caption: string;
-  // Short helper for the placeholder card.
   context: string;
 };
 
-// Neutral royalty-free clip (Mixkit, no attribution required) used only
-// for the two hero slots so autoplay and unmute are real and testable.
-// Replace with real Illuminate training footage when delivered.
-const HERO_PLACEHOLDER =
-  "https://assets.mixkit.co/videos/preview/mixkit-business-team-having-a-meeting-in-the-office-5006-large.mp4";
+// Real session footage in /public. Keys carry editorial intent.
+const videos = {
+  // Widest, most ambient room shot — used full-bleed behind the heroes.
+  heroWide: "/8716579-uhd_3840_2160_25fps.mp4",
+  // Engaged faces / reactions in the room.
+  facesClose: "/7647627-hd_1920_1080_30fps.mp4",
+  // Someone leading the room, vertical framing.
+  presenting: "/8344225-uhd_2160_3840_25fps.mp4",
+  // Detail / texture clip, vertical.
+  detail: "/7647616-hd_1080_1920_30fps.mp4",
+} as const;
 
 export const media = {
   // Full-bleed hero on /session
   sessionHero: {
     id: "session-hero",
-    src: HERO_PLACEHOLDER,
+    src: videos.heroWide,
     caption: "Live session, MSP cohort",
-    context: "Hero footage placeholder. Swap in real session clip.",
+    context: "Hero footage",
   },
   // Full-screen ambient hero on /room
   roomHero: {
     id: "room-hero",
-    src: HERO_PLACEHOLDER,
+    src: videos.heroWide,
     caption: "You are in the room",
-    context: "Hero footage placeholder. Swap in real session clip.",
+    context: "Hero footage",
   },
 
   // Horizontal scroll on /session — moments of the method
   approachReel: [
     {
       id: "approach-1",
-      src: null,
+      src: videos.facesClose,
       caption: "A sales director rebuilds her Monday morning around Copilot.",
       context: "Role-specific session, executive cohort",
     },
     {
       id: "approach-2",
-      src: null,
+      src: videos.presenting,
       caption: "Engineers stress-test a prompt pattern they will ship next week.",
       context: "Technical training, scenario-led",
     },
     {
       id: "approach-3",
-      src: null,
+      src: videos.detail,
       caption: "Adoption clinic at the 30-day mark. Habits, not headlines.",
       context: "Follow-up clinic, 30 / 60 / 90",
     },
     {
       id: "approach-4",
-      src: null,
+      src: videos.facesClose,
       caption: "A field engineer dictates a service report between jobs.",
       context: "Real workflow, real device",
     },
     {
       id: "approach-5",
-      src: null,
+      src: videos.presenting,
       caption: "Leadership reviews the adoption numbers, in the room.",
       context: "Measurement session, exec sponsor",
     },
   ] satisfies MediaClip[],
 
-  // Case study scene on /session
+  // Case study scene on /session — interview to follow.
   caseStudy: {
     id: "case-study",
     src: null,
@@ -83,21 +85,27 @@ export const media = {
 
   // Cinematic scenes used on /room
   roomScenes: {
+    room: {
+      id: "scene-room",
+      src: videos.heroWide,
+      caption: "Wide of the room",
+      context: "Scene 1 · Establishing shot",
+    },
     problem: {
       id: "scene-problem",
-      src: null,
+      src: videos.presenting,
       caption: "Every team has the tools.",
       context: "Scene 2 · The problem the room is solving",
     },
     breakthrough: {
       id: "scene-breakthrough",
-      src: null,
+      src: videos.facesClose,
       caption: "The moment a workflow tilts.",
       context: "Scene 3 · Breakthrough",
     },
     result: {
       id: "scene-result",
-      src: null,
+      src: videos.detail,
       caption: "Eight weeks later.",
       context: "Scene 4 · Result",
     },

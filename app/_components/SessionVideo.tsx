@@ -73,6 +73,19 @@ export function SessionVideo({
       ref={wrapRef}
       className={`relative overflow-hidden bg-[#0b0a08] text-[#f4ede0] ${aspect} ${className}`}
     >
+      {clip.poster && !errored && (
+        // Eager <img> poster shows a frame instantly, even before the
+        // <video> element mounts (lazy variants) or finishes its initial
+        // request. The video, once playing, paints over it.
+        <img
+          src={clip.poster}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+        />
+      )}
       {showVideo ? (
         <video
           ref={videoRef}
@@ -81,14 +94,14 @@ export function SessionVideo({
           muted={muted}
           loop
           playsInline
-          preload="metadata"
+          preload={eager ? "auto" : "metadata"}
           poster={clip.poster}
           onError={() => setErrored(true)}
           className="absolute inset-0 h-full w-full object-cover"
         />
-      ) : (
+      ) : !clip.src || errored ? (
         <Placeholder label={labelText} variant={variant} />
-      )}
+      ) : null}
 
       {/* Darkening over the hero video for legibility of overlay content. */}
       {showVideo && variant === "hero" && (

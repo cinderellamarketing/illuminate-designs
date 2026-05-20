@@ -104,7 +104,7 @@ function Hero() {
             opacity: numberOpacity,
             y: numberY,
           }}
-          className="pointer-events-none absolute inset-0 z-10 flex items-end justify-center pb-[12vh]"
+          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-end pb-[12vh]"
         >
           <div
             className="font-display text-center leading-[0.78] tracking-tight"
@@ -117,6 +117,13 @@ function Hero() {
           >
             {headlineNumber.value}
           </div>
+          <p
+            className="font-display mt-6 max-w-2xl px-6 text-center text-2xl italic leading-[1.15] text-white md:text-3xl"
+            style={{ textShadow: "0 2px 30px rgba(0,0,0,0.6)" }}
+          >
+            Copilot adoption in eight weeks. The industry average sits around
+            30%.
+          </p>
         </motion.div>
 
         {/* Scroll cue */}

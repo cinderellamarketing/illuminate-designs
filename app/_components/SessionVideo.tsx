@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { MediaClip } from "@/lib/media";
 
-type Variant = "hero" | "scene" | "reel" | "portrait";
+type Variant = "hero" | "scene" | "reel" | "portrait" | "fill";
 
 type SessionVideoProps = {
   clip: MediaClip;
@@ -64,7 +64,7 @@ export function SessionVideo({
         ? "aspect-[4/3]"
         : variant === "scene"
           ? "aspect-[16/9]"
-          : ""; // hero: parent controls sizing
+          : ""; // hero / fill: parent controls sizing
 
   const labelText = label ?? "Session footage to follow";
 
@@ -97,6 +97,9 @@ export function SessionVideo({
           preload={eager ? "auto" : "metadata"}
           poster={clip.poster}
           onError={() => setErrored(true)}
+          disablePictureInPicture
+          disableRemotePlayback
+          controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : !clip.src || errored ? (

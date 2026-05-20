@@ -42,13 +42,13 @@ export function RoomPage() {
 function EmergingNav({ visible }: { visible: boolean }) {
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-40 border-b border-[#f4ede0]/10 bg-[#0a0907]/80 backdrop-blur-md transition-all duration-500 supports-[backdrop-filter]:bg-[#0a0907]/65 ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none -translate-y-2 opacity-0"
       }`}
     >
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-5 md:px-10">
+      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4 md:px-10 md:py-5">
         <Link
           href="/"
           className="font-display text-xl italic tracking-tight text-[#f4ede0]"
@@ -57,7 +57,7 @@ function EmergingNav({ visible }: { visible: boolean }) {
         </Link>
         <a
           href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-          className="font-ui inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] backdrop-blur transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
+          className="font-ui inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
         >
           Book a session
         </a>
@@ -73,13 +73,14 @@ function Hero() {
     offset: ["start start", "end start"],
   });
   // Number stays small initially, then enlarges and lifts as you arrive.
-  const numberScale = useTransform(scrollYProgress, [0, 0.35], [0.85, 1]);
+  const numberScale = useTransform(scrollYProgress, [0, 0.35], [0.9, 1]);
   const numberOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85], [0, 1, 1]);
-  const numberY = useTransform(scrollYProgress, [0, 1], [40, -120]);
+  // Gentle parallax that never lifts the number out of the viewport.
+  const numberY = useTransform(scrollYProgress, [0, 1], [20, -40]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
-    <section ref={ref} className="relative h-[140svh] w-full bg-black">
+    <section ref={ref} className="relative h-[140svh] w-full bg-[#0a0907]">
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <SessionVideo
           clip={media.roomHero}
@@ -99,20 +100,22 @@ function Hero() {
         </div>
 
         {/* The 82% reveal — appears via motion as you arrive.
-            Non-interactive so the unmute control underneath stays clickable. */}
+            Non-interactive so the unmute control underneath stays clickable.
+            Centred vertically and sized off both vw and vh so the whole
+            number always fits within the visible area. */}
         <motion.div
           style={{
             scale: numberScale,
             opacity: numberOpacity,
             y: numberY,
           }}
-          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-end pb-[12vh]"
+          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
         >
           <div
-            className="font-display text-center leading-[0.78] tracking-tight"
+            className="font-display text-center leading-[0.82] tracking-tight"
             style={{
               color: "#f55e09",
-              fontSize: "clamp(10rem, 32vw, 32rem)",
+              fontSize: "min(26vw, 44svh)",
               fontVariationSettings: '"opsz" 144',
               textShadow: "0 4px 60px rgba(0,0,0,0.55)",
             }}
@@ -120,7 +123,7 @@ function Hero() {
             {headlineNumber.value}
           </div>
           <p
-            className="font-display mt-6 max-w-2xl px-6 text-center text-2xl italic leading-[1.15] text-white md:text-3xl"
+            className="font-display mt-6 max-w-xl px-2 text-center text-lg italic leading-[1.2] text-white md:text-xl"
             style={{ textShadow: "0 2px 30px rgba(0,0,0,0.6)" }}
           >
             Copilot adoption in eight weeks. The industry average sits around
@@ -150,24 +153,28 @@ function SceneRoom() {
       eyebrow={scene.eyebrow}
       kicker="You did not arrive at the start."
     >
-      <Statement>
-        {scene.title.split(". ").map((line, i) => (
-          <span key={i} className="block">
-            {line}
-            {i === 0 ? "." : ""}
-          </span>
-        ))}
-      </Statement>
-
-      <Body>{scene.body}</Body>
-
-      <div className="mt-16">
-        <SessionVideo
-          clip={media.roomScenes.room}
-          variant="scene"
-          className="rounded-sm"
-          label="Wide of the room to follow"
-        />
+      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
+        <div className="md:col-span-6">
+          <Statement>
+            {scene.title.split(". ").map((line, i) => (
+              <span key={i} className="block">
+                {line}
+                {i === 0 ? "." : ""}
+              </span>
+            ))}
+          </Statement>
+          <Body className="mt-6">{scene.body}</Body>
+        </div>
+        <div className="md:col-span-6">
+          <SceneVideoFrame>
+            <SessionVideo
+              clip={media.roomScenes.room}
+              variant="fill"
+              className="h-full w-full"
+              label="Wide of the room to follow"
+            />
+          </SceneVideoFrame>
+        </div>
       </div>
     </Scene>
   );
@@ -176,21 +183,27 @@ function SceneRoom() {
 function SceneProblem() {
   const scene = roomScenes[1];
   return (
-    <Scene eyebrow={scene.eyebrow} dark>
-      <Statement size="xl">
-        <span className="block text-[#f4ede0]">Every team has the tools.</span>
-        <span className="block italic text-[#f55e09]">
-          Far fewer have the skills.
-        </span>
-      </Statement>
-      <Body>{scene.body}</Body>
-      <div className="mt-16">
-        <SessionVideo
-          clip={media.roomScenes.problem}
-          variant="scene"
-          className="rounded-sm"
-          label="The problem in the room"
-        />
+    <Scene eyebrow={scene.eyebrow}>
+      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
+        <div className="md:col-span-6">
+          <Statement size="xl">
+            <span className="block text-[#f4ede0]">Every team has the tools.</span>
+            <span className="block italic text-[#f55e09]">
+              Far fewer have the skills.
+            </span>
+          </Statement>
+          <Body className="mt-6">{scene.body}</Body>
+        </div>
+        <div className="md:col-span-6">
+          <SceneVideoFrame>
+            <SessionVideo
+              clip={media.roomScenes.problem}
+              variant="fill"
+              className="h-full w-full"
+              label="The problem in the room"
+            />
+          </SceneVideoFrame>
+        </div>
       </div>
     </Scene>
   );
@@ -200,22 +213,24 @@ function SceneBreakthrough() {
   const scene = roomScenes[2];
   return (
     <Scene eyebrow={scene.eyebrow}>
-      <div className="grid items-start gap-12 md:grid-cols-12">
+      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-5">
           <Statement size="lg">
             <span className="block">A workflow</span>
             <span className="block italic text-[#f9a71d]">tilts.</span>
           </Statement>
-          <Body className="mt-8">{scene.body}</Body>
+          <Body className="mt-6">{scene.body}</Body>
         </div>
         <div className="md:col-span-7">
-          <SessionVideo
-            clip={media.roomScenes.breakthrough}
-            variant="scene"
-            className="rounded-sm"
-            label="Breakthrough moment to follow"
-          />
-          <p className="font-ui mt-4 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
+          <SceneVideoFrame>
+            <SessionVideo
+              clip={media.roomScenes.breakthrough}
+              variant="fill"
+              className="h-full w-full"
+              label="Breakthrough moment to follow"
+            />
+          </SceneVideoFrame>
+          <p className="font-ui mt-3 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
             Recorded in the room. Names withheld until clients clear release.
           </p>
         </div>
@@ -230,65 +245,69 @@ function SceneResult() {
     target: ref,
     offset: ["start 80%", "end start"],
   });
-  const numberScale = useTransform(scrollYProgress, [0, 0.4], [0.7, 1]);
-  const numberY = useTransform(scrollYProgress, [0, 0.5], [60, 0]);
+  const numberScale = useTransform(scrollYProgress, [0, 0.4], [0.8, 1]);
+  const numberY = useTransform(scrollYProgress, [0, 0.5], [40, 0]);
   const numberOpacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
 
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden border-t border-[#f4ede0]/10 bg-[#0a0907] py-32 md:py-44"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-[#0a0907] py-14 md:py-16"
     >
-      <div className="mx-auto max-w-[1500px] px-6 md:px-10">
-        <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
-          {roomScenes[3].eyebrow}
-        </p>
-        <p className="font-display mt-6 max-w-[20ch] text-3xl italic leading-[1.05] text-[#f4ede0] md:text-5xl">
-          Eight weeks later.
-        </p>
-
-        <motion.div
-          style={{
-            scale: numberScale,
-            y: numberY,
-            opacity: numberOpacity,
-          }}
-          className="mt-12"
-        >
-          <div
-            className="font-display leading-[0.78] tracking-tight"
-            style={{
-              color: "#f55e09",
-              fontSize: "clamp(10rem, 34vw, 34rem)",
-              fontVariationSettings: '"opsz" 144',
-            }}
-          >
-            {headlineNumber.value}
-          </div>
-        </motion.div>
-
-        <div className="mt-10 grid gap-10 md:grid-cols-12">
-          <p className="font-serif-text md:col-span-5 text-2xl italic leading-[1.25] text-[#f4ede0]">
-            Copilot adoption across the cohort. Industry norm sits closer to
-            thirty.
-          </p>
-          <blockquote className="font-serif-text md:col-span-7 md:col-start-7 text-xl leading-[1.4] text-[#f4ede0]/85">
-            <span className="text-[#f55e09]">&ldquo;</span>
-            {caseStudy.quote}
-            <span className="text-[#f55e09]">&rdquo;</span>
-            <footer className="font-ui mt-4 text-[11px] uppercase not-italic tracking-[0.22em] text-[#f4ede0]/55">
-              {caseStudy.attribution}
-            </footer>
-          </blockquote>
+      <div className="mx-auto w-full max-w-[1500px] px-6 md:px-10">
+        <div className="flex items-baseline gap-6">
+          <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
+            {roomScenes[3].eyebrow}
+          </span>
+          <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/45">
+            Eight weeks later.
+          </span>
         </div>
 
-        <div className="mt-16">
-          <SessionVideo
-            clip={media.roomScenes.result}
-            variant="scene"
-            className="rounded-sm"
-            label="Eight weeks later"
-          />
+        <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-12 md:gap-12">
+          <div className="md:col-span-6">
+            <motion.div
+              style={{
+                scale: numberScale,
+                y: numberY,
+                opacity: numberOpacity,
+              }}
+            >
+              <div
+                className="font-display leading-[0.85] tracking-tight"
+                style={{
+                  color: "#f55e09",
+                  fontSize: "min(22vw, 38svh)",
+                  fontVariationSettings: '"opsz" 144',
+                }}
+              >
+                {headlineNumber.value}
+              </div>
+            </motion.div>
+            <p className="font-serif-text mt-5 max-w-[36ch] text-base italic leading-[1.35] text-[#f4ede0] md:text-lg">
+              Copilot adoption across the cohort. Industry norm sits closer to
+              thirty.
+            </p>
+          </div>
+
+          <div className="md:col-span-6">
+            <SceneVideoFrame>
+              <SessionVideo
+                clip={media.roomScenes.result}
+                variant="fill"
+                className="h-full w-full"
+                label="Eight weeks later"
+              />
+            </SceneVideoFrame>
+            <blockquote className="font-serif-text mt-5 max-w-[48ch] text-base leading-[1.4] text-[#f4ede0]/85 md:text-lg">
+              <span className="text-[#f55e09]">&ldquo;</span>
+              {caseStudy.quote}
+              <span className="text-[#f55e09]">&rdquo;</span>
+              <footer className="font-ui mt-3 text-[11px] uppercase not-italic tracking-[0.22em] text-[#f4ede0]/55">
+                {caseStudy.attribution}
+              </footer>
+            </blockquote>
+          </div>
         </div>
       </div>
     </section>
@@ -301,47 +320,46 @@ function SceneInvitation() {
     target: ref,
     offset: ["start end", "end end"],
   });
-  const lift = useTransform(scrollYProgress, [0, 1], [60, 0]);
+  const lift = useTransform(scrollYProgress, [0, 1], [40, 0]);
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden bg-[#f4ede0] py-32 text-[#0b0a08] md:py-44"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-[#f4ede0] py-14 text-[#0b0a08] md:py-16"
     >
-      <div className="mx-auto max-w-[1500px] px-6 md:px-10">
+      <div className="mx-auto w-full max-w-[1500px] px-6 md:px-10">
         <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#0b0a08]/55">
           {roomScenes[4].eyebrow}
         </p>
         <motion.div style={{ y: lift }}>
           <h2
-            className="font-display mt-6 leading-[0.92] tracking-tight"
-            style={{ fontSize: "clamp(3.5rem, 10vw, 11rem)" }}
+            className="font-display mt-5 leading-[0.95] tracking-tight"
+            style={{ fontSize: "clamp(2.5rem, 7vw, 6.5rem)" }}
           >
             <span className="block">Come and</span>
             <span className="block italic text-[#f55e09]">sit in.</span>
           </h2>
         </motion.div>
 
-        <p className="font-serif-text mt-10 max-w-[44ch] text-2xl italic leading-[1.25] text-[#0b0a08]/85">
+        <p className="font-serif-text mt-6 max-w-[44ch] text-lg italic leading-[1.3] text-[#0b0a08]/85 md:text-xl">
           We run cohorts continuously. The next session has space, and the one
           after will not.
         </p>
 
-        <div className="mt-12 flex flex-wrap items-center gap-6">
+        <div className="mt-8 flex flex-wrap items-center gap-6">
           <a
             href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-            className="inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-8 py-4 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+            className="inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
           >
             Book a session
             <span aria-hidden>→</span>
           </a>
           <a
             href={`mailto:${company.email}`}
-            className="font-serif-text text-2xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
+            className="font-serif-text text-xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
           >
             {company.email}
           </a>
         </div>
-
       </div>
     </section>
   );
@@ -376,12 +394,10 @@ function Scene({
   eyebrow,
   kicker,
   children,
-  dark = false,
 }: {
   eyebrow: string;
   kicker?: string;
   children: React.ReactNode;
-  dark?: boolean;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
@@ -394,13 +410,11 @@ function Scene({
   return (
     <section
       ref={ref}
-      className={`relative overflow-hidden py-32 md:py-44 ${
-        dark ? "bg-black" : "bg-[#0a0907]"
-      } text-[#f4ede0]`}
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-[#0a0907] py-14 text-[#f4ede0] md:py-16"
     >
       <motion.div
         style={{ opacity, y }}
-        className="mx-auto max-w-[1500px] px-6 md:px-10"
+        className="mx-auto w-full max-w-[1500px] px-6 md:px-10"
       >
         <div className="flex items-baseline gap-6">
           <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
@@ -412,7 +426,7 @@ function Scene({
             </span>
           )}
         </div>
-        <div className="mt-10">{children}</div>
+        <div className="mt-6 md:mt-8">{children}</div>
       </motion.div>
     </section>
   );
@@ -427,13 +441,13 @@ function Statement({
 }) {
   const fontSize =
     size === "xl"
-      ? "clamp(4rem, 12vw, 12rem)"
+      ? "clamp(2.25rem, 5.5vw, 4.75rem)"
       : size === "lg"
-        ? "clamp(3rem, 9vw, 8rem)"
-        : "clamp(2.5rem, 7vw, 6.5rem)";
+        ? "clamp(2rem, 4.8vw, 4rem)"
+        : "clamp(1.75rem, 4vw, 3.25rem)";
   return (
     <h2
-      className="font-display leading-[0.9] tracking-tight"
+      className="font-display leading-[0.95] tracking-tight"
       style={{ fontSize, fontVariationSettings: '"opsz" 144' }}
     >
       {children}
@@ -450,9 +464,27 @@ function Body({
 }) {
   return (
     <p
-      className={`font-serif-text max-w-[48ch] text-xl italic leading-[1.35] text-[#f4ede0]/85 md:text-2xl ${className}`}
+      className={`font-serif-text max-w-[48ch] text-base italic leading-[1.4] text-[#f4ede0]/85 md:text-lg ${className}`}
     >
       {children}
     </p>
+  );
+}
+
+// Wrapper that constrains a scene video so it never escapes the 100dvh frame.
+// Fixed 16/9 ratio with a viewport-height cap; the video covers within.
+// max-width keeps the aspect ratio honoured even when the height cap is binding.
+function SceneVideoFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="relative mx-auto overflow-hidden rounded-sm"
+      style={{
+        aspectRatio: "16 / 9",
+        width: "100%",
+        maxWidth: "calc(42svh * 16 / 9)",
+      }}
+    >
+      {children}
+    </div>
   );
 }

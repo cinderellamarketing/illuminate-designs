@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
 import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
@@ -34,18 +34,18 @@ export function SessionPage() {
 
 function Nav() {
   return (
-    <header className="fixed inset-x-0 top-0 z-40">
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5 md:px-10 md:py-6">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-ink/10 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4 md:px-10 md:py-5">
         <Link
           href="/"
-          className="font-display text-2xl italic tracking-tight text-white mix-blend-difference"
+          className="font-display text-2xl italic tracking-tight text-ink"
         >
           Illuminate
         </Link>
-        <nav className="hidden items-center gap-9 text-[12px] uppercase tracking-[0.18em] text-white mix-blend-difference md:flex">
-          <a href="#approach">Approach</a>
-          <a href="#case-study">Proof</a>
-          <a href="#team">Team</a>
+        <nav className="hidden items-center gap-9 text-[12px] uppercase tracking-[0.18em] text-ink/75 md:flex">
+          <a href="#approach" className="hover:text-[#f55e09]">Approach</a>
+          <a href="#case-study" className="hover:text-[#f55e09]">Proof</a>
+          <a href="#team" className="hover:text-[#f55e09]">Team</a>
         </nav>
         <a
           href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
@@ -74,29 +74,16 @@ function Hero() {
           only the actual CTAs opt back in. */}
       <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-6 pb-14 md:px-10 md:pb-20">
         <div className="max-w-[1400px] mx-auto w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
-            className="flex items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-white/80"
-          >
-            <span
-              aria-hidden
-              className="inline-block h-1.5 w-1.5 rounded-full bg-[#f9a71d]"
-            />
-            Live · Cohort in session
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, ease: [0.2, 0.7, 0.2, 1], delay: 0.1 }}
-            className="font-display mt-6 flex items-baseline gap-6 text-white"
+            className="font-display flex items-baseline gap-6 text-white"
           >
             <span
               className="block leading-[0.78] tracking-tight"
               style={{
-                fontSize: "clamp(8rem, 26vw, 24rem)",
+                fontSize: "clamp(5rem, 16vw, 14rem)",
                 fontVariationSettings: '"opsz" 144',
                 color: "#f55e09",
               }}
@@ -109,7 +96,7 @@ function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.5 }}
-            className="font-display mt-4 max-w-2xl text-2xl italic leading-[1.15] text-white md:text-3xl"
+            className="font-display mt-4 max-w-xl text-lg italic leading-[1.2] text-white md:text-xl"
           >
             Copilot adoption in eight weeks. The industry norm sits closer to
             thirty.
@@ -199,6 +186,57 @@ function Problem() {
 
 function Approach() {
   const reel = media.approachReel;
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+  const [showHint, setShowHint] = useState(true);
+
+  // Subtle initial nudge so users see the reel scrolls sideways.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced) return;
+    const t1 = window.setTimeout(() => {
+      el.scrollTo({ left: 64, behavior: "smooth" });
+    }, 1200);
+    const t2 = window.setTimeout(() => {
+      el.scrollTo({ left: 0, behavior: "smooth" });
+    }, 2100);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setAtStart(el.scrollLeft <= 4);
+      setAtEnd(el.scrollLeft >= max - 4);
+      if (el.scrollLeft > 8) setShowHint(false);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const scrollByCard = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>("[data-reel-card]");
+    const step = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+
   return (
     <section id="approach" className="relative bg-ink py-24 text-paper md:py-32">
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
@@ -215,47 +253,112 @@ function Approach() {
               <em className="text-[#f9a71d]">It sticks.</em>
             </h2>
           </div>
-          <p className="hidden max-w-[28ch] text-sm leading-[1.55] text-paper/65 md:block">
-            We do not write generic decks. Every cohort sees its own workflow on
-            screen, in the room. Scroll through a session.
-          </p>
+          <div className="hidden max-w-[28ch] md:block">
+            <p className="text-sm leading-[1.55] text-paper/65">
+              We do not write generic decks. Every cohort sees its own workflow
+              on screen, in the room.
+            </p>
+            <div className="mt-5 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => scrollByCard(-1)}
+                disabled={atStart}
+                aria-label="Previous moment"
+                className="font-ui inline-flex h-10 w-10 items-center justify-center rounded-full border border-paper/25 text-paper transition hover:border-[#f9a71d] hover:text-[#f9a71d] disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <span aria-hidden>←</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCard(1)}
+                disabled={atEnd}
+                aria-label="Next moment"
+                className="font-ui inline-flex h-10 w-10 items-center justify-center rounded-full border border-paper/25 text-paper transition hover:border-[#f9a71d] hover:text-[#f9a71d] disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <span aria-hidden>→</span>
+              </button>
+              <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
+                Scroll through a session
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Horizontal scroll of session moments */}
-      <div className="mt-14 overflow-x-auto pb-6 [scrollbar-width:thin]">
-        <div className="flex gap-5 px-6 md:px-10">
-          {reel.map((clip, i) => {
-            const moment = approachMoments[i % approachMoments.length];
-            return (
-              <article
-                key={clip.id}
-                className="w-[78vw] shrink-0 sm:w-[460px] md:w-[520px]"
-              >
-                <SessionVideo
-                  clip={clip}
-                  variant="reel"
-                  className="rounded-sm"
-                />
-                <div className="mt-4 flex items-baseline gap-3">
-                  <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
-                    0{i + 1}
-                  </span>
-                  <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
-                    {moment.eyebrow}
-                  </span>
-                </div>
-                <p className="font-serif-text mt-2 max-w-[36ch] text-lg leading-[1.4] text-paper">
-                  {clip.caption}
-                </p>
-                <p className="mt-2 max-w-[36ch] text-sm leading-[1.55] text-paper/65">
-                  {moment.body}
-                </p>
-              </article>
-            );
-          })}
-          <div className="w-6 shrink-0 md:w-10" aria-hidden />
+      <div className="relative mt-14">
+        <div
+          ref={scrollerRef}
+          className="overflow-x-auto pb-6 [scrollbar-width:thin]"
+        >
+          <div className="flex gap-5 px-6 md:px-10">
+            {reel.map((clip, i) => {
+              const moment = approachMoments[i % approachMoments.length];
+              return (
+                <article
+                  key={clip.id}
+                  data-reel-card
+                  className="w-[78vw] shrink-0 sm:w-[460px] md:w-[520px]"
+                >
+                  <SessionVideo
+                    clip={clip}
+                    variant="reel"
+                    className="rounded-sm"
+                  />
+                  <div className="mt-4 flex items-baseline gap-3">
+                    <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
+                      0{i + 1}
+                    </span>
+                    <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
+                      {moment.eyebrow}
+                    </span>
+                  </div>
+                  <p className="font-serif-text mt-2 max-w-[36ch] text-lg leading-[1.4] text-paper">
+                    {clip.caption}
+                  </p>
+                  <p className="mt-2 max-w-[36ch] text-sm leading-[1.55] text-paper/65">
+                    {moment.body}
+                  </p>
+                </article>
+              );
+            })}
+            <div className="w-6 shrink-0 md:w-10" aria-hidden />
+          </div>
         </div>
+
+        {/* Fade on the right so it's visually clear more is hiding offscreen. */}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink to-transparent transition-opacity duration-300 md:w-40 ${
+            atEnd ? "opacity-0" : "opacity-100"
+          }`}
+        />
+
+        {/* Mobile / floating affordance — also visible on desktop as a nudge. */}
+        <motion.button
+          type="button"
+          onClick={() => scrollByCard(1)}
+          aria-label="Next moment"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: atEnd ? 0 : 1 }}
+          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 md:right-8"
+        >
+          <motion.span
+            animate={
+              showHint
+                ? { x: [0, 10, 0] }
+                : { x: 0 }
+            }
+            transition={
+              showHint
+                ? { repeat: Infinity, duration: 1.6, ease: "easeInOut" }
+                : { duration: 0.2 }
+            }
+            className="font-ui inline-flex h-12 w-12 items-center justify-center rounded-full border border-paper/30 bg-ink/70 text-paper backdrop-blur transition hover:border-[#f9a71d] hover:text-[#f9a71d]"
+          >
+            <span aria-hidden className="text-lg">→</span>
+          </motion.span>
+        </motion.button>
       </div>
     </section>
   );

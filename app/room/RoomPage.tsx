@@ -9,6 +9,7 @@ import {
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
+import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
 import { media } from "@/lib/media";
 import {
   caseStudy,
@@ -33,6 +34,7 @@ export function RoomPage() {
       <SceneBreakthrough />
       <SceneResult />
       <SceneInvitation />
+      <RoomFooter />
     </main>
   );
 }
@@ -340,17 +342,31 @@ function SceneInvitation() {
           </a>
         </div>
 
-        <div className="mt-24 flex flex-wrap items-baseline justify-between gap-4 border-t border-[#0b0a08]/15 pt-8 text-[11px] uppercase tracking-[0.22em] text-[#0b0a08]/55">
-          <span className="font-display text-xl not-italic tracking-tight text-[#0b0a08]">
+      </div>
+    </section>
+  );
+}
+
+function RoomFooter() {
+  return (
+    <footer>
+      <div className="bg-[#0b0a08]">
+        <div className="mx-auto max-w-[1500px] px-6 pt-20 pb-10 md:px-10 md:pt-24 md:pb-14">
+          <StudioSpotlight />
+        </div>
+      </div>
+      <div className="bg-[#0a0907]">
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-baseline justify-between gap-4 border-t border-[#f4ede0]/10 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55 md:px-10">
+          <span className="font-display text-xl not-italic tracking-tight text-[#f4ede0]">
             Illuminate Learning
           </span>
-          <span>Pembrokeshire</span>
+          <span>Pembrokeshire · {company.email}</span>
           <Link href="/session" className="hover:text-[#f55e09]">
             Conventional version: /session
           </Link>
         </div>
       </div>
-    </section>
+    </footer>
   );
 }
 

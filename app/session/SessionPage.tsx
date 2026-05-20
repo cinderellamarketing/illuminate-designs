@@ -4,6 +4,7 @@ import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
+import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
 import { media } from "@/lib/media";
 import {
   approachMoments,
@@ -430,17 +431,24 @@ function ClosingCTA() {
 
 function Footer() {
   return (
-    <footer className="bg-paper">
-      <div className="mx-auto flex max-w-[1400px] flex-wrap items-baseline justify-between gap-4 border-t border-ink/15 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-ink/55 md:px-10">
-        <span className="font-display text-xl not-italic tracking-tight text-ink">
-          Illuminate Learning
-        </span>
-        <span>Pembrokeshire · {company.email}</span>
-        <span>
-          <Link href="/room" className="text-ink/55 hover:text-[#f55e09]">
-            Cinematic version: /room
-          </Link>
-        </span>
+    <footer>
+      <div className="bg-[#0b0a08]">
+        <div className="mx-auto max-w-[1500px] px-6 pt-20 pb-10 md:px-10 md:pt-24 md:pb-14">
+          <StudioSpotlight />
+        </div>
+      </div>
+      <div className="bg-paper">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-baseline justify-between gap-4 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-ink/55 md:px-10">
+          <span className="font-display text-xl not-italic tracking-tight text-ink">
+            Illuminate Learning
+          </span>
+          <span>Pembrokeshire · {company.email}</span>
+          <span>
+            <Link href="/room" className="text-ink/55 hover:text-[#f55e09]">
+              Cinematic version: /room
+            </Link>
+          </span>
+        </div>
       </div>
     </footer>
   );

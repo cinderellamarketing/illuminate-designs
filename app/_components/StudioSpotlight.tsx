@@ -41,7 +41,7 @@ export function StudioSpotlight() {
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
       className="relative w-full select-none overflow-hidden"
-      style={{ "--mx": "50%", "--my": "50%" } as React.CSSProperties}
+      style={{ "--mx": "-9999px", "--my": "-9999px" } as React.CSSProperties}
     >
       <div
         aria-hidden

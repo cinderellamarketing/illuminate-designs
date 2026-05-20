@@ -1,25 +1,18 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand */
   --color-brand-orange: #f55e09;
   --color-brand-amber: #f9a71d;
 
-  --color-paper-editorial: #f6efe2;
-  --color-ink-editorial: #15110d;
+  /* Base canvas: warm off-white and near-black */
+  --color-paper: #f4ede0;
+  --color-ink: #0b0a08;
+  --color-ink-soft: #15110d;
 
-  --color-paper-studio: #f4ede0;
-  --color-obsidian-studio: #0c0a08;
-
-  --color-cinema-bg: #050505;
-  --color-cinema-warm: #f5f0e8;
-  --color-cinema-dim: #2a2622;
-
-  --font-fraunces: var(--font-fraunces);
-  --font-public-sans: var(--font-public-sans);
-  --font-bricolage: var(--font-bricolage);
-  --font-instrument: var(--font-instrument);
-  --font-plex-mono: var(--font-plex-mono);
-  --font-plex-sans: var(--font-plex-sans);
+  /* Fonts */
+  --font-newsreader: var(--font-newsreader);
+  --font-hanken: var(--font-hanken);
 }
 
 @layer base {
@@ -31,6 +24,9 @@
   body {
     margin: 0;
     padding: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-hanken), system-ui, sans-serif;
   }
 
   body {
@@ -45,43 +41,36 @@
   }
 }
 
-/* Editorial paper grain — subtle SVG noise */
-.paper-grain {
+/* Display optical sizing for Newsreader at large sizes. */
+.font-display {
+  font-family: var(--font-newsreader), "Times New Roman", serif;
+  font-variation-settings: "opsz" 144;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -0.012em;
+}
+
+.font-serif-text {
+  font-family: var(--font-newsreader), "Times New Roman", serif;
+  font-variation-settings: "opsz" 18;
+}
+
+.font-ui {
+  font-family: var(--font-hanken), system-ui, sans-serif;
+}
+
+/* Subtle film grain for cinematic placeholders. */
+.film-grain {
   position: relative;
 }
-.paper-grain::before {
+.film-grain::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08, 0 0 0 0 0.07, 0 0 0 0 0.05, 0 0 0 0.22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-size: 240px 240px;
-}
-
-/* Studio mono-marquee */
-@keyframes marquee {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-.marquee-track {
-  animation: marquee 28s linear infinite;
-}
-.marquee-track[data-paused="true"] {
-  animation-play-state: paused;
-}
-
-/* Cinema body text: dim by default, revealed by spotlight mask */
-.cinema-mask {
-  -webkit-mask-image: var(--cinema-mask, none);
-  mask-image: var(--cinema-mask, none);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1, 0 0 0 0 1, 0 0 0 0 1, 0 0 0 0.22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 320px 320px;
 }
 
 @media (prefers-reduced-motion: reduce) {

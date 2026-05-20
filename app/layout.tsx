@@ -9,12 +9,12 @@ export const metadata: Metadata = {
     template: "%s · Illuminate Learning",
   },
   description:
-    "Illuminate Learning trains teams on Microsoft Copilot and AI tools. Role-specific programmes that change behaviour, not just attendance.",
+    "You are in the room. Illuminate Learning runs role-specific Microsoft Copilot training that gets teams to 82% adoption.",
   keywords: [
     "Microsoft Copilot training",
     "AI adoption",
     "sales enablement",
-    "MSP training",
+    "Pembrokeshire",
     "Illuminate Learning",
   ],
   authors: [{ name: "Illuminate Learning" }],
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
     locale: "en_GB",
     title: "Illuminate Learning — Microsoft Copilot training that sticks",
     description:
-      "Role-specific Copilot and AI programmes for sales, technical and adoption teams.",
+      "You are in the room. Role-specific Copilot training, 82% adoption versus an industry norm of 30%.",
     siteName: "Illuminate Learning",
   },
   twitter: {
     card: "summary_large_image",
     title: "Illuminate Learning",
     description:
-      "Microsoft Copilot training that changes behaviour, not just attendance.",
+      "You are in the room. Microsoft Copilot training that gets teams to 82% adoption.",
   },
   robots: { index: true, follow: true },
 };

@@ -1,202 +1,101 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { company, headlineNumber } from "@/lib/copy";
 
 export const metadata: Metadata = {
-  title: "Three design directions",
+  title: "Two directions — in the room",
   description:
-    "Three homepage directions for Illuminate Learning. Pick the one that fits the brand voice.",
+    "Two concept directions for Illuminate Learning's homepage, both built around the idea of stepping into a live training session.",
 };
 
-const variants = [
+const directions = [
   {
-    href: "/editorial",
-    label: "Editorial",
-    tag: "Pentagram × Monocle",
+    href: "/session",
+    label: "/session",
+    title: "In the room",
     summary:
-      "Refined editorial. Asymmetric grids on cream paper, restrained motion, an oversized italic Fraunces voice.",
-    palette: ["#f6efe2", "#15110d", "#f55e09"],
-    font: "var(--font-fraunces)",
-    bg: "#f6efe2",
-    ink: "#15110d",
+      "Recognisably a website. Clear nav, a persistent booking CTA, footage doing the heavy lifting.",
+    role: "Distinctive but converts",
   },
   {
-    href: "/studio",
-    label: "Studio",
-    tag: "Linear × Stripe",
+    href: "/room",
+    label: "/room",
+    title: "The room",
     summary:
-      "Modern studio. Mixed cream and obsidian sections, a blend-mode cursor, magnetic CTAs, a hero spotlight.",
-    palette: ["#f4ede0", "#0c0a08", "#f55e09"],
-    font: "var(--font-bricolage)",
-    bg: "#0c0a08",
-    ink: "#f4ede0",
-  },
-  {
-    href: "/cinema",
-    label: "Cinema",
-    tag: "Agency portfolio",
-    summary:
-      "Cinematic. Near-black canvas where a cursor torch reveals the words. Aggressive on purpose.",
-    palette: ["#050505", "#f5f0e8", "#f55e09"],
-    font: "var(--font-instrument)",
-    bg: "#050505",
-    ink: "#f5f0e8",
+      "Less like a website, more like a filmed experience you scroll through. A single session, told as scenes.",
+    role: "Experimental, accepts risk",
   },
 ] as const;
 
 export default function IndexPage() {
   return (
-    <main
-      className="min-h-dvh bg-paper-editorial text-ink-editorial"
-      style={{ fontFamily: "var(--font-public-sans)" }}
-    >
-      <header className="px-6 md:px-10 pt-10 pb-6 flex items-baseline justify-between border-b border-ink-editorial/10">
-        <div className="flex items-baseline gap-3">
-          <span
-            className="text-2xl tracking-tight"
-            style={{
-              fontFamily: "var(--font-fraunces)",
-              fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 1',
-              fontStyle: "italic",
-            }}
-          >
+    <main className="font-ui min-h-dvh bg-paper text-ink">
+      <header className="border-b border-ink/10">
+        <div className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-8 md:px-10 md:py-10">
+          <span className="font-display text-2xl italic tracking-tight">
             Illuminate
           </span>
-          <span className="text-xs uppercase tracking-[0.18em] text-ink-editorial/60">
-            Design study
+          <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
+            Two homepage directions · {company.location}
           </span>
         </div>
-        <span className="text-xs uppercase tracking-[0.18em] text-ink-editorial/60">
-          Three directions
-        </span>
       </header>
 
-      <section className="px-6 md:px-10 pt-16 pb-10 max-w-5xl">
+      <section className="mx-auto max-w-[1400px] px-6 pt-20 pb-12 md:px-10 md:pt-28">
+        <p className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          The organising idea
+        </p>
         <h1
-          className="text-5xl md:text-7xl leading-[0.95] tracking-tight"
-          style={{
-            fontFamily: "var(--font-fraunces)",
-            fontVariationSettings: '"opsz" 144, "SOFT" 70',
-          }}
+          className="font-display mt-6 max-w-[18ch] leading-[0.92] tracking-tight"
+          style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
         >
-          Three homepage directions for{" "}
-          <em
-            className="text-brand-orange"
-            style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 1' }}
-          >
-            Illuminate
-          </em>
-          .
+          You are in the <em className="text-[#f55e09]">room.</em>
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-ink-editorial/70">
-          Same eight sections. Same copy. Three very different voices. The
-          cursor-tracked spotlight wordmark sits in every footer, but it is
-          interpreted differently in each.
+        <p className="font-serif-text mt-10 max-w-[58ch] text-2xl italic leading-[1.3] text-ink/80">
+          Both directions recreate the feeling of sitting in on a live Illuminate
+          training session. Real footage and real faces, the same hero number
+          ({headlineNumber.value} Copilot adoption), interpreted at two
+          different levels of risk.
         </p>
       </section>
 
-      <section className="px-6 md:px-10 pb-24 grid gap-8 md:grid-cols-3">
-        {variants.map((v, i) => (
+      <section className="mx-auto grid max-w-[1400px] gap-0 px-6 pb-32 md:grid-cols-2 md:gap-px md:bg-ink/10 md:px-10">
+        {directions.map((d) => (
           <Link
-            key={v.href}
-            href={v.href}
-            className="group block"
-            aria-label={`Open the ${v.label} variant`}
+            key={d.href}
+            href={d.href}
+            className="group relative block bg-paper p-10 md:p-14 transition-colors hover:bg-ink hover:text-paper"
           >
-            <div
-              className="relative aspect-[4/5] overflow-hidden rounded-sm transition-transform duration-500 group-hover:-translate-y-1"
-              style={{ backgroundColor: v.bg, color: v.ink }}
+            <div className="flex items-baseline justify-between text-[11px] uppercase tracking-[0.22em] text-current/55">
+              <span>{d.label}</span>
+              <span className="text-[#f55e09]">{d.role}</span>
+            </div>
+            <h2
+              className="font-display mt-12 leading-[0.95]"
+              style={{ fontSize: "clamp(2.75rem, 5vw, 4.5rem)" }}
             >
-              {/* Thumbnail composition */}
-              <div
-                className="absolute inset-0 p-6 flex flex-col justify-between"
-                style={{ fontFamily: v.font }}
-              >
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] opacity-70">
-                  <span>0{i + 1}</span>
-                  <span>{v.tag}</span>
-                </div>
-
-                <div className="space-y-3">
-                  <div
-                    className="text-5xl leading-[0.9]"
-                    style={
-                      v.label === "Cinema" || v.label === "Editorial"
-                        ? { fontStyle: "italic" }
-                        : undefined
-                    }
-                  >
-                    {v.label === "Studio" ? (
-                      <span>
-                        Built for the way
-                        <br />
-                        <em
-                          style={{
-                            fontFamily: "var(--font-instrument)",
-                            color: "#f55e09",
-                          }}
-                        >
-                          work
-                        </em>{" "}
-                        happens.
-                      </span>
-                    ) : v.label === "Cinema" ? (
-                      <span style={{ color: v.ink, opacity: 0.18 }}>
-                        Training
-                        <br />
-                        built for
-                        <br />
-                        <span style={{ color: "#f55e09", opacity: 1 }}>
-                          the way
-                        </span>
-                      </span>
-                    ) : (
-                      <span>
-                        Training built
-                        <br />
-                        for the way{" "}
-                        <em style={{ color: "#f55e09" }}>work</em>
-                        <br />
-                        actually happens.
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex gap-1">
-                    {v.palette.map((c) => (
-                      <span
-                        key={c}
-                        className="h-3 w-3 rounded-full border border-black/10"
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-end justify-between">
-                  <p className="text-sm opacity-80 max-w-[18ch]">{v.summary}</p>
-                  <span
-                    className="text-xs uppercase tracking-[0.2em] opacity-80 transition-transform group-hover:translate-x-1"
-                    aria-hidden
-                  >
-                    Open →
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 flex items-baseline justify-between">
-              <span className="text-lg" style={{ fontFamily: v.font }}>
-                /{v.href.replace("/", "")}
+              {d.title}
+            </h2>
+            <p className="font-serif-text mt-6 max-w-[36ch] text-lg italic leading-[1.45]">
+              {d.summary}
+            </p>
+            <span className="font-ui mt-14 inline-flex items-center gap-3 text-[12px] uppercase tracking-[0.22em] text-[#f55e09]">
+              Open
+              <span aria-hidden className="transition-transform group-hover:translate-x-1">
+                →
               </span>
-              <span className="text-xs uppercase tracking-[0.18em] text-ink-editorial/50">
-                {v.tag}
-              </span>
-            </div>
+            </span>
           </Link>
         ))}
       </section>
 
-      <footer className="px-6 md:px-10 py-10 border-t border-ink-editorial/10 flex flex-wrap items-baseline justify-between gap-4 text-xs uppercase tracking-[0.18em] text-ink-editorial/60">
-        <span>Illuminate Learning · Design study · 2026</span>
-        <span>British English throughout</span>
+      <footer className="border-t border-ink/10">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-baseline justify-between gap-4 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-ink/55 md:px-10">
+          <span>{company.name} · {company.location}</span>
+          <a href={`mailto:${company.email}`} className="hover:text-[#f55e09]">
+            {company.email}
+          </a>
+        </div>
       </footer>
     </main>
   );

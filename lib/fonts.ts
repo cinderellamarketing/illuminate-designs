@@ -1,59 +1,20 @@
-import {
-  Fraunces,
-  Public_Sans,
-  Bricolage_Grotesque,
-  Instrument_Serif,
-  IBM_Plex_Mono,
-  IBM_Plex_Sans,
-} from "next/font/google";
+import { Newsreader, Hanken_Grotesk } from "next/font/google";
 
-export const fraunces = Fraunces({
+// Editorial serif for headlines and big statements.
+// Variable axis "opsz" lets us flip into display optical sizing at large sizes.
+export const newsreader = Newsreader({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-newsreader",
   display: "swap",
-  axes: ["opsz", "SOFT", "WONK"],
-});
-
-export const publicSans = Public_Sans({
-  subsets: ["latin"],
-  variable: "--font-public-sans",
-  display: "swap",
-});
-
-export const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-bricolage",
-  display: "swap",
-  axes: ["opsz", "wdth"],
-});
-
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-instrument",
-  display: "swap",
-  weight: "400",
+  axes: ["opsz"],
   style: ["normal", "italic"],
 });
 
-export const ibmPlexMono = IBM_Plex_Mono({
+// Clean modern grotesque for body, labels and UI.
+export const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-plex-mono",
+  variable: "--font-hanken",
   display: "swap",
-  weight: ["400", "500", "600"],
 });
 
-export const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-plex-sans",
-  display: "swap",
-  weight: ["300", "400", "500", "600"],
-});
-
-export const allFontVariables = [
-  fraunces.variable,
-  publicSans.variable,
-  bricolage.variable,
-  instrumentSerif.variable,
-  ibmPlexMono.variable,
-  ibmPlexSans.variable,
-].join(" ");
+export const allFontVariables = [newsreader.variable, hanken.variable].join(" ");

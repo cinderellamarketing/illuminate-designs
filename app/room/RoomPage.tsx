@@ -210,7 +210,7 @@ function SceneRoom() {
           clip={media.roomScenes.room}
           variant="scene"
           className="rounded-sm"
-          label="Wide of the room to follow"
+          label="Wide of the room, give it a sec"
         />
       </div>
     </Scene>
@@ -233,7 +233,7 @@ function SceneProblem() {
           clip={media.roomScenes.problem}
           variant="scene"
           className="rounded-sm"
-          label="The problem in the room"
+          label="The problem, still warming up"
         />
       </div>
     </Scene>
@@ -257,7 +257,7 @@ function SceneBreakthrough() {
             clip={media.roomScenes.breakthrough}
             variant="scene"
             className="rounded-sm"
-            label="Breakthrough moment to follow"
+            label="Breakthrough, mid-rebake"
           />
           <p className="font-ui mt-4 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
             Recorded in the room. Names withheld until clients clear release.
@@ -338,7 +338,7 @@ function SceneResult() {
             clip={media.roomScenes.result}
             variant="scene"
             className="rounded-sm"
-            label="Eight weeks later"
+            label="Eight weeks later, cuppa optional"
           />
         </div>
       </div>

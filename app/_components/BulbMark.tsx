@@ -12,11 +12,13 @@ type BulbMarkProps = {
   onClick?: () => void;
   ariaLabel?: string;
   title?: string;
+  // When true, the bulb renders in its blown state until reset.
+  blown?: boolean;
 };
 
 // Small outlined bulb glyph. Idle flicker fires roughly every 8–12 seconds
-// (skipped under reduced motion). Hovering ignites a warm glow. Used as the
-// nav mark on /session — clicking it opens the LightMaze easter egg.
+// (skipped under reduced motion). Hovering ignites a warm glow. The
+// `blown` prop temporarily renders it dim and lifeless after a pop.
 export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
   function BulbMark(
     {
@@ -26,6 +28,7 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
       onClick,
       ariaLabel,
       title,
+      blown = false,
     },
     ref,
   ) {
@@ -33,7 +36,7 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
     const [flicker, setFlicker] = useState(false);
 
     useEffect(() => {
-      if (reduce) return;
+      if (reduce || blown) return;
       let cancelled = false;
       let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -54,7 +57,7 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
         cancelled = true;
         if (timeout) clearTimeout(timeout);
       };
-    }, [reduce]);
+    }, [reduce, blown]);
 
     const stroke = tone === "ink" ? "#0b0a08" : "#f4ede0";
 
@@ -65,7 +68,9 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden
-        className={`bulb-mark__glyph ${flicker ? "is-flicker" : ""}`}
+        className={`bulb-mark__glyph ${flicker ? "is-flicker" : ""} ${
+          blown ? "is-blown" : ""
+        }`}
         style={{ color: stroke }}
       >
         {/* glass envelope */}
@@ -97,6 +102,16 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
       </svg>
     );
 
+    // Small sparks that scatter when the bulb pops. Pure decoration.
+    const sparks = blown && !reduce ? (
+      <span aria-hidden className="bulb-mark__pop">
+        <span style={{ ["--dx" as string]: "14px", ["--dy" as string]: "-12px" }} />
+        <span style={{ ["--dx" as string]: "-12px", ["--dy" as string]: "-14px", animationDelay: "60ms" }} />
+        <span style={{ ["--dx" as string]: "10px", ["--dy" as string]: "10px", animationDelay: "100ms" }} />
+        <span style={{ ["--dx" as string]: "-13px", ["--dy" as string]: "8px", animationDelay: "140ms" }} />
+      </span>
+    ) : null;
+
     if (onClick) {
       return (
         <button
@@ -108,6 +123,7 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
           className={`bulb-mark bulb-mark--button ${className}`}
         >
           {glyph}
+          {sparks}
         </button>
       );
     }
@@ -118,6 +134,7 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
         className={`bulb-mark ${className}`}
       >
         {glyph}
+        {sparks}
       </span>
     );
   },

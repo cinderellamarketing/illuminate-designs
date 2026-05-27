@@ -6,10 +6,12 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
 import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
+import { LightMaze } from "@/app/_components/LightMaze";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { media } from "@/lib/media";
 import {
   caseStudy,
@@ -18,12 +20,47 @@ import {
   roomScenes,
 } from "@/lib/copy";
 
+const INTRO_KEY = "illuminate_intro_seen";
+
 export function RoomPage() {
   const [navVisible, setNavVisible] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
+  const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
     setNavVisible(latest > 320);
   });
+
+  // Decide whether to show the intro gate. Skipped under reduced motion
+  // and once the visitor has seen it before. State is flipped via a
+  // microtask so we don't trigger a cascading render inside the effect.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let seen = false;
+    try {
+      seen = window.localStorage.getItem(INTRO_KEY) === "1";
+    } catch {
+      // Storage unavailable — treat as seen so the gate never blocks.
+      seen = true;
+    }
+    if (!seen && !reduce) {
+      const handle = setTimeout(() => setGateOpen(true), 0);
+      return () => clearTimeout(handle);
+    }
+    if (!seen && reduce) {
+      // Reduced motion: still mark seen so we don't try again next visit.
+      try {
+        window.localStorage.setItem(INTRO_KEY, "1");
+      } catch {}
+    }
+  }, [reduce]);
+
+  const dismissGate = () => {
+    setGateOpen(false);
+    try {
+      window.localStorage.setItem(INTRO_KEY, "1");
+    } catch {}
+  };
 
   return (
     <main className="font-ui min-h-dvh bg-[#0a0907] text-[#f4ede0]">
@@ -35,6 +72,13 @@ export function RoomPage() {
       <SceneResult />
       <SceneInvitation />
       <RoomFooter />
+      <LightMaze
+        open={gateOpen}
+        onClose={dismissGate}
+        variant="gate"
+        title="Find the workspace."
+        subtitle="Switch the room on. The page is waiting on the other side."
+      />
     </main>
   );
 }
@@ -57,7 +101,7 @@ function EmergingNav({ visible }: { visible: boolean }) {
         </Link>
         <a
           href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-          className="font-ui inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
+          className="font-ui ignite inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
         >
           Book a session
         </a>
@@ -241,6 +285,7 @@ function SceneBreakthrough() {
 
 function SceneResult() {
   const ref = useRef<HTMLDivElement | null>(null);
+  const inner = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 80%", "end start"],
@@ -248,13 +293,19 @@ function SceneResult() {
   const numberScale = useTransform(scrollYProgress, [0, 0.4], [0.8, 1]);
   const numberY = useTransform(scrollYProgress, [0, 0.5], [40, 0]);
   const numberOpacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
+  const lightsOn = useSceneLights(inner);
 
   return (
     <section
       ref={ref}
       className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-[#0a0907] py-14 md:py-16"
     >
-      <div className="mx-auto w-full max-w-[1500px] px-6 md:px-10">
+      <div
+        ref={inner}
+        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
+          lightsOn ? "is-on" : ""
+        }`}
+      >
         <div className="flex items-baseline gap-6">
           <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
             {roomScenes[3].eyebrow}
@@ -316,17 +367,24 @@ function SceneResult() {
 
 function SceneInvitation() {
   const ref = useRef<HTMLDivElement | null>(null);
+  const inner = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end end"],
   });
   const lift = useTransform(scrollYProgress, [0, 1], [40, 0]);
+  const lightsOn = useSceneLights(inner);
   return (
     <section
       ref={ref}
       className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-[#f4ede0] py-14 text-[#0b0a08] md:py-16"
     >
-      <div className="mx-auto w-full max-w-[1500px] px-6 md:px-10">
+      <div
+        ref={inner}
+        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
+          lightsOn ? "is-on" : ""
+        }`}
+      >
         <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#0b0a08]/55">
           {roomScenes[4].eyebrow}
         </p>
@@ -348,14 +406,14 @@ function SceneInvitation() {
         <div className="mt-8 flex flex-wrap items-center gap-6">
           <a
             href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-            className="inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+            className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
           >
             Book a session
             <span aria-hidden>→</span>
           </a>
           <a
             href={`mailto:${company.email}`}
-            className="font-serif-text text-xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
+            className="font-serif-text ignite-text text-xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
           >
             {company.email}
           </a>
@@ -406,6 +464,7 @@ function Scene({
   });
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 1]);
   const y = useTransform(scrollYProgress, [0, 0.25], [40, 0]);
+  const lightsOn = useSceneLights(ref);
 
   return (
     <section
@@ -414,7 +473,9 @@ function Scene({
     >
       <motion.div
         style={{ opacity, y }}
-        className="mx-auto w-full max-w-[1500px] px-6 md:px-10"
+        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
+          lightsOn ? "is-on" : ""
+        }`}
       >
         <div className="flex items-baseline gap-6">
           <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
@@ -430,6 +491,33 @@ function Scene({
       </motion.div>
     </section>
   );
+}
+
+// Toggle the scene from dim to lit when it scrolls into view.
+function useSceneLights(ref: React.RefObject<HTMLDivElement | null>) {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setOn(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setOn(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  return on;
 }
 
 function Statement({

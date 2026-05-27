@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useIsTouch } from "@/lib/useIsTouch";
 
@@ -83,7 +77,9 @@ export function LightMaze({
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
-  // Animation state lives in refs so the rAF loop doesn't trigger re-renders.
+  // All gameplay state lives in refs so the rAF loop doesn't trigger
+  // re-renders. The dialog's surrounding UI doesn't depend on win state —
+  // it reads from refs at draw time only.
   const posRef = useRef({ r: START.r, c: START.c, animFrom: null as
     | { r: number; c: number }
     | null, animTo: null as { r: number; c: number } | null, animStart: 0 });
@@ -92,10 +88,7 @@ export function LightMaze({
   const wonRef = useRef(false);
   const flashStartRef = useRef<number | null>(null);
 
-  const [, setRenderTick] = useState(0); // for the "won" UI swap only
-  const [hasWon, setHasWon] = useState(false);
-
-  // Reset on open/close.
+  // Reset on open. No setState here; the rAF loop reads refs.
   useEffect(() => {
     if (!open) return;
     posRef.current = {
@@ -108,7 +101,6 @@ export function LightMaze({
     queueRef.current = null;
     wonRef.current = false;
     flashStartRef.current = null;
-    setHasWon(false);
   }, [open]);
 
   /* ---------- input ---------- */
@@ -287,7 +279,6 @@ export function LightMaze({
           ) {
             wonRef.current = true;
             flashStartRef.current = now;
-            setHasWon(true);
             const totalWait = reduce ? 500 : 600;
             setTimeout(() => {
               onWin?.();
@@ -401,11 +392,6 @@ export function LightMaze({
       window.removeEventListener("resize", onResize);
     };
   }, [open, reduce, onClose, onWin, tryMove]);
-
-  // Force a re-render once when won, so footer copy updates.
-  useEffect(() => {
-    if (hasWon) setRenderTick((n) => n + 1);
-  }, [hasWon]);
 
   const hint = useMemo(() => {
     if (isTouch) return "Swipe to move. Find the dark workspace.";

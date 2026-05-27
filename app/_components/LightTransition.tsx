@@ -1,17 +1,21 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 // Lights-on page transitions. On route change a near-black overlay wipes
 // in and out as the new page mounts. Under reduced motion we fade gently
 // for 150ms (no full blackout). Rendered once at the root layout level.
+//
+// Implemented with direct ref mutation so the transition doesn't trigger
+// React re-renders on every pathname change.
 export function LightTransition() {
   const pathname = usePathname();
   const reduce = useReducedMotion();
   const previousPath = useRef<string | null>(null);
-  const [phase, setPhase] = useState<"idle" | "off" | "on">("idle");
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (previousPath.current === null) {
@@ -21,43 +25,46 @@ export function LightTransition() {
     if (previousPath.current === pathname) return;
     previousPath.current = pathname;
 
+    const overlay = overlayRef.current;
+    const inner = innerRef.current;
+    if (!overlay || !inner) return;
+
     if (reduce) {
-      setPhase("on");
-      const t = setTimeout(() => setPhase("idle"), 160);
+      overlay.style.opacity = "1";
+      inner.style.background = "rgba(11,10,8,0.35)";
+      const t = setTimeout(() => {
+        overlay.style.opacity = "0";
+      }, 160);
       return () => clearTimeout(t);
     }
-    setPhase("off");
-    const t1 = setTimeout(() => setPhase("on"), 170);
-    const t2 = setTimeout(() => setPhase("idle"), 360);
+
+    overlay.style.opacity = "1";
+    inner.style.background = "#070605";
+    const t1 = setTimeout(() => {
+      inner.style.background = "rgba(7,6,5,0)";
+    }, 170);
+    const t2 = setTimeout(() => {
+      overlay.style.opacity = "0";
+    }, 360);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
   }, [pathname, reduce]);
 
-  const visible = phase !== "idle";
-  const dark = phase === "off";
-
   return (
     <div
+      ref={overlayRef}
       aria-hidden
       className="pointer-events-none fixed inset-0 z-[80]"
-      style={{
-        opacity: visible ? 1 : 0,
-        transition: "opacity 180ms ease-out",
-      }}
+      style={{ opacity: 0, transition: "opacity 180ms ease-out" }}
     >
       <div
+        ref={innerRef}
         className="absolute inset-0"
         style={{
-          background: reduce
-            ? "rgba(11,10,8,0.35)"
-            : dark
-              ? "#070605"
-              : "rgba(7,6,5,0)",
-          transition: reduce
-            ? "background 160ms ease-out"
-            : "background 180ms ease-out",
+          background: "rgba(7,6,5,0)",
+          transition: "background 180ms ease-out",
         }}
       />
     </div>

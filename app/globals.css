@@ -189,6 +189,22 @@
   animation: hero-number-settle 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+/* Gentle nudge for the "drag along" arrow on the session reel. */
+@keyframes reel-arrow-nudge {
+  0%,
+  60%,
+  100% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.reel-arrow {
+  animation: reel-arrow-nudge 3s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

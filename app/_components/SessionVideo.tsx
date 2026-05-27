@@ -15,6 +15,9 @@ type SessionVideoProps = {
   label?: string;
   // Lazy-load: only mount video element when within viewport (cheap).
   eager?: boolean;
+  // When true, the clip waits for hover/focus before playing on devices
+  // that support hover. Touch devices fall back to autoplay.
+  playOnHover?: boolean;
 };
 
 export function SessionVideo({
@@ -24,12 +27,40 @@ export function SessionVideo({
   className = "",
   label,
   eager = false,
+  playOnHover = false,
 }: SessionVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [muted, setMuted] = useState(true);
   const [errored, setErrored] = useState(false);
   const [inView, setInView] = useState(eager);
+  const [supportsHover, setSupportsHover] = useState(false);
+
+  useEffect(() => {
+    if (!playOnHover || typeof window === "undefined") return;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setSupportsHover(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, [playOnHover]);
+
+  const hoverGated = playOnHover && supportsHover;
+  const shouldAutoPlay = !hoverGated;
+
+  const handlePlay = () => {
+    if (!hoverGated) return;
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {});
+  };
+  const handlePause = () => {
+    if (!hoverGated) return;
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    v.currentTime = 0;
+  };
 
   // Mount when near viewport to keep things light.
   useEffect(() => {
@@ -72,6 +103,10 @@ export function SessionVideo({
     <div
       ref={wrapRef}
       className={`relative overflow-hidden bg-[#0b0a08] text-[#f4ede0] ${aspect} ${className}`}
+      onMouseEnter={handlePlay}
+      onMouseLeave={handlePause}
+      onFocus={handlePlay}
+      onBlur={handlePause}
     >
       {clip.poster && !errored && (
         // Eager <img> poster shows a frame instantly, even before the
@@ -90,7 +125,7 @@ export function SessionVideo({
         <video
           ref={videoRef}
           src={clip.src!}
-          autoPlay
+          autoPlay={shouldAutoPlay}
           muted={muted}
           loop
           playsInline

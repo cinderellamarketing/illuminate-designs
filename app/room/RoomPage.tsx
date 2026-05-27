@@ -32,7 +32,8 @@ export function RoomPage() {
   });
 
   // Decide whether to show the intro gate. Skipped under reduced motion
-  // and once the visitor has seen it before.
+  // and once the visitor has seen it before. State is flipped via a
+  // microtask so we don't trigger a cascading render inside the effect.
   useEffect(() => {
     if (typeof window === "undefined") return;
     let seen = false;
@@ -43,8 +44,10 @@ export function RoomPage() {
       seen = true;
     }
     if (!seen && !reduce) {
-      setGateOpen(true);
-    } else if (!seen && reduce) {
+      const handle = setTimeout(() => setGateOpen(true), 0);
+      return () => clearTimeout(handle);
+    }
+    if (!seen && reduce) {
       // Reduced motion: still mark seen so we don't try again next visit.
       try {
         window.localStorage.setItem(INTRO_KEY, "1");

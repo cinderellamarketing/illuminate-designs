@@ -1,10 +1,13 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
 import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
+import { BulbMark } from "@/app/_components/BulbMark";
+import { LightMaze } from "@/app/_components/LightMaze";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { media } from "@/lib/media";
 import {
   approachMoments,
@@ -16,10 +19,64 @@ import {
   team,
 } from "@/lib/copy";
 
+const KONAMI: ReadonlyArray<string> = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a",
+];
+
 export function SessionPage() {
+  const [mazeOpen, setMazeOpen] = useState(false);
+
+  // Konami easter egg + a small console hello for anyone poking around.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const buffer: string[] = [];
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      // Don't intercept keys while typing in an input.
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const key =
+        e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      buffer.push(key);
+      if (buffer.length > KONAMI.length) buffer.shift();
+      if (
+        buffer.length === KONAMI.length &&
+        buffer.every((k, i) => k === KONAMI[i])
+      ) {
+        buffer.length = 0;
+        setMazeOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+
+    // Friendly console greeting for the curious. Branded, brief.
+    try {
+      const brand =
+        "padding:2px 6px; background:#f55e09; color:#fff; font:600 12px/1 'Hanken Grotesk', sans-serif; border-radius:3px";
+      const muted = "color:#9a8b73; font:13px/1.45 'Hanken Grotesk', sans-serif";
+      console.log(
+        "%cIlluminate%c  hello there. there's a bulb in the nav. it does something.\n%cif you remember the Konami code, give it a try.",
+        brand,
+        muted,
+        muted,
+      );
+    } catch {}
+
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <main className="font-ui bg-paper text-ink min-h-dvh">
-      <Nav />
+      <Nav onBulb={() => setMazeOpen(true)} />
       <Hero />
       <Credibility />
       <Problem />
@@ -28,28 +85,50 @@ export function SessionPage() {
       <Team />
       <ClosingCTA />
       <Footer />
+      <LightMaze
+        open={mazeOpen}
+        onClose={() => setMazeOpen(false)}
+        variant="modal"
+        title="The bulb wants a moment."
+        subtitle="Find the workspace. We'll light it up."
+      />
     </main>
   );
 }
 
-function Nav() {
+function Nav({ onBulb }: { onBulb: () => void }) {
   return (
     <header className="fixed inset-x-0 top-0 z-40">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5 md:px-10 md:py-6">
-        <Link
-          href="/"
-          className="font-display text-2xl italic tracking-tight text-white mix-blend-difference"
-        >
-          Illuminate
-        </Link>
+        <div className="flex items-center gap-3 text-white mix-blend-difference">
+          <BulbMark
+            tone="light"
+            size={22}
+            onClick={onBulb}
+            ariaLabel="Illuminate"
+            title="It does something."
+          />
+          <Link
+            href="/"
+            className="font-display ignite-text text-2xl italic tracking-tight"
+          >
+            Illuminate
+          </Link>
+        </div>
         <nav className="hidden items-center gap-9 text-[12px] uppercase tracking-[0.18em] text-white mix-blend-difference md:flex">
-          <a href="#approach">Approach</a>
-          <a href="#case-study">Proof</a>
-          <a href="#team">Team</a>
+          <a href="#approach" className="ignite-text">
+            Approach
+          </a>
+          <a href="#case-study" className="ignite-text">
+            Proof
+          </a>
+          <a href="#team" className="ignite-text">
+            Team
+          </a>
         </nav>
         <a
           href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-          className="font-ui inline-flex items-center gap-2 rounded-full bg-[#f55e09] px-5 py-2.5 text-[12px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+          className="font-ui ignite inline-flex items-center gap-2 rounded-full bg-[#f55e09] px-5 py-2.5 text-[12px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
         >
           Book a session
         </a>
@@ -101,14 +180,14 @@ function Hero() {
                 color: "#f55e09",
               }}
             >
-              {headlineNumber.value}
+              <HeroNumber />
             </span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.5 }}
+            transition={{ duration: 0.9, delay: 1.8 }}
             className="font-display mt-4 max-w-2xl text-2xl italic leading-[1.15] text-white md:text-3xl"
           >
             Copilot adoption in eight weeks. The industry norm sits closer to
@@ -118,19 +197,19 @@ function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 2.1 }}
             className="pointer-events-auto mt-10 flex flex-wrap items-center gap-5"
           >
             <a
               href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-              className="inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+              className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
             >
               Book a session
               <span aria-hidden>→</span>
             </a>
             <a
               href="#approach"
-              className="text-[12px] uppercase tracking-[0.22em] text-white/80 underline-offset-4 hover:text-white hover:underline"
+              className="ignite-text text-[12px] uppercase tracking-[0.22em] text-white/80 underline-offset-4 hover:text-white hover:underline"
             >
               See the method
             </a>
@@ -222,19 +301,26 @@ function Approach() {
         </div>
       </div>
 
-      {/* Horizontal scroll of session moments */}
-      <div className="mt-14 overflow-x-auto pb-6 [scrollbar-width:thin]">
+      {/* Horizontal scroll of session moments. Cards snap as they
+          settle, clips wait for hover before they play. */}
+      <div
+        className="relative mt-14 overflow-x-auto pb-6 [scrollbar-width:thin]"
+        style={{ scrollSnapType: "x mandatory" }}
+      >
         <div className="flex gap-5 px-6 md:px-10">
           {reel.map((clip, i) => {
             const moment = approachMoments[i % approachMoments.length];
             return (
               <article
                 key={clip.id}
-                className="w-[78vw] shrink-0 sm:w-[460px] md:w-[520px]"
+                tabIndex={0}
+                className="ignite group w-[78vw] shrink-0 cursor-pointer rounded-sm transition-transform duration-300 ease-out hover:-translate-y-[3px] focus-visible:-translate-y-[3px] focus-visible:outline-none sm:w-[460px] md:w-[520px]"
+                style={{ scrollSnapAlign: "center" }}
               >
                 <SessionVideo
                   clip={clip}
                   variant="reel"
+                  playOnHover
                   className="rounded-sm"
                 />
                 <div className="mt-4 flex items-baseline gap-3">
@@ -243,6 +329,9 @@ function Approach() {
                   </span>
                   <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
                     {moment.eyebrow}
+                  </span>
+                  <span className="font-ui ml-auto text-[10px] uppercase tracking-[0.22em] text-paper/35 transition-opacity group-hover:text-[#f9a71d] group-focus-visible:text-[#f9a71d]">
+                    Hover to play
                   </span>
                 </div>
                 <p className="font-serif-text mt-2 max-w-[36ch] text-lg leading-[1.4] text-paper">
@@ -255,6 +344,17 @@ function Approach() {
             );
           })}
           <div className="w-6 shrink-0 md:w-10" aria-hidden />
+        </div>
+
+        {/* Inviting scroll arrow. Pulses gently to suggest more. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-3 hidden items-center md:flex"
+        >
+          <span className="font-ui flex items-center gap-2 rounded-full bg-ink/70 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-paper/75 backdrop-blur reel-arrow">
+            Drag along
+            <span aria-hidden>→</span>
+          </span>
         </div>
       </div>
     </section>
@@ -412,14 +512,14 @@ function ClosingCTA() {
         <div className="mt-12 flex flex-wrap items-center gap-6">
           <a
             href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-            className="inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+            className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
           >
             Book a session
             <span aria-hidden>→</span>
           </a>
           <a
             href={`mailto:${company.email}`}
-            className="font-serif-text text-2xl italic text-ink underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
+            className="font-serif-text ignite-text text-2xl italic text-ink underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
           >
             {company.email}
           </a>
@@ -444,12 +544,46 @@ function Footer() {
           </span>
           <span>Pembrokeshire · {company.email}</span>
           <span>
-            <Link href="/room" className="text-ink/55 hover:text-[#f55e09]">
+            <Link href="/room" className="ignite-text text-ink/55 hover:text-[#f55e09]">
               Cinematic version: /room
             </Link>
           </span>
         </div>
       </div>
     </footer>
+  );
+}
+
+// Counts from the industry baseline (30) up to the headline number on mount.
+// Under reduced motion the final value is rendered directly without the
+// animation running at all.
+function HeroNumber() {
+  const reduce = useReducedMotion();
+  const finalValue = parseInt(headlineNumber.value, 10) || 82;
+  const [count, setCount] = useState(30);
+
+  useEffect(() => {
+    if (reduce) return;
+    const start = performance.now();
+    const duration = 1500;
+    const begin = 30;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      setCount(Math.round(begin + (finalValue - begin) * e));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reduce, finalValue]);
+
+  const display = reduce ? finalValue : count;
+
+  return (
+    <span aria-label={`${finalValue} per cent`}>
+      {display}
+      <span>%</span>
+    </span>
   );
 }

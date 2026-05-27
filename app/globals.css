@@ -352,6 +352,86 @@ body.lights-off * {
   }
 }
 
+/* ---------- Variant switcher (review-phase only) ---------- */
+
+.variant-switch {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(11, 10, 8, 0.78);
+  border: 1px solid rgba(244, 237, 224, 0.18);
+  color: #f4ede0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: var(--font-hanken), system-ui, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  text-decoration: none;
+  transition:
+    background-color 260ms ease-out,
+    border-color 260ms ease-out,
+    transform 260ms ease-out,
+    box-shadow 260ms ease-out;
+}
+
+.variant-switch:hover,
+.variant-switch:focus-visible {
+  border-color: rgba(245, 94, 9, 0.55);
+  background: rgba(11, 10, 8, 0.9);
+  transform: translateY(-1px);
+}
+
+.variant-switch:focus-visible {
+  outline: 2px solid #f55e09;
+  outline-offset: 3px;
+}
+
+.variant-switch__dot {
+  display: inline-block;
+  height: 7px;
+  width: 7px;
+  border-radius: 999px;
+  background: #f9a71d;
+  box-shadow: 0 0 8px rgba(249, 167, 29, 0.6);
+}
+
+.variant-switch__label {
+  color: rgba(244, 237, 224, 0.6);
+}
+
+.variant-switch__current {
+  color: #f4ede0;
+  letter-spacing: 0.2em;
+}
+
+.variant-switch__arrow {
+  color: #f9a71d;
+  margin-left: 2px;
+  font-size: 12px;
+  transition: transform 240ms ease-out;
+}
+
+.variant-switch:hover .variant-switch__arrow {
+  transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+  .variant-switch {
+    left: 10px;
+    bottom: 10px;
+    padding: 7px 11px;
+    font-size: 9.5px;
+    gap: 8px;
+  }
+}
+
 /* ---------- Konami flourish ---------- */
 
 @keyframes konami-flourish-pulse {

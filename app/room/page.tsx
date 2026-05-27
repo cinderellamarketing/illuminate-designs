@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { RoomPage } from "./RoomPage";
+import { roomMeta } from "@/lib/copy";
 
 export const metadata: Metadata = {
-  title: "The room — a session, scrolled",
-  description:
-    "Land mid-session. A cinematic, scroll-driven walk through how Illuminate Learning gets teams to 82% Microsoft Copilot adoption.",
+  title: roomMeta.title,
+  description: roomMeta.description,
 };
 
 export default function Page() {

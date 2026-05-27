@@ -3,6 +3,7 @@ import { allFontVariables } from "@/lib/fonts";
 import { LightTransition } from "@/app/_components/LightTransition";
 import { LightsControl } from "@/app/_components/LightsControl";
 import { SiteEggs } from "@/app/_components/SiteEggs";
+import { VariantSwitcher } from "@/app/_components/VariantSwitcher";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -47,6 +48,7 @@ export default function RootLayout({
         {children}
         <LightTransition />
         <LightsControl />
+        <VariantSwitcher />
         <SiteEggs />
       </body>
     </html>

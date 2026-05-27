@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
 import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
@@ -32,20 +32,48 @@ const KONAMI: ReadonlyArray<string> = [
   "a",
 ];
 
+const BULB_POP_THRESHOLD = 4;
+const BULB_POP_WINDOW_MS = 900;
+const BULB_RESTORE_MS = 1200;
+// Wait this long after a click for any follow-up clicks before opening
+// the maze. Lets rapid-clickers reach the pop threshold first.
+const BULB_OPEN_DELAY_MS = 320;
+
 export function SessionPage() {
   const [mazeOpen, setMazeOpen] = useState(false);
+  const [flourishing, setFlourishing] = useState(false);
+  const [bulbBlown, setBulbBlown] = useState(false);
+  const clickTimesRef = useRef<number[]>([]);
+  const flourishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openMazeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Konami easter egg + a small console hello for anyone poking around.
+  // Konami code. The buffer lives in the closure of a single
+  // window-level listener registered once on mount. Arrow keys are
+  // prevented from scrolling so a determined typist actually finishes
+  // the sequence. Auto-repeat (held keys) is ignored to keep matches
+  // deterministic.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const buffer: string[] = [];
+
     const onKey = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      // Don't intercept keys while typing in an input.
-      const tag = target?.tagName;
+      const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
-      const key =
-        e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (e.repeat) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      const watching =
+        key.startsWith("Arrow") ||
+        key === "a" ||
+        key === "b" ||
+        buffer.length > 0;
+      if (!watching) return;
+
+      // Stop arrow keys from scrolling the page while the visitor is
+      // mid-sequence. Without this people give up before reaching "b a".
+      if (key.startsWith("Arrow")) e.preventDefault();
+
       buffer.push(key);
       if (buffer.length > KONAMI.length) buffer.shift();
       if (
@@ -53,30 +81,71 @@ export function SessionPage() {
         buffer.every((k, i) => k === KONAMI[i])
       ) {
         buffer.length = 0;
-        setMazeOpen(true);
+        triggerKonami();
       }
     };
+
+    const triggerKonami = () => {
+      setFlourishing(true);
+      if (flourishTimerRef.current) clearTimeout(flourishTimerRef.current);
+      flourishTimerRef.current = setTimeout(() => {
+        setFlourishing(false);
+        setMazeOpen(true);
+      }, 720);
+    };
+
     window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      if (flourishTimerRef.current) clearTimeout(flourishTimerRef.current);
+    };
+  }, []);
 
-    // Friendly console greeting for the curious. Branded, brief.
-    try {
-      const brand =
-        "padding:2px 6px; background:#f55e09; color:#fff; font:600 12px/1 'Hanken Grotesk', sans-serif; border-radius:3px";
-      const muted = "color:#9a8b73; font:13px/1.45 'Hanken Grotesk', sans-serif";
-      console.log(
-        "%cIlluminate%c  hello there. there's a bulb in the nav. it does something.\n%cif you remember the Konami code, give it a try.",
-        brand,
-        muted,
-        muted,
-      );
-    } catch {}
+  // Bulb click handler. A click triggers the maze, but only after a
+  // brief delay so a rapid-clicker can reach the pop threshold first.
+  // Four taps inside 900ms blows the bulb instead, a small flicker,
+  // then it returns after ~1.2s. Clicks during the blown state are
+  // ignored.
+  const handleBulb = useCallback(() => {
+    if (bulbBlown) return;
+    const now = performance.now();
+    const recent = clickTimesRef.current.filter(
+      (t) => now - t < BULB_POP_WINDOW_MS,
+    );
+    recent.push(now);
+    clickTimesRef.current = recent;
 
-    return () => window.removeEventListener("keydown", onKey);
+    if (recent.length >= BULB_POP_THRESHOLD) {
+      // Cancel any pending maze open. The pop wins.
+      if (openMazeTimerRef.current) {
+        clearTimeout(openMazeTimerRef.current);
+        openMazeTimerRef.current = null;
+      }
+      clickTimesRef.current = [];
+      setBulbBlown(true);
+      setTimeout(() => setBulbBlown(false), BULB_RESTORE_MS);
+      return;
+    }
+
+    // Debounce the maze open so further taps can pile up.
+    if (openMazeTimerRef.current) clearTimeout(openMazeTimerRef.current);
+    openMazeTimerRef.current = setTimeout(() => {
+      openMazeTimerRef.current = null;
+      clickTimesRef.current = [];
+      setMazeOpen(true);
+    }, BULB_OPEN_DELAY_MS);
+  }, [bulbBlown]);
+
+  // Cleanup any pending timers on unmount.
+  useEffect(() => {
+    return () => {
+      if (openMazeTimerRef.current) clearTimeout(openMazeTimerRef.current);
+    };
   }, []);
 
   return (
     <main className="font-ui bg-paper text-ink min-h-dvh">
-      <Nav onBulb={() => setMazeOpen(true)} />
+      <Nav onBulb={handleBulb} bulbBlown={bulbBlown} />
       <Hero />
       <Credibility />
       <Problem />
@@ -92,11 +161,18 @@ export function SessionPage() {
         title="The bulb wants a moment."
         subtitle="Find the workspace. We'll light it up."
       />
+      <KonamiFlourish active={flourishing} />
     </main>
   );
 }
 
-function Nav({ onBulb }: { onBulb: () => void }) {
+function Nav({
+  onBulb,
+  bulbBlown,
+}: {
+  onBulb: () => void;
+  bulbBlown: boolean;
+}) {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-ink/10 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4 md:px-10 md:py-5">
@@ -105,8 +181,9 @@ function Nav({ onBulb }: { onBulb: () => void }) {
             tone="ink"
             size={26}
             onClick={onBulb}
+            blown={bulbBlown}
             ariaLabel="Illuminate"
-            title="It does something."
+            title={bulbBlown ? "Ouch." : "It does something. Easy on the clicks."}
           />
           <Link
             href="/"
@@ -154,12 +231,13 @@ function Hero() {
             className="font-display flex items-baseline gap-6 text-white"
           >
             <span
-              className="block leading-[0.78] tracking-tight"
+              className="block leading-[0.78] tracking-tight pointer-events-auto"
               style={{
                 fontSize: "clamp(5rem, 16vw, 14rem)",
                 fontVariationSettings: '"opsz" 144',
                 color: "#f55e09",
               }}
+              title="Yes really. We checked twice. Then a third time."
             >
               <HeroNumber />
             </span>
@@ -382,6 +460,7 @@ function Approach() {
                     variant="reel"
                     playOnHover
                     className="rounded-sm"
+                    label="Clip warming up"
                   />
                   <div className="mt-4 flex items-baseline gap-3">
                     <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
@@ -391,7 +470,7 @@ function Approach() {
                       {moment.eyebrow}
                     </span>
                     <span className="font-ui ml-auto text-[10px] uppercase tracking-[0.22em] text-paper/35 transition-opacity group-hover:text-[#f9a71d] group-focus-visible:text-[#f9a71d]">
-                      Hover to play
+                      Hover, gently
                     </span>
                   </div>
                   <p className="font-serif-text mt-2 max-w-[36ch] text-lg leading-[1.4] text-paper">
@@ -461,7 +540,7 @@ function CaseStudy() {
             clip={media.caseStudy}
             variant="portrait"
             className="rounded-sm"
-            label="Interview to follow"
+            label="Interview, just out of frame"
           />
           <p className="font-ui mt-4 text-[11px] uppercase tracking-[0.22em] text-ink/55">
             {caseStudy.attribution}
@@ -540,7 +619,7 @@ function Team() {
                     clip={media.team[i]}
                     variant="portrait"
                     className="rounded-sm"
-                    label="Portrait to follow"
+                    label="Portrait, still drying"
                   />
                   <div className="mt-4">
                     <h3 className="font-serif-text text-xl text-paper">
@@ -598,7 +677,7 @@ function ClosingCTA() {
             href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
             className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
           >
-            Book a session
+            Pop the kettle on
             <span aria-hidden>→</span>
           </a>
           <a
@@ -635,6 +714,18 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+// Brief warm flash painted over the page when Konami fires, before the
+// maze opens. Reduced-motion gets an instant, gentle wash.
+function KonamiFlourish({ active }: { active: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className="konami-flourish"
+      data-active={active ? "true" : "false"}
+    />
   );
 }
 

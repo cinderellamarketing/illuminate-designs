@@ -215,7 +215,7 @@ function SceneRoom() {
               clip={media.roomScenes.room}
               variant="fill"
               className="h-full w-full"
-              label="Wide of the room to follow"
+              label="Wide of the room, give it a sec"
             />
           </SceneVideoFrame>
         </div>
@@ -244,7 +244,7 @@ function SceneProblem() {
               clip={media.roomScenes.problem}
               variant="fill"
               className="h-full w-full"
-              label="The problem in the room"
+              label="The problem, still warming up"
             />
           </SceneVideoFrame>
         </div>
@@ -271,7 +271,7 @@ function SceneBreakthrough() {
               clip={media.roomScenes.breakthrough}
               variant="fill"
               className="h-full w-full"
-              label="Breakthrough moment to follow"
+              label="Breakthrough, mid-rebake"
             />
           </SceneVideoFrame>
           <p className="font-ui mt-3 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
@@ -347,7 +347,7 @@ function SceneResult() {
                 clip={media.roomScenes.result}
                 variant="fill"
                 className="h-full w-full"
-                label="Eight weeks later"
+                label="Eight weeks later, cuppa optional"
               />
             </SceneVideoFrame>
             <blockquote className="font-serif-text mt-5 max-w-[48ch] text-base leading-[1.4] text-[#f4ede0]/85 md:text-lg">

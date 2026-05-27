@@ -205,6 +205,234 @@
   animation: reel-arrow-nudge 3s ease-in-out infinite;
 }
 
+/* ---------- Site-wide lights toggle ---------- */
+
+/* Full-viewport overlay: near-black ground with a warm radial cutout
+   that tracks the cursor. Pointer-events are disabled so the visitor
+   can still click through to whatever is "lit". The footer
+   StudioSpotlight is unrelated and untouched; this is a separate
+   layer rendered from the root layout. */
+.lights-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  background: rgba(4, 3, 2, 0.985);
+  opacity: 0;
+  transition: opacity 380ms ease-out;
+  -webkit-mask-image: radial-gradient(
+    circle 220px at var(--lx, 50%) var(--ly, 50%),
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.92) 78%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  mask-image: radial-gradient(
+    circle 220px at var(--lx, 50%) var(--ly, 50%),
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.92) 78%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.lights-overlay[data-active="true"] {
+  opacity: 1;
+}
+
+/* Warm glow halo painted on top, just inside the cutout. */
+.lights-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 380ms ease-out;
+  background: radial-gradient(
+    circle 200px at var(--lx, 50%) var(--ly, 50%),
+    rgba(255, 200, 110, 0.32) 0%,
+    rgba(249, 167, 29, 0.16) 35%,
+    rgba(245, 94, 9, 0) 70%
+  );
+}
+
+.lights-overlay[data-active="true"]::after {
+  opacity: 1;
+}
+
+.lights-overlay[data-reduce="true"],
+.lights-overlay[data-reduce="true"]::after {
+  transition: none;
+}
+
+/* Hide the cursor inside the dark scene so the torch reads as the
+   visitor's own light source. */
+body.lights-off,
+body.lights-off * {
+  cursor: none !important;
+}
+
+/* The small corner switch. Lives above the overlay so it remains
+   tappable in either state. */
+.lights-switch {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(11, 10, 8, 0.78);
+  border: 1px solid rgba(244, 237, 224, 0.18);
+  color: #f4ede0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: var(--font-hanken), system-ui, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color 260ms ease-out,
+    border-color 260ms ease-out,
+    transform 260ms ease-out,
+    box-shadow 260ms ease-out;
+}
+
+.lights-switch:hover,
+.lights-switch:focus-visible {
+  border-color: rgba(245, 94, 9, 0.5);
+  background: rgba(11, 10, 8, 0.9);
+  transform: translateY(-1px);
+}
+
+.lights-switch:focus-visible {
+  outline: 2px solid #f55e09;
+  outline-offset: 3px;
+}
+
+.lights-switch__pip {
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+  border-radius: 999px;
+  background: #f9a71d;
+  box-shadow: 0 0 8px rgba(249, 167, 29, 0.7);
+  transition:
+    background-color 240ms ease-out,
+    box-shadow 240ms ease-out;
+}
+
+.lights-switch[aria-pressed="true"] .lights-switch__pip {
+  background: #3a2a16;
+  box-shadow: none;
+}
+
+.lights-switch__state {
+  color: #f9a71d;
+  letter-spacing: 0.24em;
+  transition: color 240ms ease-out;
+}
+
+.lights-switch[aria-pressed="true"] .lights-switch__state {
+  color: rgba(244, 237, 224, 0.6);
+}
+
+/* Push the switch above the bottom-right mute control on hero videos. */
+@media (max-width: 640px) {
+  .lights-switch {
+    right: 10px;
+    bottom: 10px;
+    padding: 7px 10px;
+    font-size: 9.5px;
+  }
+}
+
+/* ---------- Konami flourish ---------- */
+
+@keyframes konami-flourish-pulse {
+  0% { opacity: 0; transform: scale(0.6); }
+  18% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+.konami-flourish {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 224, 160, 0.55) 0%,
+    rgba(249, 167, 29, 0.35) 18%,
+    rgba(245, 94, 9, 0.2) 38%,
+    rgba(11, 10, 8, 0) 70%
+  );
+  mix-blend-mode: screen;
+}
+
+.konami-flourish[data-active="true"] {
+  animation: konami-flourish-pulse 720ms cubic-bezier(0.22, 0.7, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .konami-flourish[data-active="true"] {
+    animation: none;
+    opacity: 0.5;
+    transition: opacity 200ms ease-out;
+  }
+}
+
+/* ---------- Bulb pop / blown state ---------- */
+
+@keyframes bulb-pop-flicker {
+  0% { filter: brightness(2) drop-shadow(0 0 14px rgba(255, 220, 120, 0.95)); transform: scale(1); }
+  10% { filter: brightness(0.3); transform: scale(0.94); }
+  20% { filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 220, 120, 0.7)); transform: scale(1.02); }
+  35% { filter: brightness(0.2); transform: scale(0.96); }
+  60% { filter: brightness(0.15) saturate(0.2); opacity: 0.45; }
+  100% { filter: brightness(0.15) saturate(0.2); opacity: 0.45; }
+}
+
+.bulb-mark__glyph.is-blown {
+  animation: bulb-pop-flicker 950ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+}
+
+/* A tiny puff/spark element that sits next to the glyph on pop. */
+.bulb-mark__pop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bulb-mark__pop span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: #f9a71d;
+  box-shadow: 0 0 6px rgba(255, 200, 100, 0.8);
+  opacity: 0;
+  animation: bulb-pop-spark 700ms ease-out forwards;
+}
+
+@keyframes bulb-pop-spark {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 12px), var(--dy, -10px)) scale(0.4);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -219,5 +447,13 @@
   }
   .bulb-mark__glyph.is-flicker {
     filter: none;
+  }
+  .bulb-mark__glyph.is-blown {
+    filter: brightness(0.2) saturate(0.2);
+    opacity: 0.45;
+    animation: none;
+  }
+  .lights-overlay {
+    transition: none;
   }
 }

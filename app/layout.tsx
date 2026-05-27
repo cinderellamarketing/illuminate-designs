@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { allFontVariables } from "@/lib/fonts";
 import { LightTransition } from "@/app/_components/LightTransition";
+import { LightsControl } from "@/app/_components/LightsControl";
+import { SiteEggs } from "@/app/_components/SiteEggs";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -44,6 +46,8 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <LightTransition />
+        <LightsControl />
+        <SiteEggs />
       </body>
     </html>
   );

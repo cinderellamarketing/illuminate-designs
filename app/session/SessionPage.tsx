@@ -103,7 +103,7 @@ function Nav({ onBulb }: { onBulb: () => void }) {
         <div className="flex items-center gap-3 text-white mix-blend-difference">
           <BulbMark
             tone="light"
-            size={22}
+            size={26}
             onClick={onBulb}
             ariaLabel="Illuminate"
             title="It does something."

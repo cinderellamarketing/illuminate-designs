@@ -2,45 +2,35 @@
 
 import {
   motion,
-  useMotionValueEvent,
   useScroll,
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
-import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
 import { LightMaze } from "@/app/_components/LightMaze";
+import { SiteFooter } from "@/app/_components/SiteFooter";
+import { SiteNav } from "@/app/_components/SiteNav";
+import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { media } from "@/lib/media";
-import {
-  caseStudy,
-  company,
-  headlineNumber,
-  roomScenes,
-} from "@/lib/copy";
+import { roomScenes, statTooltip } from "@/lib/copy";
 
 const INTRO_KEY = "illuminate_intro_seen";
 
 export function RoomPage() {
-  const [navVisible, setNavVisible] = useState(false);
+  useDeclareVariant("room");
   const [gateOpen, setGateOpen] = useState(false);
   const reduce = useReducedMotion();
-  const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setNavVisible(latest > 320);
-  });
 
   // Decide whether to show the intro gate. Skipped under reduced motion
-  // and once the visitor has seen it before. State is flipped via a
-  // microtask so we don't trigger a cascading render inside the effect.
+  // and once the visitor has seen it before.
   useEffect(() => {
     if (typeof window === "undefined") return;
     let seen = false;
     try {
       seen = window.localStorage.getItem(INTRO_KEY) === "1";
     } catch {
-      // Storage unavailable — treat as seen so the gate never blocks.
       seen = true;
     }
     if (!seen && !reduce) {
@@ -48,7 +38,6 @@ export function RoomPage() {
       return () => clearTimeout(handle);
     }
     if (!seen && reduce) {
-      // Reduced motion: still mark seen so we don't try again next visit.
       try {
         window.localStorage.setItem(INTRO_KEY, "1");
       } catch {}
@@ -64,14 +53,16 @@ export function RoomPage() {
 
   return (
     <main className="font-ui min-h-dvh bg-[#0a0907] text-[#f4ede0]">
-      <EmergingNav visible={navVisible} />
+      <SiteNav tone="light" />
       <Hero />
-      <SceneRoom />
-      <SceneProblem />
-      <SceneBreakthrough />
-      <SceneResult />
-      <SceneInvitation />
-      <RoomFooter />
+      <Scene01 />
+      <Scene02 />
+      <Scene03 />
+      <Scene04 />
+      <Scene05 />
+      <Scene06 />
+      <Scene07 />
+      <SiteFooter />
       <LightMaze
         open={gateOpen}
         onClose={dismissGate}
@@ -83,32 +74,7 @@ export function RoomPage() {
   );
 }
 
-function EmergingNav({ visible }: { visible: boolean }) {
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
-        visible
-          ? "translate-y-0 opacity-100"
-          : "pointer-events-none -translate-y-2 opacity-0"
-      }`}
-    >
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-5 md:px-10">
-        <Link
-          href="/"
-          className="font-display text-xl italic tracking-tight text-[#f4ede0]"
-        >
-          Illuminate
-        </Link>
-        <a
-          href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-          className="font-ui ignite inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] backdrop-blur transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
-        >
-          Book a session
-        </a>
-      </div>
-    </header>
-  );
-}
+/* ---------------- Hero ---------------- */
 
 function Hero() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -116,14 +82,10 @@ function Hero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  // Number stays small initially, then enlarges and lifts as you arrive.
-  const numberScale = useTransform(scrollYProgress, [0, 0.35], [0.85, 1]);
-  const numberOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85], [0, 1, 1]);
-  const numberY = useTransform(scrollYProgress, [0, 1], [40, -120]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
-    <section ref={ref} className="relative h-[140svh] w-full bg-black">
+    <section ref={ref} className="relative h-[120svh] w-full bg-black">
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <SessionVideo
           clip={media.roomHero}
@@ -133,49 +95,17 @@ function Hero() {
           className="h-full w-full"
         />
 
-        {/* Top-left orientation chrome, minimal */}
-        <div className="font-ui absolute left-6 top-6 z-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/80 md:left-10 md:top-8">
+        <div className="font-ui absolute left-6 top-24 z-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/80 md:left-10">
           <span
             aria-hidden
             className="inline-block h-1.5 w-1.5 rounded-full bg-[#f9a71d]"
           />
-          Illuminate · Session in progress
+          Session in progress
         </div>
 
-        {/* The 82% reveal — appears via motion as you arrive.
-            Non-interactive so the unmute control underneath stays clickable. */}
-        <motion.div
-          style={{
-            scale: numberScale,
-            opacity: numberOpacity,
-            y: numberY,
-          }}
-          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-end pb-[12vh]"
-        >
-          <div
-            className="font-display text-center leading-[0.78] tracking-tight"
-            style={{
-              color: "#f55e09",
-              fontSize: "clamp(10rem, 32vw, 32rem)",
-              fontVariationSettings: '"opsz" 144',
-              textShadow: "0 4px 60px rgba(0,0,0,0.55)",
-            }}
-          >
-            {headlineNumber.value}
-          </div>
-          <p
-            className="font-display mt-6 max-w-2xl px-6 text-center text-2xl italic leading-[1.15] text-white md:text-3xl"
-            style={{ textShadow: "0 2px 30px rgba(0,0,0,0.6)" }}
-          >
-            Copilot adoption in eight weeks. The industry average sits around
-            30%.
-          </p>
-        </motion.div>
-
-        {/* Scroll cue */}
         <motion.div
           style={{ opacity: cueOpacity }}
-          className="font-ui absolute inset-x-0 bottom-6 z-10 flex justify-center text-[10px] uppercase tracking-[0.3em] text-white/70"
+          className="font-ui absolute inset-x-0 bottom-8 z-10 flex justify-center text-[10px] uppercase tracking-[0.3em] text-white/75"
         >
           <span className="flex items-center gap-3">
             <span aria-hidden>↓</span>
@@ -187,24 +117,17 @@ function Hero() {
   );
 }
 
-function SceneRoom() {
+/* ---------------- Scene 01 ---------------- */
+
+function Scene01() {
   const scene = roomScenes[0];
   return (
-    <Scene
-      eyebrow={scene.eyebrow}
-      kicker="You did not arrive at the start."
-    >
+    <Scene eyebrow={scene.eyebrow} dark>
       <Statement>
-        {scene.title.split(". ").map((line, i) => (
-          <span key={i} className="block">
-            {line}
-            {i === 0 ? "." : ""}
-          </span>
-        ))}
+        Most Copilot rollouts{" "}
+        <em className="italic text-[#f9a71d]">happen in the dark.</em>
       </Statement>
-
-      <Body>{scene.body}</Body>
-
+      <Body>{scene.sub}</Body>
       <div className="mt-16">
         <SessionVideo
           clip={media.roomScenes.room}
@@ -217,50 +140,47 @@ function SceneRoom() {
   );
 }
 
-function SceneProblem() {
+/* ---------------- Scene 02 ---------------- */
+
+function Scene02() {
   const scene = roomScenes[1];
   return (
-    <Scene eyebrow={scene.eyebrow} dark>
+    <Scene eyebrow={scene.eyebrow}>
       <Statement size="xl">
-        <span className="block text-[#f4ede0]">Every team has the tools.</span>
+        <span className="block text-[#f4ede0]">{scene.line}</span>
         <span className="block italic text-[#f55e09]">
-          Far fewer have the skills.
+          {"line2" in scene ? scene.line2 : ""}
         </span>
       </Statement>
-      <Body>{scene.body}</Body>
-      <div className="mt-16">
-        <SessionVideo
-          clip={media.roomScenes.problem}
-          variant="scene"
-          className="rounded-sm"
-          label="The problem, still warming up"
-        />
-      </div>
     </Scene>
   );
 }
 
-function SceneBreakthrough() {
+/* ---------------- Scene 03 ---------------- */
+
+function Scene03() {
   const scene = roomScenes[2];
   return (
     <Scene eyebrow={scene.eyebrow}>
       <div className="grid items-start gap-12 md:grid-cols-12">
         <div className="md:col-span-5">
           <Statement size="lg">
-            <span className="block">A workflow</span>
-            <span className="block italic text-[#f9a71d]">tilts.</span>
+            <span className="block">This is what it looks like</span>
+            <span className="block italic text-[#f9a71d]">
+              when the lights come on.
+            </span>
           </Statement>
-          <Body className="mt-8">{scene.body}</Body>
+          <Body className="mt-8">{scene.sub}</Body>
         </div>
         <div className="md:col-span-7">
           <SessionVideo
             clip={media.roomScenes.breakthrough}
             variant="scene"
             className="rounded-sm"
-            label="Breakthrough, mid-rebake"
+            label="Real footage, warming up"
           />
           <p className="font-ui mt-4 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
-            Recorded in the room. Names withheld until clients clear release.
+            Real footage plays here.
           </p>
         </div>
       </div>
@@ -268,7 +188,25 @@ function SceneBreakthrough() {
   );
 }
 
-function SceneResult() {
+/* ---------------- Scene 04 ---------------- */
+
+function Scene04() {
+  const scene = roomScenes[3];
+  return (
+    <Scene eyebrow={scene.eyebrow} dark>
+      <Statement size="lg">
+        We train the role,{" "}
+        <em className="italic text-[#f9a71d]">not the feature list.</em>
+      </Statement>
+      <Body>{scene.sub}</Body>
+    </Scene>
+  );
+}
+
+/* ---------------- Scene 05 ---------------- */
+
+function Scene05() {
+  const scene = roomScenes[4];
   const ref = useRef<HTMLDivElement | null>(null);
   const inner = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
@@ -292,10 +230,7 @@ function SceneResult() {
         }`}
       >
         <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
-          {roomScenes[3].eyebrow}
-        </p>
-        <p className="font-display mt-6 max-w-[20ch] text-3xl italic leading-[1.05] text-[#f4ede0] md:text-5xl">
-          Eight weeks later.
+          {scene.eyebrow}
         </p>
 
         <motion.div
@@ -305,48 +240,59 @@ function SceneResult() {
             opacity: numberOpacity,
           }}
           className="mt-12"
+          title={statTooltip}
         >
           <div
             className="font-display leading-[0.78] tracking-tight"
             style={{
               color: "#f55e09",
-              fontSize: "clamp(10rem, 34vw, 34rem)",
+              fontSize: "clamp(8rem, 28vw, 28rem)",
               fontVariationSettings: '"opsz" 144',
             }}
           >
-            {headlineNumber.value}
+            82%
           </div>
         </motion.div>
 
-        <div className="mt-10 grid gap-10 md:grid-cols-12">
-          <p className="font-serif-text md:col-span-5 text-2xl italic leading-[1.25] text-[#f4ede0]">
-            Copilot adoption across the cohort. Industry norm sits closer to
-            thirty.
-          </p>
-          <blockquote className="font-serif-text md:col-span-7 md:col-start-7 text-xl leading-[1.4] text-[#f4ede0]/85">
-            <span className="text-[#f55e09]">&ldquo;</span>
-            {caseStudy.quote}
-            <span className="text-[#f55e09]">&rdquo;</span>
-            <footer className="font-ui mt-4 text-[11px] uppercase not-italic tracking-[0.22em] text-[#f4ede0]/55">
-              {caseStudy.attribution}
-            </footer>
-          </blockquote>
-        </div>
-
-        <div className="mt-16">
-          <SessionVideo
-            clip={media.roomScenes.result}
-            variant="scene"
-            className="rounded-sm"
-            label="Eight weeks later, cuppa optional"
-          />
-        </div>
+        <p className="font-display mt-8 max-w-[26ch] text-3xl italic leading-[1.05] text-[#f4ede0] md:text-5xl">
+          adoption in eight weeks.
+        </p>
+        <p className="font-serif-text mt-6 max-w-[44ch] text-xl italic leading-[1.4] text-[#f4ede0]/80 md:text-2xl">
+          {scene.sub}
+        </p>
       </div>
     </section>
   );
 }
 
-function SceneInvitation() {
+/* ---------------- Scene 06 ---------------- */
+
+function Scene06() {
+  const scene = roomScenes[5];
+  return (
+    <Scene eyebrow={scene.eyebrow}>
+      <Statement size="lg">
+        <span className="block">MSPs, you do not have to</span>
+        <span className="block italic text-[#f9a71d]">become the trainer.</span>
+      </Statement>
+      <Body>{scene.sub}</Body>
+      <div className="mt-12">
+        <Link
+          href="/for-msps"
+          className="ignite-text font-ui inline-flex items-center gap-3 text-[12px] uppercase tracking-[0.22em] text-[#f9a71d] hover:text-[#f55e09]"
+        >
+          Partner with us
+          <span aria-hidden>→</span>
+        </Link>
+      </div>
+    </Scene>
+  );
+}
+
+/* ---------------- Scene 07 ---------------- */
+
+function Scene07() {
+  const scene = roomScenes[6];
   const ref = useRef<HTMLDivElement | null>(null);
   const inner = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
@@ -367,77 +313,52 @@ function SceneInvitation() {
         }`}
       >
         <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#0b0a08]/55">
-          {roomScenes[4].eyebrow}
+          {scene.eyebrow}
         </p>
         <motion.div style={{ y: lift }}>
           <h2
             className="font-display mt-6 leading-[0.92] tracking-tight"
-            style={{ fontSize: "clamp(3.5rem, 10vw, 11rem)" }}
+            style={{ fontSize: "clamp(3rem, 9vw, 10rem)" }}
           >
-            <span className="block">Come and</span>
-            <span className="block italic text-[#f55e09]">sit in.</span>
+            <span className="block">Ready to switch</span>
+            <span className="block italic text-[#f55e09]">
+              the lights on?
+            </span>
           </h2>
         </motion.div>
 
-        <p className="font-serif-text mt-10 max-w-[44ch] text-2xl italic leading-[1.25] text-[#0b0a08]/85">
-          We run cohorts continuously. The next session has space, and the one
-          after will not.
-        </p>
-
         <div className="mt-12 flex flex-wrap items-center gap-6">
-          <a
-            href={`mailto:${company.email}?subject=Booking%20an%20Illuminate%20session`}
-            className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-8 py-4 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
-          >
-            Book a session
-            <span aria-hidden>→</span>
-          </a>
-          <a
-            href={`mailto:${company.email}`}
-            className="font-serif-text ignite-text text-2xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
-          >
-            {company.email}
-          </a>
+          {"primaryCta" in scene && scene.primaryCta && (
+            <Link
+              href={scene.primaryCta.href}
+              className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-8 py-4 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+            >
+              {scene.primaryCta.label}
+              <span aria-hidden>→</span>
+            </Link>
+          )}
+          {"secondaryCta" in scene && scene.secondaryCta && (
+            <Link
+              href={scene.secondaryCta.href}
+              className="font-serif-text ignite-text text-2xl italic text-[#0b0a08] underline decoration-[#f55e09] decoration-2 underline-offset-4 hover:text-[#f55e09]"
+            >
+              {scene.secondaryCta.label}
+            </Link>
+          )}
         </div>
-
       </div>
     </section>
   );
 }
 
-function RoomFooter() {
-  return (
-    <footer>
-      <div className="bg-[#0b0a08]">
-        <div className="mx-auto max-w-[1500px] px-6 pt-20 pb-10 md:px-10 md:pt-24 md:pb-14">
-          <StudioSpotlight />
-        </div>
-      </div>
-      <div className="bg-[#0a0907]">
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-baseline justify-between gap-4 border-t border-[#f4ede0]/10 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55 md:px-10">
-          <span className="font-display text-xl not-italic tracking-tight text-[#f4ede0]">
-            Illuminate Learning
-          </span>
-          <span>Pembrokeshire · {company.email}</span>
-          <Link href="/session" className="hover:text-[#f55e09]">
-            Conventional version: /session
-          </Link>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-/* ---------- shared scene primitives ---------- */
+/* ---------------- Shared scene primitives ---------------- */
 
 function Scene({
   eyebrow,
-  kicker,
   children,
   dark = false,
 }: {
   eyebrow: string;
-  kicker?: string;
   children: React.ReactNode;
   dark?: boolean;
 }) {
@@ -463,23 +384,15 @@ function Scene({
           lightsOn ? "is-on" : ""
         }`}
       >
-        <div className="flex items-baseline gap-6">
-          <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
-            {eyebrow}
-          </span>
-          {kicker && (
-            <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/45">
-              {kicker}
-            </span>
-          )}
-        </div>
+        <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
+          {eyebrow}
+        </span>
         <div className="mt-10">{children}</div>
       </motion.div>
     </section>
   );
 }
 
-// Toggle the scene from dim to lit when it scrolls into view.
 function useSceneLights(ref: React.RefObject<HTMLDivElement | null>) {
   const [on, setOn] = useState(false);
   useEffect(() => {
@@ -515,10 +428,10 @@ function Statement({
 }) {
   const fontSize =
     size === "xl"
-      ? "clamp(4rem, 12vw, 12rem)"
+      ? "clamp(3.5rem, 11vw, 11rem)"
       : size === "lg"
-        ? "clamp(3rem, 9vw, 8rem)"
-        : "clamp(2.5rem, 7vw, 6.5rem)";
+        ? "clamp(2.75rem, 8vw, 7.5rem)"
+        : "clamp(2.25rem, 6vw, 5.5rem)";
   return (
     <h2
       className="font-display leading-[0.9] tracking-tight"
@@ -538,7 +451,7 @@ function Body({
 }) {
   return (
     <p
-      className={`font-serif-text max-w-[48ch] text-xl italic leading-[1.35] text-[#f4ede0]/85 md:text-2xl ${className}`}
+      className={`font-serif-text mt-10 max-w-[48ch] text-xl italic leading-[1.35] text-[#f4ede0]/85 md:text-2xl ${className}`}
     >
       {children}
     </p>

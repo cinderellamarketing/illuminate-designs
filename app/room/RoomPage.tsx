@@ -17,6 +17,7 @@ import { media } from "@/lib/media";
 import {
   company,
   headlineNumber,
+  nav,
   roomScenes,
   statTooltip,
 } from "@/lib/copy";
@@ -92,28 +93,80 @@ export function RoomPage() {
   );
 }
 
+// Full site nav, hidden during the hero so the cinematic frame is
+// uninterrupted, fading in once the visitor has scrolled past it. The
+// link set matches the shared SiteNav used on /session and the inner
+// pages, so the rest of the site is visible from /room not just the
+// footer. A compact "menu" toggle on small screens reveals the same
+// link list in a stacked panel.
 function EmergingNav({ visible }: { visible: boolean }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 border-b border-[#f4ede0]/10 bg-[#0a0907]/80 backdrop-blur-md transition-all duration-500 supports-[backdrop-filter]:bg-[#0a0907]/65 ${
+      className={`fixed inset-x-0 top-0 z-40 border-b border-[#f4ede0]/10 bg-[#0a0907]/85 backdrop-blur-md transition-all duration-500 supports-[backdrop-filter]:bg-[#0a0907]/65 ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none -translate-y-2 opacity-0"
       }`}
     >
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4 md:px-10 md:py-5">
+      <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-6 px-6 py-4 md:px-10 md:py-5">
         <Link
           href="/"
-          className="font-display text-xl italic tracking-tight text-[#f4ede0]"
+          className="font-display ignite-text text-xl italic tracking-tight text-[#f4ede0]"
         >
           Illuminate
         </Link>
-        <Link
-          href="/contact"
-          className="font-ui ignite inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
-        >
-          Book a session
-        </Link>
+
+        <nav className="hidden items-center gap-7 text-[12px] uppercase tracking-[0.18em] text-[#f4ede0]/75 md:flex">
+          {nav.links
+            .filter((l) => l.href !== "/")
+            .map((l) => (
+              <Link key={l.label} href={l.href} className="ignite-text">
+                {l.label}
+              </Link>
+            ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href={nav.primaryCta.href}
+            className="font-ui ignite inline-flex items-center gap-2 rounded-full border border-[#f4ede0]/30 bg-[#f4ede0]/5 px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
+          >
+            {nav.primaryCta.label}
+          </Link>
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="room-nav-mobile"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="ignite font-ui inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#f4ede0]/25 text-[#f4ede0] md:hidden"
+          >
+            <span aria-hidden className="text-base leading-none">
+              {menuOpen ? "×" : "≡"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="room-nav-mobile"
+        hidden={!menuOpen}
+        className="border-t border-[#f4ede0]/10 md:hidden"
+      >
+        <nav className="mx-auto flex max-w-[1500px] flex-col gap-1 px-6 py-4 text-[#f4ede0]">
+          {nav.links.map((l) => (
+            <Link
+              key={l.label}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              className="ignite-text rounded-md py-2 text-[13px] uppercase tracking-[0.18em]"
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );

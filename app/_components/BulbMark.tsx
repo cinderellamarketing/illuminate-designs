@@ -72,24 +72,26 @@ export const BulbMark = forwardRef<HTMLButtonElement, BulbMarkProps>(
         <path
           d="M12 3.25c-3.45 0-6.25 2.7-6.25 6.05 0 2.06 1.04 3.86 2.62 4.96.55.38.88 1 .88 1.66v1.2c0 .76.62 1.38 1.38 1.38h2.74c.76 0 1.38-.62 1.38-1.38v-1.2c0-.66.33-1.28.88-1.66 1.58-1.1 2.62-2.9 2.62-4.96 0-3.35-2.8-6.05-6.25-6.05z"
           stroke="currentColor"
-          strokeWidth="1.25"
+          strokeWidth="1.55"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* filament hint */}
+        {/* warm filament core — high-saturation amber so the bulb reads as
+            interactive against both dark video and cream paper backgrounds
+            even through mix-blend-difference */}
+        <circle cx="12" cy="10.4" r="1.5" fill="#f9a71d" />
         <path
-          d="M10.25 11.5 12 9.5l1.75 2"
-          stroke="currentColor"
-          strokeWidth="1.15"
+          d="M10.5 11.5 12 9.8l1.5 1.7"
+          stroke="#f55e09"
+          strokeWidth="1.2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          opacity="0.75"
         />
         {/* base contacts */}
         <path
-          d="M9.75 19.6h4.5M10.5 21h3"
+          d="M9.5 19.6h5M10.5 21h3"
           stroke="currentColor"
-          strokeWidth="1.25"
+          strokeWidth="1.5"
           strokeLinecap="round"
         />
       </svg>

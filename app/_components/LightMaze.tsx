@@ -4,29 +4,33 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useIsTouch } from "@/lib/useIsTouch";
 
-/* Maze grid: 1 = wall, 0 = open, S = start, T = target.
-   Built as an S-shaped path: right, then up via the right column,
-   left across a middle corridor, up via the left column, right
-   again to the target in the top corridor. Forgiving but not flat. */
-const W = 13;
-const H = 9;
+/* Maze grid: 1 = wall, 0 = open, 2 = target, 3 = start.
+   A cinematic S-route through three wide horizontal corridors. The
+   player starts bottom-left, runs the lower corridor, climbs the left
+   notch, threads the middle corridor, climbs the right notch, then
+   finds the workspace top-right. Wide enough to feel designed, not
+   fiddly. */
+const W = 19;
+const H = 11;
 const GRID: number[][] = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], // 2 marks the target
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-  [1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 3 marks the start
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-const START = { c: 1, r: 7 };
-const TARGET = { c: 11, r: 1 };
+const START = { c: 1, r: 9 };
+const TARGET = { c: 17, r: 1 };
 
-const SPOTLIGHT_RADIUS_RATIO = 0.32;
-const MOVE_MS = 120;
+const SPOTLIGHT_RADIUS_RATIO = 0.44;
+const MOVE_MS = 95;
 
 type Dir = "up" | "down" | "left" | "right" | null;
 
@@ -50,6 +54,29 @@ function isOpen(r: number, c: number): boolean {
   return GRID[r][c] !== 1;
 }
 
+function keyToDir(k: string): Dir {
+  switch (k) {
+    case "ArrowUp":
+    case "w":
+    case "W":
+      return "up";
+    case "ArrowDown":
+    case "s":
+    case "S":
+      return "down";
+    case "ArrowLeft":
+    case "a":
+    case "A":
+      return "left";
+    case "ArrowRight":
+    case "d":
+    case "D":
+      return "right";
+    default:
+      return null;
+  }
+}
+
 export type LightMazeProps = {
   open: boolean;
   onClose: () => void;
@@ -67,8 +94,8 @@ export function LightMaze({
   onClose,
   onWin,
   variant = "modal",
-  title = "Find the workspace.",
-  subtitle = "Move the bulb. Light it up.",
+  title = "Find the light.",
+  subtitle = "Move the bulb. Switch the workspace on.",
 }: LightMazeProps) {
   const reduce = useReducedMotion();
   const isTouch = useIsTouch();
@@ -80,13 +107,27 @@ export function LightMaze({
   // All gameplay state lives in refs so the rAF loop doesn't trigger
   // re-renders. The dialog's surrounding UI doesn't depend on win state —
   // it reads from refs at draw time only.
-  const posRef = useRef({ r: START.r, c: START.c, animFrom: null as
-    | { r: number; c: number }
-    | null, animTo: null as { r: number; c: number } | null, animStart: 0 });
-  const queueRef = useRef<Dir>(null);
-  const rafRef = useRef<number | null>(null);
+  const posRef = useRef({
+    r: START.r,
+    c: START.c,
+    animFrom: null as { r: number; c: number } | null,
+    animTo: null as { r: number; c: number } | null,
+    animStart: 0,
+  });
+
+  // Held-direction tracking for smooth continuous motion. Keys held while
+  // an animation completes auto-advance to the next cell, so movement
+  // feels like a single fluid slide rather than discrete keypresses.
+  const heldRef = useRef({
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+  });
+  const lastDirRef = useRef<Dir>(null);
+
   const wonRef = useRef(false);
-  const flashStartRef = useRef<number | null>(null);
+  const winStartRef = useRef<number | null>(null);
 
   // Reset on open. No setState here; the rAF loop reads refs.
   useEffect(() => {
@@ -98,80 +139,84 @@ export function LightMaze({
       animTo: null,
       animStart: 0,
     };
-    queueRef.current = null;
+    heldRef.current = { up: false, down: false, left: false, right: false };
+    lastDirRef.current = null;
     wonRef.current = false;
-    flashStartRef.current = null;
+    winStartRef.current = null;
   }, [open]);
 
   /* ---------- input ---------- */
 
-  const tryMove = useCallback((dir: Dir) => {
-    if (!dir || wonRef.current) return;
+  const tryMove = useCallback((dir: Dir): boolean => {
+    if (!dir || wonRef.current) return false;
     const p = posRef.current;
-    // If currently animating, queue the input; will be tried on arrival.
-    if (p.animTo) {
-      queueRef.current = dir;
-      return;
-    }
+    if (p.animTo) return false; // already animating, ignore
     const { dr, dc } = dirDelta(dir);
     const nr = p.r + dr;
     const nc = p.c + dc;
-    if (!isOpen(nr, nc)) {
-      queueRef.current = null;
-      return;
-    }
+    if (!isOpen(nr, nc)) return false;
     p.animFrom = { r: p.r, c: p.c };
     p.animTo = { r: nr, c: nc };
     p.animStart = performance.now();
-    queueRef.current = null;
+    return true;
+  }, []);
+
+  // Pick the next direction to consume after a move finishes. Prefer the
+  // most recently pressed key if it's still held; otherwise any held key.
+  const pickHeld = useCallback((): Dir => {
+    const last = lastDirRef.current;
+    const h = heldRef.current;
+    if (last && h[last]) return last;
+    if (h.right) return "right";
+    if (h.left) return "left";
+    if (h.down) return "down";
+    if (h.up) return "up";
+    return null;
   }, []);
 
   // Keyboard.
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => {
+    const onDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
         return;
       }
-      let dir: Dir = null;
-      switch (e.key) {
-        case "ArrowUp":
-        case "w":
-        case "W":
-          dir = "up";
-          break;
-        case "ArrowDown":
-        case "s":
-        case "S":
-          dir = "down";
-          break;
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          dir = "left";
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          dir = "right";
-          break;
-      }
-      if (dir) {
-        e.preventDefault();
-        tryMove(dir);
-      }
+      const dir = keyToDir(e.key);
+      if (!dir) return;
+      e.preventDefault();
+      // Suppress OS auto-repeat — we drive continuity ourselves from the
+      // animation completion handler. Stops jitter and double-moves.
+      if (e.repeat) return;
+      heldRef.current[dir] = true;
+      lastDirRef.current = dir;
+      tryMove(dir);
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    const onUp = (e: KeyboardEvent) => {
+      const dir = keyToDir(e.key);
+      if (!dir) return;
+      heldRef.current[dir] = false;
+    };
+    // If the page loses focus, release all keys so the bulb doesn't
+    // wander when the user comes back.
+    const onBlur = () => {
+      heldRef.current = { up: false, down: false, left: false, right: false };
+    };
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+      window.removeEventListener("blur", onBlur);
+    };
   }, [open, onClose, tryMove]);
 
   // Focus management.
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
-    // Defer to next tick so the overlay has actually painted.
     const t = setTimeout(() => closeRef.current?.focus(), 30);
     return () => {
       clearTimeout(t);
@@ -214,7 +259,7 @@ export function LightMaze({
       const dy = t.clientY - startY;
       const adx = Math.abs(dx);
       const ady = Math.abs(dy);
-      if (Math.max(adx, ady) < 24) return; // too small to count
+      if (Math.max(adx, ady) < 24) return;
       if (adx > ady) tryMove(dx > 0 ? "right" : "left");
       else tryMove(dy > 0 ? "down" : "up");
     };
@@ -236,7 +281,6 @@ export function LightMaze({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // High-DPI scaling.
     const setupDpr = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
@@ -261,7 +305,8 @@ export function LightMaze({
       const offX = Math.floor((cssW - drawW) / 2);
       const offY = Math.floor((cssH - drawH) / 2);
 
-      // Update animation state.
+      // Advance animation, settle on arrival, and chain to the next held
+      // direction immediately for unbroken motion.
       const p = posRef.current;
       if (p.animTo && p.animFrom) {
         const t = Math.min(1, (now - p.animStart) / MOVE_MS);
@@ -271,38 +316,30 @@ export function LightMaze({
           p.animFrom = null;
           p.animTo = null;
 
-          // Win check.
-          if (
-            !wonRef.current &&
-            p.r === TARGET.r &&
-            p.c === TARGET.c
-          ) {
+          if (!wonRef.current && p.r === TARGET.r && p.c === TARGET.c) {
             wonRef.current = true;
-            flashStartRef.current = now;
-            const totalWait = reduce ? 500 : 600;
+            winStartRef.current = now;
+            const totalWait = reduce ? 700 : 1250;
             setTimeout(() => {
               onWin?.();
               onClose();
             }, totalWait);
-          } else if (queueRef.current) {
-            // Consume queued input.
-            const next = queueRef.current;
-            queueRef.current = null;
-            tryMove(next);
+          } else {
+            const next = pickHeld();
+            if (next) tryMove(next);
           }
         }
       }
 
-      // Compute pixel position (cell centre).
+      // Pixel position. Use a smoother sine-eased blend so the slide
+      // between cells feels organic, especially when chained.
       const ppos = (() => {
         if (p.animTo && p.animFrom) {
-          const t = Math.min(1, (now - p.animStart) / MOVE_MS);
-          // ease-out cubic
-          const e = 1 - Math.pow(1 - t, 3);
-          const cx =
-            p.animFrom.c + (p.animTo.c - p.animFrom.c) * e + 0.5;
-          const cy =
-            p.animFrom.r + (p.animTo.r - p.animFrom.r) * e + 0.5;
+          const tt = Math.min(1, (now - p.animStart) / MOVE_MS);
+          // smoothstep-like easing: gentle accel/decel, no overshoot.
+          const e = tt * tt * (3 - 2 * tt);
+          const cx = p.animFrom.c + (p.animTo.c - p.animFrom.c) * e + 0.5;
+          const cy = p.animFrom.r + (p.animTo.r - p.animFrom.r) * e + 0.5;
           return { x: offX + cx * cell, y: offY + cy * cell };
         }
         return {
@@ -311,22 +348,28 @@ export function LightMaze({
         };
       })();
 
-      // 1. Fill background — full darkness.
+      // 1. Deep black ground.
       ctx.save();
-      ctx.fillStyle = "#070605";
+      ctx.fillStyle = "#040302";
       ctx.fillRect(0, 0, cssW, cssH);
 
-      // 2. Draw maze scene fully (walls + target). The spotlight overlay
-      //    in step 3 hides anything outside the bulb's reach.
-      drawMaze(ctx, offX, offY, cell, wonRef.current, now);
-      drawTarget(ctx, offX, offY, cell, wonRef.current, now);
+      // 2. Maze scene (walls + workspace). Painted fully; the spotlight
+      //    overlay in step 3 hides anything outside the bulb's reach.
+      drawMaze(ctx, offX, offY, cell, wonRef.current, winStartRef.current, now);
+      drawTarget(ctx, offX, offY, cell, wonRef.current, winStartRef.current, now);
 
-      // 3. Spotlight: a radial gradient from clear at the bulb's centre
-      //    to opaque darkness around it. Skip the gradient under reduced
-      //    motion only when the maze is already won (so the user can see
-      //    their finish state). The reveal itself is still spotlight-led.
-      if (!wonRef.current) {
-        const radius = drawW * SPOTLIGHT_RADIUS_RATIO;
+      // 3. Spotlight. A wide radial cutout from the bulb, fading to deep
+      //    black around the maze. When the puzzle is won the spotlight
+      //    blooms outward to reveal the whole room.
+      const winT = wonRef.current && winStartRef.current
+        ? Math.min(1, (now - winStartRef.current) / (reduce ? 320 : 520))
+        : 0;
+      const bloom = easeOutCubic(winT);
+      const baseRadius = drawW * SPOTLIGHT_RADIUS_RATIO;
+      const maxBloom = Math.hypot(drawW, drawH) * 0.65;
+      const radius = baseRadius + (maxBloom - baseRadius) * bloom;
+
+      if (winT < 1) {
         const grad = ctx.createRadialGradient(
           ppos.x,
           ppos.y,
@@ -335,49 +378,41 @@ export function LightMaze({
           ppos.y,
           radius,
         );
-        grad.addColorStop(0, "rgba(7,6,5,0)");
-        grad.addColorStop(0.5, "rgba(7,6,5,0.55)");
-        grad.addColorStop(0.85, "rgba(7,6,5,0.95)");
-        grad.addColorStop(1, "rgba(7,6,5,1)");
+        // Inside the spotlight: subtle warm wash so the maze reads as lit,
+        // not just unmasked. Falls off to absolute black at the rim.
+        grad.addColorStop(0, "rgba(255,184,80,0.05)");
+        grad.addColorStop(0.18, "rgba(7,6,5,0)");
+        grad.addColorStop(0.6, "rgba(4,3,2,0.55)");
+        grad.addColorStop(0.85, "rgba(4,3,2,0.95)");
+        grad.addColorStop(1, "rgba(4,3,2,1)");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, cssW, cssH);
-      } else {
-        // Once won: the workspace switching on lights the whole maze.
-        // Use a soft luminance lift, not a hard flash.
-        const fadeMs = reduce ? 400 : 360;
-        const t = flashStartRef.current
-          ? Math.min(1, (now - flashStartRef.current) / fadeMs)
-          : 1;
-        const alpha = 1 - t;
-        if (alpha > 0) {
-          const radius = drawW * (SPOTLIGHT_RADIUS_RATIO + 0.5 * t);
-          const grad = ctx.createRadialGradient(
-            ppos.x,
-            ppos.y,
-            0,
-            ppos.x,
-            ppos.y,
-            radius,
-          );
-          grad.addColorStop(0, "rgba(7,6,5,0)");
-          grad.addColorStop(1, `rgba(7,6,5,${0.95 * alpha})`);
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, cssW, cssH);
-        }
       }
 
-      // 4. Draw the bulb on top of everything so it always glows.
-      drawBulb(ctx, ppos.x, ppos.y, cell, wonRef.current);
+      // 4. Bulb on top, always glowing.
+      drawBulb(ctx, ppos.x, ppos.y, cell, wonRef.current, winT);
 
-      // 5. Win flourish: a brief white softness, not a strobe.
-      if (wonRef.current && flashStartRef.current) {
-        const t = Math.min(1, (now - flashStartRef.current) / 220);
-        // Reduced motion: a gentle warm tint, no white peak.
-        const alpha = reduce ? 0.18 * (1 - t) : 0.42 * (1 - t);
-        ctx.fillStyle = reduce
-          ? `rgba(249,167,29,${alpha.toFixed(3)})`
-          : `rgba(255,255,255,${alpha.toFixed(3)})`;
-        ctx.fillRect(0, 0, cssW, cssH);
+      // 5. Win flare: a brief warm-white peak that softens into the
+      //    sustained bloom. Reduced motion gets a gentle amber wash.
+      if (wonRef.current && winStartRef.current) {
+        const flashT = Math.min(1, (now - winStartRef.current) / 280);
+        const peak = reduce ? 0.22 : 0.55;
+        const alpha = peak * (1 - flashT) * (1 - flashT);
+        if (alpha > 0.001) {
+          ctx.fillStyle = reduce
+            ? `rgba(249,167,29,${alpha.toFixed(3)})`
+            : `rgba(255,238,200,${alpha.toFixed(3)})`;
+          ctx.fillRect(0, 0, cssW, cssH);
+        }
+
+        // Sustained warm room glow after the flash, brightening the
+        // whole maze with a soft amber tint. Confident, not strobing.
+        const warmT = Math.min(1, (now - winStartRef.current) / 700);
+        const warmAlpha = reduce ? 0.08 * warmT : 0.14 * warmT;
+        ctx.fillStyle = `rgba(249,167,29,${warmAlpha.toFixed(3)})`;
+        ctx.globalCompositeOperation = "screen";
+        ctx.fillRect(offX, offY, drawW, drawH);
+        ctx.globalCompositeOperation = "source-over";
       }
 
       ctx.restore();
@@ -386,16 +421,15 @@ export function LightMaze({
     };
 
     raf = requestAnimationFrame(render);
-    rafRef.current = raf;
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
     };
-  }, [open, reduce, onClose, onWin, tryMove]);
+  }, [open, reduce, onClose, onWin, tryMove, pickHeld]);
 
   const hint = useMemo(() => {
-    if (isTouch) return "Swipe to move. Find the dark workspace.";
-    return "Arrow keys or WASD. Find the dark workspace.";
+    if (isTouch) return "Swipe to move. Find the workspace.";
+    return "Arrow keys or WASD. Hold to glide.";
   }, [isTouch]);
 
   if (!open) return null;
@@ -411,22 +445,25 @@ export function LightMaze({
       className="fixed inset-0 z-[120] flex flex-col items-center justify-center"
       style={{
         background: isGate
-          ? "linear-gradient(180deg, #050403 0%, #0a0907 100%)"
-          : "rgba(5,4,3,0.94)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
+          ? "linear-gradient(180deg, #020201 0%, #060503 100%)"
+          : "rgba(3,2,1,0.97)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
       }}
     >
-      <div className="flex w-full max-w-[820px] flex-col px-6 md:px-8">
-        <div className="flex items-baseline justify-between gap-4">
+      <div className="flex w-full max-w-[1080px] flex-col px-6 md:px-10">
+        <div className="flex items-baseline justify-between gap-6">
           <div>
-            <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-[#f9a71d]/85">
+            <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-[#f9a71d]/80">
               Illuminate · light maze
             </p>
-            <h2 className="font-display mt-2 text-2xl italic leading-[1.1] text-[#f4ede0] md:text-3xl">
+            <h2
+              className="font-display mt-2 italic leading-[1.02] tracking-tight text-[#f4ede0]"
+              style={{ fontSize: "clamp(2rem, 4.4vw, 3.4rem)" }}
+            >
               {title}
             </h2>
-            <p className="font-serif-text mt-1 text-base italic text-[#f4ede0]/70 md:text-lg">
+            <p className="font-serif-text mt-1 text-base italic leading-[1.3] text-[#f4ede0]/65 md:text-lg">
               {subtitle}
             </p>
           </div>
@@ -434,7 +471,7 @@ export function LightMaze({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="font-ui ignite shrink-0 rounded-full border border-[#f4ede0]/30 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/85 hover:border-[#f55e09] hover:text-[#f55e09]"
+            className="font-ui ignite shrink-0 rounded-full border border-[#f4ede0]/25 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/85 hover:border-[#f55e09] hover:text-[#f55e09]"
             aria-label="Skip the maze and close"
           >
             {isGate ? "Skip into the room" : "Close"}
@@ -445,18 +482,16 @@ export function LightMaze({
         <div className="relative mt-6">
           <canvas
             ref={canvasRef}
-            className="block h-[64svh] max-h-[560px] min-h-[320px] w-full rounded-sm bg-[#070605]"
-            // Touch-action so swipes don't scroll the page.
+            className="block h-[70svh] max-h-[680px] min-h-[360px] w-full rounded-sm bg-[#040302]"
             style={{ touchAction: "none" }}
           />
-          {/* Subtle frame */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 rounded-sm ring-1 ring-[#f4ede0]/10"
           />
         </div>
 
-        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
           <span>{hint}</span>
           <span>Press Esc to close</span>
         </div>
@@ -467,17 +502,21 @@ export function LightMaze({
 
 /* ---------- drawing helpers ---------- */
 
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 function drawMaze(
   ctx: CanvasRenderingContext2D,
   offX: number,
   offY: number,
   cell: number,
   won: boolean,
+  winStart: number | null,
   now: number,
 ) {
-  // Floors — almost invisible until the spotlight reaches them; we still
-  // paint them so the spotlight has something warm to reveal.
-  ctx.fillStyle = "#1a1612";
+  // Floors — warm but dim, only really seen inside the spotlight.
+  ctx.fillStyle = "#1c1611";
   for (let r = 0; r < H; r++) {
     for (let c = 0; c < W; c++) {
       if (GRID[r][c] === 1) continue;
@@ -485,17 +524,17 @@ function drawMaze(
     }
   }
 
-  // Walls — a touch warmer than the void, with a thin orange hairline edge
-  // so they read as objects in the spotlight rather than absence.
+  // Walls — slightly warmer black so they read as objects when the
+  // spotlight passes over them. A thin orange hairline along open
+  // edges suggests filament light catching the corner of the wall.
   for (let r = 0; r < H; r++) {
     for (let c = 0; c < W; c++) {
       if (GRID[r][c] !== 1) continue;
       const x = offX + c * cell;
       const y = offY + r * cell;
-      ctx.fillStyle = "#0d0b09";
+      ctx.fillStyle = "#0c0a08";
       ctx.fillRect(x, y, cell, cell);
-      // Hairline along open neighbours.
-      ctx.strokeStyle = "rgba(245,94,9,0.18)";
+      ctx.strokeStyle = "rgba(245,94,9,0.22)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       if (r + 1 < H && GRID[r + 1][c] !== 1) {
@@ -518,12 +557,18 @@ function drawMaze(
     }
   }
 
-  // Once won, brighten everything slightly — the workspace lit the room.
-  if (won) {
-    const t = Math.min(1, ((now % 1200) + 0) / 1200);
-    ctx.globalAlpha = 0.04 + 0.02 * Math.sin(t * Math.PI * 2);
+  // Once won, a soft amber wash brightens the floors — the workspace
+  // lit the whole room. Climbs in over ~700ms then holds steady.
+  if (won && winStart != null) {
+    const t = Math.min(1, (now - winStart) / 700);
+    ctx.globalAlpha = 0.06 + 0.05 * t;
     ctx.fillStyle = "#f9a71d";
-    ctx.fillRect(offX, offY, cell * W, cell * H);
+    for (let r = 0; r < H; r++) {
+      for (let c = 0; c < W; c++) {
+        if (GRID[r][c] === 1) continue;
+        ctx.fillRect(offX + c * cell, offY + r * cell, cell, cell);
+      }
+    }
     ctx.globalAlpha = 1;
   }
 }
@@ -534,36 +579,37 @@ function drawTarget(
   offY: number,
   cell: number,
   won: boolean,
+  winStart: number | null,
   now: number,
 ) {
-  // Abstract workspace: a small monitor on a desk. Dim until won, then
-  // its screen lights up and a soft halo pours into the room around it.
   const cx = offX + (TARGET.c + 0.5) * cell;
   const cy = offY + (TARGET.r + 0.5) * cell;
-  const s = cell * 0.78;
+  const s = cell * 0.86;
 
-  // Halo when on.
-  if (won) {
-    const pulse = 0.6 + 0.4 * Math.sin(now / 220);
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cell * 3.2);
-    grad.addColorStop(0, `rgba(249,167,29,${0.55 * pulse})`);
-    grad.addColorStop(0.5, "rgba(245,94,9,0.18)");
+  // Big halo once the screen comes on — a confident pool of light
+  // spilling around the desk.
+  if (won && winStart != null) {
+    const t = Math.min(1, (now - winStart) / 520);
+    const pulse = 0.7 + 0.3 * Math.sin(now / 240);
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cell * 4.5);
+    grad.addColorStop(0, `rgba(255,206,120,${0.85 * t * pulse})`);
+    grad.addColorStop(0.35, `rgba(249,167,29,${0.4 * t})`);
+    grad.addColorStop(0.7, "rgba(245,94,9,0.12)");
     grad.addColorStop(1, "rgba(245,94,9,0)");
     ctx.fillStyle = grad;
-    ctx.fillRect(cx - cell * 3.2, cy - cell * 3.2, cell * 6.4, cell * 6.4);
+    ctx.fillRect(cx - cell * 4.5, cy - cell * 4.5, cell * 9, cell * 9);
   }
 
-  // Monitor outline.
+  // Monitor body.
   const screenW = s;
   const screenH = s * 0.62;
   const screenX = cx - screenW / 2;
   const screenY = cy - screenH / 2 - cell * 0.06;
 
   ctx.lineWidth = Math.max(1.2, cell * 0.06);
-  ctx.strokeStyle = won ? "#f9a71d" : "rgba(244,237,224,0.55)";
-  ctx.fillStyle = won ? "rgba(249,167,29,0.85)" : "rgba(20,16,12,0.85)";
+  ctx.strokeStyle = won ? "#fff0c5" : "rgba(244,237,224,0.55)";
+  ctx.fillStyle = won ? "#f9a71d" : "rgba(20,16,12,0.85)";
 
-  // Rounded screen rect.
   const r = Math.max(2, cell * 0.08);
   roundedRect(ctx, screenX, screenY, screenW, screenH, r);
   ctx.fill();
@@ -577,13 +623,13 @@ function drawTarget(
   ctx.lineTo(cx + standW * 0.7, screenY + screenH + cell * 0.22);
   ctx.lineTo(cx - standW * 0.7, screenY + screenH + cell * 0.22);
   ctx.closePath();
-  ctx.fillStyle = won ? "rgba(249,167,29,0.6)" : "rgba(244,237,224,0.18)";
+  ctx.fillStyle = won ? "rgba(249,167,29,0.7)" : "rgba(244,237,224,0.18)";
   ctx.fill();
   ctx.stroke();
 
-  // Tiny screen lines for texture.
+  // Screen lines once lit.
   if (won) {
-    ctx.strokeStyle = "rgba(255,255,255,0.45)";
+    ctx.strokeStyle = "rgba(255,255,255,0.55)";
     ctx.lineWidth = 1;
     for (let i = 0; i < 3; i++) {
       const y = screenY + screenH * (0.28 + i * 0.18);
@@ -601,28 +647,39 @@ function drawBulb(
   y: number,
   cell: number,
   won: boolean,
+  winT: number,
 ) {
-  const core = cell * 0.18;
-  const halo = cell * 1.05;
+  // Bloom the bulb itself as the workspace switches on — the source
+  // grows brighter and bigger to sell the payoff.
+  const haloMul = 1.85 + 1.4 * winT;
+  const coreMul = 0.24 + 0.18 * winT;
+  const core = cell * coreMul;
+  const halo = cell * haloMul;
 
-  // Warm halo.
-  const grad = ctx.createRadialGradient(x, y, 0, x, y, halo);
-  grad.addColorStop(0, "rgba(255,184,80,0.85)");
-  grad.addColorStop(0.25, "rgba(249,167,29,0.55)");
-  grad.addColorStop(0.6, "rgba(245,94,9,0.18)");
-  grad.addColorStop(1, "rgba(245,94,9,0)");
-  ctx.fillStyle = grad;
+  // Outer warm halo — wide, soft, gradient.
+  const outer = ctx.createRadialGradient(x, y, 0, x, y, halo);
+  outer.addColorStop(0, "rgba(255,200,110,0.95)");
+  outer.addColorStop(0.18, "rgba(255,184,80,0.7)");
+  outer.addColorStop(0.4, "rgba(249,167,29,0.42)");
+  outer.addColorStop(0.7, "rgba(245,94,9,0.16)");
+  outer.addColorStop(1, "rgba(245,94,9,0)");
+  ctx.fillStyle = outer;
   ctx.fillRect(x - halo, y - halo, halo * 2, halo * 2);
 
-  // Hot core.
+  // Inner hot ring — the visible bulb glass.
+  const inner = ctx.createRadialGradient(x, y, 0, x, y, core * 2.2);
+  inner.addColorStop(0, "rgba(255,255,255,1)");
+  inner.addColorStop(0.4, "rgba(255,236,180,0.95)");
+  inner.addColorStop(1, "rgba(255,200,110,0)");
+  ctx.fillStyle = inner;
   ctx.beginPath();
-  ctx.arc(x, y, core, 0, Math.PI * 2);
-  ctx.fillStyle = won ? "#fff7d8" : "#fff1c5";
+  ctx.arc(x, y, core * 2.2, 0, Math.PI * 2);
   ctx.fill();
 
+  // White hot pin.
   ctx.beginPath();
   ctx.arc(x, y, core * 0.55, 0, Math.PI * 2);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = won ? "#ffffff" : "#fff7e0";
   ctx.fill();
 }
 

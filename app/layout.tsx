@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { allFontVariables } from "@/lib/fonts";
+import { LightTransition } from "@/app/_components/LightTransition";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,7 +41,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-GB" className={allFontVariables}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <LightTransition />
+      </body>
     </html>
   );
 }

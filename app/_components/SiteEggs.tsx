@@ -11,13 +11,25 @@ import { useEffect } from "react";
 const GREETED_KEY = "illuminate_console_greeted";
 
 const ASCII_BULB = [
-  "      .---.      ",
-  "     /     \\     ",
-  "    |  *_*  |    ",
-  "     \\     /     ",
-  "      |   |      ",
-  "      |___|      ",
+  "      .-.  ",
+  "     /   \\ ",
+  "     \\   / ",
+  "      | |  ",
+  "      |_|  ",
 ].join("\n");
+
+const GREETING =
+  "\n\nYou're trying to illuminate your knowledge by peeking under the bonnet\n" +
+  "of our site. We like that. It's exactly the sort of instinct we look for.\n\n" +
+  "You've earned a bit of fun, so here are the hidden bits:\n\n" +
+  "  • Click the lightbulb in our logo and take 5. There's a little game in there.\n" +
+  "  • Feeling nostalgic? The Konami code still works.\n" +
+  "    Up, up, down, down, left, right, left, right, B, A.\n" +
+  "  • Press L to turn the lights off and have a look around in the dark.\n\n" +
+  "And if you do this for a living, helping people get real use out of the\n" +
+  "Microsoft tools they already pay for, we should probably talk.\n" +
+  "There's a contact page for exactly that.\n\n" +
+  "Now off you pop. The maze is waiting.";
 
 export function SiteEggs() {
   useEffect(() => {
@@ -32,29 +44,14 @@ export function SiteEggs() {
     }
 
     try {
-      const brand =
-        "padding:2px 6px; background:#f55e09; color:#fff; font:600 12px/1 'Hanken Grotesk', sans-serif; border-radius:3px";
-      const muted =
-        "color:#9a8b73; font:13px/1.45 'Hanken Grotesk', sans-serif";
-      const amber =
-        "color:#f9a71d; font:13px/1.45 'Hanken Grotesk', sans-serif";
-
-      // Group keeps the cluster collapsible if the visitor finds it noisy.
-      console.groupCollapsed(
-        "%cIlluminate%c  hello you, lovely lurker.",
-        brand,
-        muted,
-      );
-      console.log("%c" + ASCII_BULB, amber);
+      // One log so the bulb's spacing survives. Only the greeting line is
+      // styled (brand orange, bold); the rest stays at the console default
+      // so it reads on both light and dark consoles.
       console.log(
-        "%cThere is a bulb in the nav. It does something.\n" +
-          "Press %cL%c to drop the lights. The cursor will sort you out.\n" +
-          "If you remember the Konami code, give it a try on either homepage.",
-        muted,
-        amber,
-        muted,
+        ASCII_BULB + "\n\n%cHello, curious one.%c" + GREETING,
+        "color:#f55e09;font-weight:700",
+        "",
       );
-      console.groupEnd();
     } catch {
       // Console unavailable in some sandboxed environments. Nothing to
       // do but move on.

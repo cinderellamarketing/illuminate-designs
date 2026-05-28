@@ -1,36 +1,96 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useIsTouch } from "@/lib/useIsTouch";
 
-/* Maze grid: 1 = wall, 0 = open, 2 = target, 3 = start.
-   A cinematic S-route through three wide horizontal corridors. The
-   player starts bottom-left, runs the lower corridor, climbs the left
-   notch, threads the middle corridor, climbs the right notch, then
-   finds the workspace top-right. Wide enough to feel designed, not
-   fiddly. */
-const W = 19;
-const H = 11;
-const GRID: number[][] = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-];
+/* The maze is generated fresh each time it opens with a recursive
+   backtracker (depth-first carving). That gives real branching paths and
+   dead ends, and a different layout on every visit for replayability.
 
-const START = { c: 1, r: 9 };
-const TARGET = { c: 17, r: 1 };
+   Cells are carved on a coarse grid; the rendered grid is (2*cols+1) by
+   (2*rows+1) so every passage has a one-cell wall around it. 1 = wall,
+   0 = open. The bulb starts bottom-left; the workspace sits top-right. */
 
-const SPOTLIGHT_RADIUS_RATIO = 0.44;
+const MAZE_COLS = 9;
+const MAZE_ROWS = 7;
+
+// generateMaze always carves the start at the bottom-left passage, so the
+// bulb's opening cell is known without reading the maze during render.
+const START_R = (MAZE_ROWS - 1) * 2 + 1;
+const START_C = 1;
+
+// Spotlight reach measured in cells, not pixels, so the challenge stays
+// the same whatever the viewport: a small pool of light around the bulb.
+// Touch gets a touch more reach since cells are tiny on a phone.
+const LIGHT_CELLS_POINTER = 3.3;
+const LIGHT_CELLS_TOUCH = 3.9;
+
 const MOVE_MS = 95;
+
+type Maze = {
+  grid: Uint8Array;
+  W: number;
+  H: number;
+  start: { r: number; c: number };
+  target: { r: number; c: number };
+};
+
+function generateMaze(cols: number, rows: number): Maze {
+  const W = cols * 2 + 1;
+  const H = rows * 2 + 1;
+  const grid = new Uint8Array(W * H).fill(1); // everything walled to start
+  const at = (r: number, c: number) => r * W + c;
+
+  const visited = new Array(cols * rows).fill(false);
+  const cell = (cr: number, cc: number) => cr * cols + cc;
+
+  const dirs = [
+    { dr: -1, dc: 0 },
+    { dr: 1, dc: 0 },
+    { dr: 0, dc: -1 },
+    { dr: 0, dc: 1 },
+  ];
+
+  // Explicit stack rather than recursion so a big maze can't blow the
+  // call stack.
+  const stack: Array<{ cr: number; cc: number }> = [];
+  const startCr = rows - 1;
+  const startCc = 0;
+  visited[cell(startCr, startCc)] = true;
+  grid[at(startCr * 2 + 1, startCc * 2 + 1)] = 0;
+  stack.push({ cr: startCr, cc: startCc });
+
+  while (stack.length) {
+    const cur = stack[stack.length - 1];
+    const open: Array<{ nr: number; nc: number; dr: number; dc: number }> = [];
+    for (const d of dirs) {
+      const nr = cur.cr + d.dr;
+      const nc = cur.cc + d.dc;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+      if (visited[cell(nr, nc)]) continue;
+      open.push({ nr, nc, dr: d.dr, dc: d.dc });
+    }
+    if (open.length === 0) {
+      stack.pop();
+      continue;
+    }
+    const pick = open[(Math.random() * open.length) | 0];
+    // Knock through the wall between the two cells, then open the cell.
+    grid[at(cur.cr * 2 + 1 + pick.dr, cur.cc * 2 + 1 + pick.dc)] = 0;
+    grid[at(pick.nr * 2 + 1, pick.nc * 2 + 1)] = 0;
+    visited[cell(pick.nr, pick.nc)] = true;
+    stack.push({ cr: pick.nr, cc: pick.nc });
+  }
+
+  return {
+    grid,
+    W,
+    H,
+    start: { r: (rows - 1) * 2 + 1, c: 1 },
+    target: { r: 1, c: (cols - 1) * 2 + 1 },
+  };
+}
 
 type Dir = "up" | "down" | "left" | "right" | null;
 
@@ -49,9 +109,9 @@ function dirDelta(d: Dir): { dr: number; dc: number } {
   }
 }
 
-function isOpen(r: number, c: number): boolean {
-  if (r < 0 || r >= H || c < 0 || c >= W) return false;
-  return GRID[r][c] !== 1;
+function isOpen(maze: Maze, r: number, c: number): boolean {
+  if (r < 0 || r >= maze.H || c < 0 || c >= maze.W) return false;
+  return maze.grid[r * maze.W + c] !== 1;
 }
 
 function keyToDir(k: string): Dir {
@@ -77,14 +137,21 @@ function keyToDir(k: string): Dir {
   }
 }
 
+// Dry little sign-off, scaled to how long it took. British, no fuss.
+function winLine(seconds: number): string {
+  if (seconds <= 20) return `Lights on in ${seconds} seconds. Show off.`;
+  if (seconds <= 45) return `Lights on in ${seconds} seconds. Tidy.`;
+  if (seconds <= 90) return `Lights on in ${seconds} seconds. Got there.`;
+  return `Lights on in ${seconds} seconds. We will say no more about it.`;
+}
+
 export type LightMazeProps = {
   open: boolean;
   onClose: () => void;
   onWin?: () => void;
-  // "gate" mounts before the page (used as the /room intro); "modal" floats
-  // above the page (used from the /session bulb easter egg).
+  // "gate" mounts before the page; "modal" floats above it (the bulb /
+  // Konami easter egg on both homepages uses "modal").
   variant?: "gate" | "modal";
-  // Optional intro headline beneath the maze.
   title?: string;
   subtitle?: string;
 };
@@ -104,12 +171,16 @@ export function LightMaze({
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
+  // The generated maze for this opening. Lives in a ref so the rAF loop
+  // reads it without re-rendering.
+  const mazeRef = useRef<Maze>(generateMaze(MAZE_COLS, MAZE_ROWS));
+
   // All gameplay state lives in refs so the rAF loop doesn't trigger
-  // re-renders. The dialog's surrounding UI doesn't depend on win state —
-  // it reads from refs at draw time only.
+  // re-renders. The only thing that re-renders the dialog is the final
+  // win time, surfaced once for the dry sign-off line.
   const posRef = useRef({
-    r: START.r,
-    c: START.c,
+    r: START_R,
+    c: START_C,
     animFrom: null as { r: number; c: number } | null,
     animTo: null as { r: number; c: number } | null,
     animStart: 0,
@@ -128,13 +199,29 @@ export function LightMaze({
 
   const wonRef = useRef(false);
   const winStartRef = useRef<number | null>(null);
+  // Clock starts on the first move so reading the intro isn't punished.
+  const moveStartRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset on open. No setState here; the rAF loop reads refs.
+  const [winSeconds, setWinSeconds] = useState<number | null>(null);
+
+  // Clear the win line when the maze (re)opens. Done during render with the
+  // previous-value-in-state pattern (not an effect, not a ref) so it neither
+  // trips the hooks rules nor leaves a stale line on the next opening.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) setWinSeconds(null);
+  }
+
+  // Reset on open: a fresh maze, bulb back at the start, clocks cleared.
   useEffect(() => {
     if (!open) return;
+    const maze = generateMaze(MAZE_COLS, MAZE_ROWS);
+    mazeRef.current = maze;
     posRef.current = {
-      r: START.r,
-      c: START.c,
+      r: maze.start.r,
+      c: maze.start.c,
       animFrom: null,
       animTo: null,
       animStart: 0,
@@ -143,6 +230,13 @@ export function LightMaze({
     lastDirRef.current = null;
     wonRef.current = false;
     winStartRef.current = null;
+    moveStartRef.current = null;
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
   }, [open]);
 
   /* ---------- input ---------- */
@@ -154,7 +248,8 @@ export function LightMaze({
     const { dr, dc } = dirDelta(dir);
     const nr = p.r + dr;
     const nc = p.c + dc;
-    if (!isOpen(nr, nc)) return false;
+    if (!isOpen(mazeRef.current, nr, nc)) return false;
+    if (moveStartRef.current == null) moveStartRef.current = performance.now();
     p.animFrom = { r: p.r, c: p.c };
     p.animTo = { r: nr, c: nc };
     p.animStart = performance.now();
@@ -174,13 +269,19 @@ export function LightMaze({
     return null;
   }, []);
 
-  // Keyboard.
+  // Keyboard: movement, Esc to close, and a simple focus trap (the only
+  // focusable control is the close button, so Tab just stays on it).
   useEffect(() => {
     if (!open) return;
     const onDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        e.preventDefault();
+        closeRef.current?.focus();
         return;
       }
       const dir = keyToDir(e.key);
@@ -281,6 +382,8 @@ export function LightMaze({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const lightCells = isTouch ? LIGHT_CELLS_TOUCH : LIGHT_CELLS_POINTER;
+
     const setupDpr = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
@@ -296,6 +399,8 @@ export function LightMaze({
     let raf = 0;
 
     const render = (now: number) => {
+      const maze = mazeRef.current;
+      const { W, H, target } = maze;
       const rect = canvas.getBoundingClientRect();
       const cssW = rect.width;
       const cssH = rect.height;
@@ -316,11 +421,16 @@ export function LightMaze({
           p.animFrom = null;
           p.animTo = null;
 
-          if (!wonRef.current && p.r === TARGET.r && p.c === TARGET.c) {
+          if (!wonRef.current && p.r === target.r && p.c === target.c) {
             wonRef.current = true;
             winStartRef.current = now;
-            const totalWait = reduce ? 700 : 1250;
-            setTimeout(() => {
+            const secs = Math.max(
+              1,
+              Math.round((now - (moveStartRef.current ?? now)) / 1000),
+            );
+            setWinSeconds(secs);
+            const totalWait = reduce ? 1700 : 3200;
+            closeTimerRef.current = setTimeout(() => {
               onWin?.();
               onClose();
             }, totalWait);
@@ -355,18 +465,18 @@ export function LightMaze({
 
       // 2. Maze scene (walls + workspace). Painted fully; the spotlight
       //    overlay in step 3 hides anything outside the bulb's reach.
-      drawMaze(ctx, offX, offY, cell, wonRef.current, winStartRef.current, now);
-      drawTarget(ctx, offX, offY, cell, wonRef.current, winStartRef.current, now);
+      drawMaze(ctx, maze, offX, offY, cell, wonRef.current, winStartRef.current, now);
+      drawTarget(ctx, maze, offX, offY, cell, wonRef.current, winStartRef.current, now);
 
-      // 3. Spotlight. A wide radial cutout from the bulb, fading to deep
-      //    black around the maze. When the puzzle is won the spotlight
-      //    blooms outward to reveal the whole room.
+      // 3. Spotlight. A pool of light around the bulb, fading to deep
+      //    black across the rest of the maze. On win the pool blooms
+      //    outward to reveal the whole room.
       const winT = wonRef.current && winStartRef.current
         ? Math.min(1, (now - winStartRef.current) / (reduce ? 320 : 520))
         : 0;
       const bloom = easeOutCubic(winT);
-      const baseRadius = drawW * SPOTLIGHT_RADIUS_RATIO;
-      const maxBloom = Math.hypot(drawW, drawH) * 0.65;
+      const baseRadius = cell * lightCells;
+      const maxBloom = Math.hypot(drawW, drawH) * 0.72;
       const radius = baseRadius + (maxBloom - baseRadius) * bloom;
 
       if (winT < 1) {
@@ -381,18 +491,24 @@ export function LightMaze({
         // Inside the spotlight: subtle warm wash so the maze reads as lit,
         // not just unmasked. Falls off to absolute black at the rim.
         grad.addColorStop(0, "rgba(255,184,80,0.05)");
-        grad.addColorStop(0.18, "rgba(7,6,5,0)");
-        grad.addColorStop(0.6, "rgba(4,3,2,0.55)");
+        grad.addColorStop(0.32, "rgba(7,6,5,0)");
+        grad.addColorStop(0.66, "rgba(4,3,2,0.6)");
         grad.addColorStop(0.85, "rgba(4,3,2,0.95)");
         grad.addColorStop(1, "rgba(4,3,2,1)");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, cssW, cssH);
+
+        // 4. Distant beacon: a faint glow at the workspace that shows
+        //    through the dark so there's always something to aim for.
+        //    Drawn over the darkness with screen blend, fading out as the
+        //    win bloom takes over.
+        drawBeacon(ctx, target, offX, offY, cell, now, 1 - bloom);
       }
 
-      // 4. Bulb on top, always glowing.
+      // 5. Bulb on top, always glowing.
       drawBulb(ctx, ppos.x, ppos.y, cell, wonRef.current, winT);
 
-      // 5. Win flare: a brief warm-white peak that softens into the
+      // 6. Win flare: a brief warm-white peak that softens into the
       //    sustained bloom. Reduced motion gets a gentle amber wash.
       if (wonRef.current && winStartRef.current) {
         const flashT = Math.min(1, (now - winStartRef.current) / 280);
@@ -425,7 +541,7 @@ export function LightMaze({
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
     };
-  }, [open, reduce, onClose, onWin, tryMove, pickHeld]);
+  }, [open, reduce, isTouch, onClose, onWin, tryMove, pickHeld]);
 
   const hint = useMemo(() => {
     if (isTouch) return "Swipe to move. Find the workspace.";
@@ -492,7 +608,13 @@ export function LightMaze({
         </div>
 
         <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
-          <span>{hint}</span>
+          {winSeconds != null ? (
+            <span className="font-serif-text text-[15px] normal-case italic tracking-normal text-[#f9a71d]">
+              {winLine(winSeconds)}
+            </span>
+          ) : (
+            <span>{hint}</span>
+          )}
           <span>Press Esc to close</span>
         </div>
       </div>
@@ -508,6 +630,7 @@ function easeOutCubic(t: number): number {
 
 function drawMaze(
   ctx: CanvasRenderingContext2D,
+  maze: Maze,
   offX: number,
   offY: number,
   cell: number,
@@ -515,11 +638,14 @@ function drawMaze(
   winStart: number | null,
   now: number,
 ) {
+  const { grid, W, H } = maze;
+  const wall = (r: number, c: number) => grid[r * W + c] === 1;
+
   // Floors — warm but dim, only really seen inside the spotlight.
   ctx.fillStyle = "#1c1611";
   for (let r = 0; r < H; r++) {
     for (let c = 0; c < W; c++) {
-      if (GRID[r][c] === 1) continue;
+      if (wall(r, c)) continue;
       ctx.fillRect(offX + c * cell, offY + r * cell, cell, cell);
     }
   }
@@ -529,7 +655,7 @@ function drawMaze(
   // edges suggests filament light catching the corner of the wall.
   for (let r = 0; r < H; r++) {
     for (let c = 0; c < W; c++) {
-      if (GRID[r][c] !== 1) continue;
+      if (!wall(r, c)) continue;
       const x = offX + c * cell;
       const y = offY + r * cell;
       ctx.fillStyle = "#0c0a08";
@@ -537,19 +663,19 @@ function drawMaze(
       ctx.strokeStyle = "rgba(245,94,9,0.22)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      if (r + 1 < H && GRID[r + 1][c] !== 1) {
+      if (r + 1 < H && !wall(r + 1, c)) {
         ctx.moveTo(x, y + cell);
         ctx.lineTo(x + cell, y + cell);
       }
-      if (r - 1 >= 0 && GRID[r - 1][c] !== 1) {
+      if (r - 1 >= 0 && !wall(r - 1, c)) {
         ctx.moveTo(x, y);
         ctx.lineTo(x + cell, y);
       }
-      if (c + 1 < W && GRID[r][c + 1] !== 1) {
+      if (c + 1 < W && !wall(r, c + 1)) {
         ctx.moveTo(x + cell, y);
         ctx.lineTo(x + cell, y + cell);
       }
-      if (c - 1 >= 0 && GRID[r][c - 1] !== 1) {
+      if (c - 1 >= 0 && !wall(r, c - 1)) {
         ctx.moveTo(x, y);
         ctx.lineTo(x, y + cell);
       }
@@ -565,7 +691,7 @@ function drawMaze(
     ctx.fillStyle = "#f9a71d";
     for (let r = 0; r < H; r++) {
       for (let c = 0; c < W; c++) {
-        if (GRID[r][c] === 1) continue;
+        if (wall(r, c)) continue;
         ctx.fillRect(offX + c * cell, offY + r * cell, cell, cell);
       }
     }
@@ -573,8 +699,38 @@ function drawMaze(
   }
 }
 
+// Faint pulsing glow at the goal, visible through the darkness so the
+// player always has a bearing. Screen blend keeps it reading as light,
+// not a painted blob. `fade` drops it out as the win bloom arrives.
+function drawBeacon(
+  ctx: CanvasRenderingContext2D,
+  target: { r: number; c: number },
+  offX: number,
+  offY: number,
+  cell: number,
+  now: number,
+  fade: number,
+) {
+  if (fade <= 0.001) return;
+  const cx = offX + (target.c + 0.5) * cell;
+  const cy = offY + (target.r + 0.5) * cell;
+  const pulse = 0.7 + 0.3 * Math.sin(now / 620);
+  const radius = cell * 2.6;
+  const a = 0.5 * fade * pulse;
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  grad.addColorStop(0, `rgba(255,196,96,${(0.5 * a).toFixed(3)})`);
+  grad.addColorStop(0.5, `rgba(249,167,29,${(0.22 * a).toFixed(3)})`);
+  grad.addColorStop(1, "rgba(245,94,9,0)");
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.fillStyle = grad;
+  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+
 function drawTarget(
   ctx: CanvasRenderingContext2D,
+  maze: Maze,
   offX: number,
   offY: number,
   cell: number,
@@ -582,8 +738,9 @@ function drawTarget(
   winStart: number | null,
   now: number,
 ) {
-  const cx = offX + (TARGET.c + 0.5) * cell;
-  const cy = offY + (TARGET.r + 0.5) * cell;
+  const { target } = maze;
+  const cx = offX + (target.c + 0.5) * cell;
+  const cy = offY + (target.r + 0.5) * cell;
   const s = cell * 0.86;
 
   // Big halo once the screen comes on — a confident pool of light

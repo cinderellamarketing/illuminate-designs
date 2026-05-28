@@ -1,14 +1,16 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
-import { BulbMark } from "@/app/_components/BulbMark";
 import { LightMaze } from "@/app/_components/LightMaze";
+import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
+import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { SiteNav } from "@/app/_components/SiteNav";
 import { useDeclareVariant } from "@/app/_components/useVariant";
+import { useLightEggs } from "@/app/_components/useLightEggs";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { media } from "@/lib/media";
 import {
@@ -24,119 +26,10 @@ import {
   statTooltip,
 } from "@/lib/copy";
 
-const KONAMI: ReadonlyArray<string> = [
-  "ArrowUp",
-  "ArrowUp",
-  "ArrowDown",
-  "ArrowDown",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowLeft",
-  "ArrowRight",
-  "b",
-  "a",
-];
-
-const BULB_POP_THRESHOLD = 4;
-const BULB_POP_WINDOW_MS = 900;
-const BULB_RESTORE_MS = 1200;
-// Wait this long after a click for any follow-up clicks before opening
-// the maze. Lets rapid-clickers reach the pop threshold first.
-const BULB_OPEN_DELAY_MS = 320;
-
 export function SessionPage() {
   useDeclareVariant("session");
-  const [mazeOpen, setMazeOpen] = useState(false);
-  const [flourishing, setFlourishing] = useState(false);
-  const [bulbBlown, setBulbBlown] = useState(false);
-  const clickTimesRef = useRef<number[]>([]);
-  const flourishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const openMazeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Konami code. Window-level listener. Arrows are prevented from
-  // scrolling so the typist can actually finish. Auto-repeat ignored.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const buffer: string[] = [];
-
-    const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      if (e.repeat) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      const watching =
-        key.startsWith("Arrow") ||
-        key === "a" ||
-        key === "b" ||
-        buffer.length > 0;
-      if (!watching) return;
-
-      if (key.startsWith("Arrow")) e.preventDefault();
-
-      buffer.push(key);
-      if (buffer.length > KONAMI.length) buffer.shift();
-      if (
-        buffer.length === KONAMI.length &&
-        buffer.every((k, i) => k === KONAMI[i])
-      ) {
-        buffer.length = 0;
-        triggerKonami();
-      }
-    };
-
-    const triggerKonami = () => {
-      setFlourishing(true);
-      if (flourishTimerRef.current) clearTimeout(flourishTimerRef.current);
-      flourishTimerRef.current = setTimeout(() => {
-        setFlourishing(false);
-        setMazeOpen(true);
-      }, 720);
-    };
-
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      if (flourishTimerRef.current) clearTimeout(flourishTimerRef.current);
-    };
-  }, []);
-
-  // Bulb click handler. Single tap → open maze (after a debounce).
-  // Four taps in 900ms → blow the bulb instead.
-  const handleBulb = useCallback(() => {
-    if (bulbBlown) return;
-    const now = performance.now();
-    const recent = clickTimesRef.current.filter(
-      (t) => now - t < BULB_POP_WINDOW_MS,
-    );
-    recent.push(now);
-    clickTimesRef.current = recent;
-
-    if (recent.length >= BULB_POP_THRESHOLD) {
-      if (openMazeTimerRef.current) {
-        clearTimeout(openMazeTimerRef.current);
-        openMazeTimerRef.current = null;
-      }
-      clickTimesRef.current = [];
-      setBulbBlown(true);
-      setTimeout(() => setBulbBlown(false), BULB_RESTORE_MS);
-      return;
-    }
-
-    if (openMazeTimerRef.current) clearTimeout(openMazeTimerRef.current);
-    openMazeTimerRef.current = setTimeout(() => {
-      openMazeTimerRef.current = null;
-      clickTimesRef.current = [];
-      setMazeOpen(true);
-    }, BULB_OPEN_DELAY_MS);
-  }, [bulbBlown]);
-
-  useEffect(() => {
-    return () => {
-      if (openMazeTimerRef.current) clearTimeout(openMazeTimerRef.current);
-    };
-  }, []);
+  const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
+    useLightEggs();
 
   return (
     <main className="font-ui bg-paper text-ink min-h-dvh">
@@ -151,12 +44,13 @@ export function SessionPage() {
       <SiteFooter />
       <LightMaze
         open={mazeOpen}
-        onClose={() => setMazeOpen(false)}
+        onClose={closeMaze}
         variant="modal"
         title="The bulb wants a moment."
         subtitle="Find the workspace. We'll light it up."
       />
       <KonamiFlourish active={flourishing} />
+      <LightSwitchGate />
     </main>
   );
 }
@@ -600,16 +494,6 @@ function Close() {
 }
 
 /* ---------------- Helpers ---------------- */
-
-function KonamiFlourish({ active }: { active: boolean }) {
-  return (
-    <div
-      aria-hidden
-      className="konami-flourish"
-      data-active={active ? "true" : "false"}
-    />
-  );
-}
 
 // Counts from the industry baseline (30) up to the headline number on
 // mount. Reduced motion goes straight to the final value.

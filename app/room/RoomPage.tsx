@@ -9,10 +9,13 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
+import { BulbMark } from "@/app/_components/BulbMark";
 import { LightMaze } from "@/app/_components/LightMaze";
+import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
+import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { useDeclareVariant } from "@/app/_components/useVariant";
-import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useLightEggs } from "@/app/_components/useLightEggs";
 import { media } from "@/lib/media";
 import {
   company,
@@ -22,11 +25,11 @@ import {
   statTooltip,
 } from "@/lib/copy";
 
-const INTRO_KEY = "illuminate_intro_seen";
-
-// /room is the cinematic homepage. First visit triggers a maze gate
-// before the page is revealed. After that the hero parallax-lifts the
-// 82%, and the seven docx scenes play out in contained 100svh shells.
+// /room is the cinematic homepage. The shared light-switch gate now
+// handles the first-visit intro (see LightSwitchGate); the maze lives on
+// here only as an easter egg, opened from the nav bulb or the Konami
+// code, matching /session. The hero parallax-lifts the 82%, and the
+// seven docx scenes play out in contained 100svh shells.
 //
 // EmergingNav is intentionally not the shared SiteNav — the cinematic
 // frame wants its chrome to fade in once the visitor has scrolled past
@@ -35,44 +38,20 @@ const INTRO_KEY = "illuminate_intro_seen";
 export function RoomPage() {
   useDeclareVariant("room");
   const [navVisible, setNavVisible] = useState(false);
-  const [gateOpen, setGateOpen] = useState(false);
-  const reduce = useReducedMotion();
+  const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
+    useLightEggs();
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
     setNavVisible(latest > 320);
   });
 
-  // Decide whether to show the intro gate. Skipped under reduced motion
-  // and once the visitor has seen it before.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let seen = false;
-    try {
-      seen = window.localStorage.getItem(INTRO_KEY) === "1";
-    } catch {
-      seen = true;
-    }
-    if (!seen && !reduce) {
-      const handle = setTimeout(() => setGateOpen(true), 0);
-      return () => clearTimeout(handle);
-    }
-    if (!seen && reduce) {
-      try {
-        window.localStorage.setItem(INTRO_KEY, "1");
-      } catch {}
-    }
-  }, [reduce]);
-
-  const dismissGate = () => {
-    setGateOpen(false);
-    try {
-      window.localStorage.setItem(INTRO_KEY, "1");
-    } catch {}
-  };
-
   return (
     <main className="font-ui min-h-dvh bg-[#0a0907] text-[#f4ede0]">
-      <EmergingNav visible={navVisible} />
+      <EmergingNav
+        visible={navVisible}
+        onBulb={handleBulb}
+        bulbBlown={bulbBlown}
+      />
       <Hero />
       <Scene01 />
       <Scene02 />
@@ -83,12 +62,14 @@ export function RoomPage() {
       <Scene07 />
       <SiteFooter />
       <LightMaze
-        open={gateOpen}
-        onClose={dismissGate}
-        variant="gate"
-        title="Find the workspace."
-        subtitle="Switch the room on. The page is waiting on the other side."
+        open={mazeOpen}
+        onClose={closeMaze}
+        variant="modal"
+        title="The bulb wants a moment."
+        subtitle="Find the workspace. We'll light it up."
       />
+      <KonamiFlourish active={flourishing} />
+      <LightSwitchGate />
     </main>
   );
 }
@@ -99,7 +80,15 @@ export function RoomPage() {
 // pages, so the rest of the site is visible from /room not just the
 // footer. A compact "menu" toggle on small screens reveals the same
 // link list in a stacked panel.
-function EmergingNav({ visible }: { visible: boolean }) {
+function EmergingNav({
+  visible,
+  onBulb,
+  bulbBlown = false,
+}: {
+  visible: boolean;
+  onBulb?: () => void;
+  bulbBlown?: boolean;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -111,12 +100,24 @@ function EmergingNav({ visible }: { visible: boolean }) {
       }`}
     >
       <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-6 px-6 py-4 md:px-10 md:py-5">
-        <Link
-          href="/"
-          className="font-display ignite-text text-xl italic tracking-tight text-[#f4ede0]"
-        >
-          Illuminate
-        </Link>
+        <div className="flex items-center gap-3">
+          <BulbMark
+            tone="light"
+            size={22}
+            onClick={onBulb}
+            blown={bulbBlown}
+            ariaLabel="Illuminate"
+            title={
+              bulbBlown ? "Ouch." : "It does something. Easy on the clicks."
+            }
+          />
+          <Link
+            href="/"
+            className="font-display ignite-text text-xl italic tracking-tight text-[#f4ede0]"
+          >
+            Illuminate
+          </Link>
+        </div>
 
         <nav className="hidden items-center gap-7 text-[12px] uppercase tracking-[0.18em] text-[#f4ede0]/75 md:flex">
           {nav.links

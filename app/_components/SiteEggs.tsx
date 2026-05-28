@@ -49,7 +49,7 @@ export function SiteEggs() {
       console.log(
         "%cThere is a bulb in the nav. It does something.\n" +
           "Press %cL%c to drop the lights. The cursor will sort you out.\n" +
-          "If you remember the Konami code, give it a try on the session page.",
+          "If you remember the Konami code, give it a try on either homepage.",
         muted,
         amber,
         muted,

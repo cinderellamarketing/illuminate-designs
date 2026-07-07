@@ -946,6 +946,70 @@ body.lights-off * {
   }
 }
 
+/* ---------- Light maze touch direction pad ---------- */
+
+.maze-pad {
+  display: grid;
+  grid-template-columns: repeat(3, clamp(52px, 18vw, 66px));
+  grid-template-rows: repeat(3, clamp(52px, 18vw, 66px));
+  gap: 10px;
+  touch-action: none;
+}
+
+.maze-pad__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  min-width: 52px;
+  border-radius: 12px;
+  background: #16120d;
+  border: 1px solid rgba(244, 237, 224, 0.16);
+  color: #f9a71d;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out,
+    color 160ms ease-out,
+    box-shadow 200ms ease-out,
+    transform 120ms ease-out;
+}
+
+.maze-pad__btn:focus-visible {
+  outline: 2px solid #f55e09;
+  outline-offset: 2px;
+}
+
+/* Pressed: the button lights up like the bulb and the wall switch. */
+.maze-pad__btn[data-pressed="true"] {
+  background: #1f1913;
+  border-color: rgba(245, 94, 9, 0.6);
+  color: #ffd27a;
+  box-shadow:
+    0 0 0 1px rgba(245, 94, 9, 0.4),
+    0 0 22px rgba(245, 94, 9, 0.5),
+    inset 0 0 12px rgba(249, 167, 29, 0.22);
+  transform: translateY(1px);
+}
+
+/* Reduced motion keeps the lit pressed state but drops the movement. */
+@media (prefers-reduced-motion: reduce) {
+  .maze-pad__btn {
+    transition: none;
+  }
+  .maze-pad__btn[data-pressed="true"] {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

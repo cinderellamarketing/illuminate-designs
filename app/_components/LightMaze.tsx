@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useIsTouch } from "@/lib/useIsTouch";
 
@@ -27,6 +28,21 @@ const LIGHT_CELLS_POINTER = 3.3;
 const LIGHT_CELLS_TOUCH = 3.9;
 
 const MOVE_MS = 95;
+
+// On-screen direction pad (touch only). Placed on a 3x3 grid: up top,
+// left/right on the sides, down below.
+type PadDir = "up" | "down" | "left" | "right";
+const PAD: ReadonlyArray<{
+  dir: PadDir;
+  label: string;
+  glyph: string;
+  cell: string;
+}> = [
+  { dir: "up", label: "Move up", glyph: "↑", cell: "col-start-2 row-start-1" },
+  { dir: "left", label: "Move left", glyph: "←", cell: "col-start-1 row-start-2" },
+  { dir: "right", label: "Move right", glyph: "→", cell: "col-start-3 row-start-2" },
+  { dir: "down", label: "Move down", glyph: "↓", cell: "col-start-2 row-start-3" },
+];
 
 type Maze = {
   grid: Uint8Array;
@@ -204,6 +220,10 @@ export function LightMaze({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [winSeconds, setWinSeconds] = useState<number | null>(null);
+  // Lit state of each on-screen pad button, for the pressed styling.
+  const [padPressed, setPadPressed] = useState<Partial<Record<PadDir, boolean>>>(
+    {},
+  );
 
   // Clear the win line when the maze (re)opens. Done during render with the
   // previous-value-in-state pattern (not an effect, not a ref) so it neither
@@ -228,6 +248,7 @@ export function LightMaze({
     };
     heldRef.current = { up: false, down: false, left: false, right: false };
     lastDirRef.current = null;
+    setPadPressed({});
     wonRef.current = false;
     winStartRef.current = null;
     moveStartRef.current = null;
@@ -267,6 +288,35 @@ export function LightMaze({
     if (h.down) return "down";
     if (h.up) return "up";
     return null;
+  }, []);
+
+  // On-screen pad. Drives exactly the same held-direction system as the
+  // keyboard: press sets the direction held and kicks off one move; the
+  // render loop then auto-advances to the held direction each time a move
+  // finishes, so press-and-hold glides just like holding an arrow key.
+  //
+  // Pointer capture on press guarantees we still receive the release even
+  // if the thumb slides off the button, so a direction can never stick on.
+  const pressDir = useCallback(
+    (dir: PadDir, e: ReactPointerEvent<HTMLButtonElement>) => {
+      // Stop scrolling/selection and the synthetic mouse/click that would
+      // otherwise follow this touch.
+      e.preventDefault();
+      if (heldRef.current[dir]) return; // ignore a duplicate press
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {}
+      heldRef.current[dir] = true;
+      lastDirRef.current = dir;
+      setPadPressed((p) => ({ ...p, [dir]: true }));
+      tryMove(dir);
+    },
+    [tryMove],
+  );
+
+  const releaseDir = useCallback((dir: PadDir) => {
+    heldRef.current[dir] = false;
+    setPadPressed((p) => (p[dir] ? { ...p, [dir]: false } : p));
   }, []);
 
   // Keyboard: movement, Esc to close, and a simple focus trap (the only
@@ -544,7 +594,7 @@ export function LightMaze({
   }, [open, reduce, isTouch, onClose, onWin, tryMove, pickHeld]);
 
   const hint = useMemo(() => {
-    if (isTouch) return "Swipe to move. Find the workspace.";
+    if (isTouch) return "Use the pad or swipe. Hold to glide.";
     return "Arrow keys or WASD. Hold to glide.";
   }, [isTouch]);
 
@@ -598,7 +648,11 @@ export function LightMaze({
         <div className="relative mt-6">
           <canvas
             ref={canvasRef}
-            className="block h-[70svh] max-h-[680px] min-h-[360px] w-full rounded-sm bg-[#040302]"
+            className={`block w-full rounded-sm bg-[#040302] ${
+              isTouch
+                ? "h-[38svh] max-h-[420px] min-h-[220px]"
+                : "h-[70svh] max-h-[680px] min-h-[360px]"
+            }`}
             style={{ touchAction: "none" }}
           />
           <div
@@ -606,6 +660,31 @@ export function LightMaze({
             className="pointer-events-none absolute inset-0 rounded-sm ring-1 ring-[#f4ede0]/10"
           />
         </div>
+
+        {/* Touch-only direction pad. Hold to glide; keyboard users get the
+            same behaviour from the arrow keys, which are untouched. */}
+        {isTouch && (
+          <div className="mt-5 flex justify-center">
+            <div className="maze-pad" role="group" aria-label="Direction pad">
+              {PAD.map((p) => (
+                <button
+                  key={p.dir}
+                  type="button"
+                  aria-label={p.label}
+                  data-pressed={padPressed[p.dir] ? "true" : "false"}
+                  className={`maze-pad__btn ${p.cell}`}
+                  onPointerDown={(e) => pressDir(p.dir, e)}
+                  onPointerUp={() => releaseDir(p.dir)}
+                  onPointerLeave={() => releaseDir(p.dir)}
+                  onPointerCancel={() => releaseDir(p.dir)}
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <span aria-hidden>{p.glyph}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 font-mono text-[11px] tracking-[0.03em] text-text-muted">
           {winSeconds != null ? (

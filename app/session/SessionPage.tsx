@@ -134,7 +134,7 @@ function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.7 }}
-            className="pointer-events-auto md:col-span-5 md:pl-4"
+            className="pointer-events-auto md:col-span-4 md:col-start-9"
           >
             <StatMeter
               value={STAT}
@@ -216,8 +216,7 @@ function WhatWeDo() {
               className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
             >
-              We train the role,{" "}
-              <span className="text-brand-amber">not the feature list.</span>
+              We build each session around the role.
             </motion.h2>
           </div>
           <div className="md:col-span-5 md:col-start-8 md:pt-10">
@@ -298,8 +297,7 @@ function QuickWin() {
               className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.25rem, 5vw, 4.5rem)" }}
             >
-              They are already paying for{" "}
-              <span className="text-brand-orange">the safe option.</span>
+              They are already paying for the safe option.
             </motion.h2>
           </div>
           <div className="md:col-span-5 md:col-start-8 md:pt-4">
@@ -337,8 +335,7 @@ function ForMsps() {
           className="font-display mt-6 max-w-[20ch] leading-[0.96]"
           style={{ fontSize: "clamp(2.5rem, 6vw, 5.5rem)" }}
         >
-          You do not have to{" "}
-          <span className="text-brand-amber">become the trainer.</span>
+          You do not have to become the trainer.
         </motion.h2>
 
         <div className="mt-12 grid gap-x-10 gap-y-8 md:grid-cols-12">
@@ -396,8 +393,7 @@ function Proof() {
               className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
             >
-              The difference is{" "}
-              <span className="text-brand-orange">the delivery.</span>
+              The difference is the delivery.
             </h2>
 
             <p className="mt-8 max-w-[48ch] text-lg leading-[1.6] text-text/80 md:text-xl">
@@ -463,7 +459,7 @@ function Close() {
             Let&apos;s turn those licences
           </span>
           <span
-            className="block text-brand-orange"
+            className="block"
             style={{ fontSize: "clamp(2.75rem, 7vw, 7rem)" }}
           >
             into something useful.

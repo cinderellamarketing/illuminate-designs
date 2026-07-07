@@ -88,7 +88,7 @@ export const sessionGap = {
 } as const;
 
 export const sessionWhatWeDo = {
-  heading: "We train the role, not the feature list.",
+  heading: "We build each session around the role.",
   body: "A sales director, a service desk engineer and a finance manager do not have the same day, so they do not get the same session. We start from the work people already have in front of them and show where Copilot saves them real time. Small groups, real tasks, and follow-up so it sticks.",
   cards: [
     {
@@ -109,7 +109,7 @@ export const sessionWhatWeDo = {
 
 export const sessionQuickWin = {
   heading: "They are already paying for the safe option.",
-  body: "There are two Copilots. The paid one lives inside Word, Excel and Teams and reads company data. But Copilot Basic, a secure AI chat under Microsoft's enterprise data protection, comes included with Business Premium and most Microsoft 365 plans at no extra cost. Their people are pasting work into free consumer chatbots because nobody told them there was a safe option already in the licence. That is the easiest place to start.",
+  body: "There are two Copilots. Copilot Premium, the paid licence, lives inside Word, Excel and Teams and reads company data. But Copilot Basic, a secure AI chat under Microsoft's enterprise data protection, comes included with Business Premium and most Microsoft 365 plans at no extra cost. Their people are pasting work into free consumer chatbots because nobody told them there was a safe option already in the licence. That is the easiest place to start.",
 } as const;
 
 export const sessionForMsps = {

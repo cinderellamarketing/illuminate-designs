@@ -108,7 +108,7 @@ export function StatMeter({
         aria-label={`${value} per cent`}
       >
         {display}
-        <span className="text-brand-amber">{unit}</span>
+        {unit}
       </div>
 
       {/* Gauge. Track holds the fill; the baseline tick marks 30. */}

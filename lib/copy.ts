@@ -79,27 +79,35 @@ export const sessionHero = {
   statCaption:
     "adoption in eight weeks, against an industry average of 30%.",
   primaryCta: { label: "Book a session", href: "/contact" },
-  secondaryCta: { label: "See a sample session", href: "/proof" },
+  secondaryCta: { label: "See a sample session", href: "/room" },
 } as const;
 
 export const sessionGap = {
   heading: "A licence is not a skill.",
   body: "Most rollouts stop at the switch being flicked. The software is on, the welcome email is sent, and then nothing changes. People carry on exactly as before, because nobody showed them how Copilot fits the job they actually do. The cost is real and recurring. The value only shows up when habits change.",
+  // Verbatim tail of the body. The gap section runs sparse, so it carries
+  // one strong line and this single quiet line, nothing more.
+  pull: "The value only shows up when habits change.",
 } as const;
 
 export const sessionWhatWeDo = {
   heading: "We build each session around the role.",
   body: "A sales director, a service desk engineer and a finance manager do not have the same day, so they do not get the same session. We start from the work people already have in front of them and show where Copilot saves them real time. Small groups, real tasks, and follow-up so it sticks.",
+  // Each lane is built around a role named verbatim in the body above, so
+  // the section can read as role panels rather than three identical cards.
   cards: [
     {
+      role: "Sales director",
       title: "Sales enablement.",
       body: "Confident teams who can talk about Copilot and use it to sell.",
     },
     {
+      role: "Service desk engineer",
       title: "Technical training.",
       body: "The hands-on skills your engineers need, security included.",
     },
     {
+      role: "Finance manager",
       title: "AI adoption.",
       body: "End users who actually change how they work.",
     },
@@ -110,6 +118,25 @@ export const sessionWhatWeDo = {
 export const sessionQuickWin = {
   heading: "They are already paying for the safe option.",
   body: "There are two Copilots. Copilot Premium, the paid licence, lives inside Word, Excel and Teams and reads company data. But Copilot Basic, a secure AI chat under Microsoft's enterprise data protection, comes included with Business Premium and most Microsoft 365 plans at no extra cost. Their people are pasting work into free consumer chatbots because nobody told them there was a safe option already in the licence. That is the easiest place to start.",
+  // The body broken out verbatim so the section can render as an actual
+  // two-side comparison. Copilot Basic is the included tier; Copilot
+  // Premium is the paid licence. Keep that distinction exact.
+  intro: "There are two Copilots.",
+  compare: {
+    premium: {
+      name: "Copilot Premium",
+      tag: "The paid licence.",
+      body: "Lives inside Word, Excel and Teams and reads company data.",
+    },
+    basic: {
+      name: "Copilot Basic",
+      tag: "Included, at no extra cost.",
+      body: "A secure AI chat under Microsoft's enterprise data protection, included with Business Premium and most Microsoft 365 plans.",
+      flag: "Start here",
+    },
+  },
+  kicker:
+    "Their people are pasting work into free consumer chatbots because nobody told them there was a safe option already in the licence. That is the easiest place to start.",
 } as const;
 
 export const sessionForMsps = {
@@ -122,8 +149,12 @@ export const sessionProof = {
   heading: "The difference is the delivery.",
   body: "The thing clients ask to see before they commit is what the training is actually like. So that is the thing we make easy to see.",
   pullFigure: "82% adoption in eight weeks.",
+  // The stat gauge lives once, in the hero. Here the figure is woven into
+  // a line so the proof section can stay visual-led, footage carrying it.
+  figureLine:
+    "82% adoption in eight weeks, against an industry average around 30%.",
   testimonialPlaceholder: "[Testimonial slot, with permission]",
-  cta: { label: "See a sample session", href: "/proof" },
+  cta: { label: "See a sample session", href: "/room" },
 } as const;
 
 export const sessionClose = {

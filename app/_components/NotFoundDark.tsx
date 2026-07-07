@@ -13,10 +13,8 @@ export function NotFoundDark() {
 
   return (
     <main
-      className={`font-ui relative min-h-dvh overflow-hidden transition-colors duration-500 ${
-        lit
-          ? "bg-[#0e0c08] text-[#f4ede0]"
-          : "bg-[#040302] text-[#f4ede0]/55"
+      className={`font-sans relative min-h-dvh overflow-hidden text-text transition-colors duration-500 ${
+        lit ? "bg-ground" : "bg-[#050403]"
       }`}
     >
       {/* Warm room glow once the switch is flipped. */}
@@ -26,37 +24,37 @@ export function NotFoundDark() {
         style={{
           opacity: lit ? 1 : 0,
           background:
-            "radial-gradient(60% 60% at 50% 35%, rgba(249,167,29,0.18) 0%, rgba(245,94,9,0.04) 55%, rgba(11,10,8,0) 100%)",
+            "radial-gradient(60% 60% at 50% 35%, rgba(249,167,29,0.18) 0%, rgba(245,94,9,0.04) 55%, rgba(13,11,9,0) 100%)",
         }}
       />
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[1100px] flex-col justify-between px-6 py-10 md:px-10 md:py-14">
-        <header className="flex items-baseline justify-between text-[11px] uppercase tracking-[0.22em] text-current/60">
-          <span className="font-display text-xl italic tracking-tight">
+        <header className="flex items-baseline justify-between font-mono text-[11px] tracking-[0.04em] text-text-muted">
+          <span className="font-display text-lg tracking-tight text-text">
             Illuminate
           </span>
           <span>Code · 404</span>
         </header>
 
         <div>
-          <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
+          <p className="label uppercase tracking-[0.12em] text-brand-amber">
             {lit ? "Found you" : "Power's out, sorry"}
           </p>
           <h1
-            className="font-display mt-6 leading-[0.92] tracking-tight"
+            className="font-display mt-6 leading-[0.94]"
             style={{ fontSize: "clamp(3.5rem, 11vw, 11rem)" }}
           >
             <span className="block">The lights</span>
             <span
-              className={`block italic transition-colors duration-500 ${
-                lit ? "text-[#f9a71d]" : "text-[#f55e09]"
+              className={`block transition-colors duration-500 ${
+                lit ? "text-brand-amber" : "text-brand-orange"
               }`}
             >
               {lit ? "are on." : "are off."}
             </span>
           </h1>
           <p
-            className="font-serif-text mt-8 max-w-[46ch] text-2xl italic leading-[1.25] transition-opacity duration-500"
+            className="mt-8 max-w-[48ch] text-lg leading-[1.6] text-text/80 transition-opacity duration-500 md:text-xl"
             style={{ opacity: lit ? 1 : 0.55 }}
           >
             {lit
@@ -64,11 +62,9 @@ export function NotFoundDark() {
               : "We could pretend this is a feature. We will not. There is a switch on the wall, though. Try that."}
           </p>
 
-          {/* The wall switch. Big enough to invite a flip; small enough
-              to feel like a real one in the corner of a dark room. */}
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <WallSwitch lit={lit} onToggle={() => setLit((v) => !v)} />
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-current/65">
+            <p className="font-mono text-[12px] text-text-muted">
               {lit ? "Have a poke around." : "Pull the cord."}
             </p>
           </div>
@@ -82,26 +78,23 @@ export function NotFoundDark() {
             }`}
             aria-hidden={!lit}
           >
-            <Link
-              href="/session"
-              className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[12px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
-            >
+            <Link href="/session" className="btn btn-primary btn-lg ignite">
+              <span aria-hidden className="btn-switch" />
               Back into the session
-              <span aria-hidden>→</span>
             </Link>
-            <Link
-              href="/room"
-              className="ignite-text font-ui text-[12px] uppercase tracking-[0.22em] underline-offset-4 hover:underline"
-            >
+            <Link href="/room" className="btn btn-secondary btn-lg ignite">
               Or step into the room
             </Link>
           </div>
         </div>
 
-        <footer className="text-[11px] uppercase tracking-[0.22em] text-current/55">
+        <footer className="font-mono text-[11px] tracking-[0.04em] text-text-muted">
           <span>
             {company.name} · {company.location} ·{" "}
-            <a href={`mailto:${company.email}`} className="ignite-text hover:text-[#f55e09]">
+            <a
+              href={`mailto:${company.email}`}
+              className="ignite-text hover:text-brand-orange"
+            >
               {company.email}
             </a>
           </span>
@@ -124,24 +117,24 @@ function WallSwitch({
       onClick={onToggle}
       aria-pressed={lit}
       aria-label={lit ? "Turn the room lights off" : "Turn the room lights on"}
-      className="group relative inline-flex items-center gap-4 rounded-md border border-[#f4ede0]/15 bg-[#0b0a08] px-4 py-3 text-left transition hover:border-[#f55e09]/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f55e09]"
+      className="group relative inline-flex items-center gap-4 rounded-lg border border-hairline bg-surface px-4 py-3 text-left transition hover:border-[#f55e09]/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f55e09]"
     >
-      <span className="relative inline-flex h-12 w-7 items-center justify-center rounded-sm border border-[#f4ede0]/25 bg-[#0a0907]">
+      <span className="relative inline-flex h-12 w-7 items-center justify-center rounded-sm border border-hairline bg-surface-2">
         {/* The toggle paddle. Slides up when lit. */}
         <span
           aria-hidden
           className={`absolute left-1 right-1 h-5 rounded-sm transition-all duration-300 ${
             lit
-              ? "top-1 bg-[#f9a71d] shadow-[0_0_12px_rgba(249,167,29,0.7)]"
+              ? "top-1 bg-brand-amber shadow-[0_0_12px_rgba(249,167,29,0.7)]"
               : "top-6 bg-[#211a12]"
           }`}
         />
       </span>
       <span className="flex flex-col">
-        <span className="font-ui text-[10px] uppercase tracking-[0.28em] text-[#f4ede0]/60">
+        <span className="font-mono text-[10px] tracking-[0.06em] text-text-muted">
           Wall switch
         </span>
-        <span className="font-ui mt-1 text-[12px] uppercase tracking-[0.22em] text-[#f4ede0]">
+        <span className="font-mono mt-1 text-[12px] tracking-[0.04em] text-text">
           {lit ? "On" : "Off"}
         </span>
       </span>

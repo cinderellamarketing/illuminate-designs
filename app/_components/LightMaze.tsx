@@ -570,16 +570,16 @@ export function LightMaze({
       <div className="flex w-full max-w-[1080px] flex-col px-6 md:px-10">
         <div className="flex items-baseline justify-between gap-6">
           <div>
-            <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-[#f9a71d]/80">
-              Illuminate · light maze
+            <p className="font-mono text-[10.5px] tracking-[0.06em] text-brand-amber">
+              illuminate · light maze
             </p>
             <h2
-              className="font-display mt-2 italic leading-[1.02] tracking-tight text-[#f4ede0]"
+              className="font-display mt-3 leading-[1.02] text-text"
               style={{ fontSize: "clamp(2rem, 4.4vw, 3.4rem)" }}
             >
               {title}
             </h2>
-            <p className="font-serif-text mt-1 text-base italic leading-[1.3] text-[#f4ede0]/65 md:text-lg">
+            <p className="mt-2 leading-[1.4] text-text/65 md:text-lg">
               {subtitle}
             </p>
           </div>
@@ -587,7 +587,7 @@ export function LightMaze({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="font-ui ignite shrink-0 rounded-full border border-[#f4ede0]/25 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/85 hover:border-[#f55e09] hover:text-[#f55e09]"
+            className="ignite shrink-0 rounded-md border border-hairline px-4 py-2 font-mono text-[11px] text-text/85 hover:border-[#f55e09] hover:text-brand-orange"
             aria-label="Skip the maze and close"
           >
             {isGate ? "Skip into the room" : "Close"}
@@ -607,9 +607,9 @@ export function LightMaze({
           />
         </div>
 
-        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 font-ui text-[11px] uppercase tracking-[0.22em] text-[#f4ede0]/55">
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 font-mono text-[11px] tracking-[0.03em] text-text-muted">
           {winSeconds != null ? (
-            <span className="font-serif-text text-[15px] normal-case italic tracking-normal text-[#f9a71d]">
+            <span className="text-[14px] text-brand-amber">
               {winLine(winSeconds)}
             </span>
           ) : (

@@ -31,8 +31,8 @@ export function StudioSpotlight() {
     "font-display block leading-[0.85] tracking-[-0.04em]";
   const wordmarkStyle: React.CSSProperties = {
     fontSize: "clamp(5rem, 18vw, 18rem)",
-    fontVariationSettings: '"opsz" 144',
-    fontWeight: 700,
+    fontVariationSettings: '"wght" 800, "wdth" 120',
+    fontWeight: 800,
   };
 
   return (

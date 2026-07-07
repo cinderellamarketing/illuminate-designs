@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
+import { StatMeter } from "@/app/_components/StatMeter";
 import { LightMaze } from "@/app/_components/LightMaze";
 import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
 import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
@@ -11,7 +12,6 @@ import { SiteFooter } from "@/app/_components/SiteFooter";
 import { SiteNav } from "@/app/_components/SiteNav";
 import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useLightEggs } from "@/app/_components/useLightEggs";
-import { useReducedMotion } from "@/lib/useReducedMotion";
 import { media } from "@/lib/media";
 import {
   headlineNumber,
@@ -26,13 +26,15 @@ import {
   statTooltip,
 } from "@/lib/copy";
 
+const STAT = parseInt(headlineNumber.value, 10) || 82;
+
 export function SessionPage() {
   useDeclareVariant("session");
   const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
     useLightEggs();
 
   return (
-    <main className="font-ui bg-paper text-ink min-h-dvh">
+    <main className="font-sans min-h-dvh bg-ground text-text">
       <SiteNav onBulb={handleBulb} bulbBlown={bulbBlown} />
       <Hero />
       <Gap />
@@ -59,7 +61,7 @@ export function SessionPage() {
 
 function Hero() {
   return (
-    <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-black">
+    <section className="relative h-[100svh] min-h-[680px] w-full overflow-hidden bg-black">
       <SessionVideo
         clip={media.sessionHero}
         variant="hero"
@@ -69,87 +71,79 @@ function Hero() {
       />
 
       {/* Overlay content. The wrapper is non-interactive so the unmute
-          control on the underlying video stays clickable; only the
-          actual CTAs opt back in. */}
+          control on the underlying video stays clickable; only the actual
+          CTAs and the stat opt back in. */}
       <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-6 pb-14 md:px-10 md:pb-20">
-        <div className="max-w-[1400px] mx-auto w-full">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
-            className="text-[11px] uppercase tracking-[0.22em] text-white/80"
-          >
-            <span
-              aria-hidden
-              className="mr-3 inline-block h-1.5 w-1.5 rounded-full bg-[#f9a71d] align-middle"
-            />
-            {sessionHero.eyebrow}
-          </motion.p>
+        <div className="mx-auto grid w-full max-w-[1400px] gap-x-10 gap-y-10 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+              className="font-mono text-[11px] tracking-[0.06em] text-text/75"
+            >
+              {sessionHero.eyebrow}
+            </motion.p>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1], delay: 0.1 }}
-            className="font-display mt-8 max-w-[20ch] leading-[0.92] tracking-tight text-white"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 5.5rem)" }}
-          >
-            Every team has the tools.{" "}
-            <em className="text-[#f9a71d] not-italic">
-              Far fewer have the skills.
-            </em>
-          </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1], delay: 0.1 }}
+              className="font-display mt-6 max-w-[16ch] leading-[0.94] text-text"
+              style={{ fontSize: "clamp(2.6rem, 6vw, 5.6rem)" }}
+            >
+              Every team has the tools.{" "}
+              <span className="text-brand-orange">
+                Far fewer have the skills.
+              </span>
+            </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.4 }}
-            className="font-serif-text mt-6 max-w-[58ch] text-xl italic leading-[1.35] text-white/85 md:text-2xl"
-          >
-            {sessionHero.sub}
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.4 }}
+              className="mt-6 max-w-[52ch] text-lg leading-[1.5] text-text/85 md:text-xl"
+            >
+              {sessionHero.sub}
+            </motion.p>
 
-          {/* Stat row — big count-up on the left, caption flanking it. */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 1 }}
+              className="pointer-events-auto mt-9 flex flex-wrap items-center gap-4"
+            >
+              <Link
+                href={sessionHero.primaryCta.href}
+                className="btn btn-primary btn-lg ignite"
+              >
+                <span aria-hidden className="btn-switch" />
+                {sessionHero.primaryCta.label}
+              </Link>
+              <Link
+                href={sessionHero.secondaryCta.href}
+                className="btn btn-secondary btn-lg ignite"
+              >
+                {sessionHero.secondaryCta.label}
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Stat gauge — the room's meter reading. */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.7 }}
-            className="mt-10 flex flex-wrap items-end gap-x-8 gap-y-3"
+            className="pointer-events-auto md:col-span-5 md:pl-4"
           >
-            <span
-              className="font-display pointer-events-auto block leading-[0.78] tracking-tight"
-              style={{
-                fontSize: "clamp(5rem, 16vw, 14rem)",
-                fontVariationSettings: '"opsz" 144',
-                color: "#f55e09",
-              }}
-              title={statTooltip}
-            >
-              <HeroNumber />
-            </span>
-            <p className="font-serif-text mb-3 max-w-[32ch] text-base italic leading-[1.35] text-white/85 md:text-lg">
-              {sessionHero.statCaption}
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.1 }}
-            className="pointer-events-auto mt-10 flex flex-wrap items-center gap-5"
-          >
-            <Link
-              href={sessionHero.primaryCta.href}
-              className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
-            >
-              {sessionHero.primaryCta.label}
-              <span aria-hidden>→</span>
-            </Link>
-            <Link
-              href={sessionHero.secondaryCta.href}
-              className="ignite-text text-[12px] uppercase tracking-[0.22em] text-white/85 underline-offset-4 hover:text-white hover:underline"
-            >
-              {sessionHero.secondaryCta.label}
-            </Link>
+            <StatMeter
+              value={STAT}
+              label="copilot adoption"
+              caption={sessionHero.statCaption}
+              tooltip={statTooltip}
+              fontSize="clamp(4.5rem, 10vw, 8.5rem)"
+              meterMaxWidth="360px"
+            />
           </motion.div>
         </div>
       </div>
@@ -163,30 +157,38 @@ function Gap() {
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
   return (
-    <section className="relative bg-paper" ref={ref}>
-      <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
-        <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-          The gap
-        </p>
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : undefined}
-          transition={{ duration: 1 }}
-          className="font-display mt-6 max-w-[18ch] leading-[0.92] tracking-tight"
-          style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
-        >
-          A licence is{" "}
-          <em className="italic text-[#f55e09]">not a skill.</em>
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : undefined}
-          transition={{ duration: 0.9, delay: 0.3 }}
-          className="mt-12 max-w-[58ch] text-lg leading-[1.55] text-ink/75"
-        >
-          {sessionGap.body}
-        </motion.p>
+    <section className="relative overflow-hidden bg-ground" ref={ref}>
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-10%", left: "-6%", width: "55%", height: "120%" }}
+      />
+      <div className="relative mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
+        <div className="grid gap-x-10 gap-y-10 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <p className="label">the gap</p>
+            <motion.h2
+              initial={{ opacity: 0, y: 24 }}
+              animate={inView ? { opacity: 1, y: 0 } : undefined}
+              transition={{ duration: 1 }}
+              className="font-display mt-6 max-w-[14ch] leading-[0.92]"
+              style={{ fontSize: "clamp(3rem, 8vw, 7.5rem)" }}
+            >
+              A licence is{" "}
+              <span className="hl-underline">not a skill.</span>
+            </motion.h2>
+          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : undefined}
+            transition={{ duration: 0.9, delay: 0.3 }}
+            className="md:col-span-4 md:col-start-9 md:self-end"
+          >
+            <p className="max-w-[46ch] text-lg leading-[1.6] text-text/75">
+              {sessionGap.body}
+            </p>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -201,37 +203,31 @@ function WhatWeDo() {
     <section
       ref={ref}
       id="what-we-do"
-      className="relative bg-ink py-28 text-paper md:py-40"
+      className="relative overflow-hidden border-t border-hairline bg-surface py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
-              What we do
-            </p>
+        <div className="grid gap-x-10 gap-y-8 md:grid-cols-12">
+          <div className="md:col-span-6">
+            <p className="label">what we do</p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.9 }}
-              className="font-display mt-6 leading-[0.95]"
+              className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
             >
               We train the role,{" "}
-              <em className="text-[#f9a71d] not-italic">
-                not the feature list.
-              </em>
+              <span className="text-brand-amber">not the feature list.</span>
             </motion.h2>
           </div>
-          <div className="md:col-span-6 md:col-start-7 md:pt-6">
-            <p className="font-serif-text max-w-[48ch] text-xl italic leading-[1.4] text-paper/85">
+          <div className="md:col-span-5 md:col-start-8 md:pt-10">
+            <p className="max-w-[48ch] text-lg leading-[1.6] text-text/75">
               {sessionWhatWeDo.body}
             </p>
           </div>
         </div>
 
-        {/* Three short cards rendered as an editorial stagger, not an
-            equal row. Each card is wider than the next, set on a
-            staircase to keep the rhythm of a long sentence. */}
+        {/* Three cards on a staircase, each holding its own space. */}
         <div className="mt-20 grid gap-6 md:grid-cols-12">
           {sessionWhatWeDo.cards.map((card, i) => (
             <motion.article
@@ -239,7 +235,7 @@ function WhatWeDo() {
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.7, delay: 0.15 + i * 0.1 }}
-              className={`ignite group rounded-sm border-t border-[#f4ede0]/15 pt-8 ${
+              className={`ignite group rounded-lg border border-hairline bg-ground/40 p-8 ${
                 i === 0
                   ? "md:col-span-7 md:col-start-1"
                   : i === 1
@@ -248,14 +244,14 @@ function WhatWeDo() {
               }`}
             >
               <div className="flex items-baseline gap-4">
-                <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f9a71d]">
+                <span className="font-mono text-[12px] text-brand-amber">
                   0{i + 1}
                 </span>
-                <h3 className="font-display text-3xl tracking-tight md:text-4xl">
+                <h3 className="font-display text-2xl tracking-tight md:text-3xl">
                   {card.title}
                 </h3>
               </div>
-              <p className="mt-4 max-w-[44ch] text-base leading-[1.55] text-paper/80">
+              <p className="mt-4 max-w-[44ch] leading-[1.6] text-text/75">
                 {card.body}
               </p>
             </motion.article>
@@ -265,7 +261,7 @@ function WhatWeDo() {
         <div className="mt-16">
           <Link
             href={sessionWhatWeDo.link.href}
-            className="ignite-text font-ui inline-flex items-center gap-3 text-[12px] uppercase tracking-[0.22em] text-[#f9a71d] hover:text-[#f55e09]"
+            className="ignite-text inline-flex items-center gap-3 font-mono text-[13px] text-brand-amber hover:text-brand-orange"
           >
             {sessionWhatWeDo.link.label}
             <span aria-hidden>→</span>
@@ -282,30 +278,36 @@ function QuickWin() {
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
   return (
-    <section ref={ref} className="relative bg-paper py-28 md:py-40">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-              The quick win most people miss
-            </p>
+    <section
+      ref={ref}
+      className="relative overflow-hidden bg-ground py-28 md:py-40"
+    >
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "0%", right: "-8%", left: "auto", width: "50%", height: "110%" }}
+      />
+      <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
+        <div className="grid gap-x-10 gap-y-10 md:grid-cols-12">
+          <div className="md:col-span-6">
+            <p className="label">the quick win most people miss</p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.9 }}
-              className="font-display mt-6 leading-[0.95] tracking-tight"
+              className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.25rem, 5vw, 4.5rem)" }}
             >
               They are already paying for{" "}
-              <em className="italic text-[#f55e09]">the safe option.</em>
+              <span className="text-brand-orange">the safe option.</span>
             </motion.h2>
           </div>
-          <div className="md:col-span-7">
+          <div className="md:col-span-5 md:col-start-8 md:pt-4">
             <motion.p
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : undefined}
               transition={{ duration: 0.9, delay: 0.2 }}
-              className="font-serif-text max-w-[60ch] text-xl italic leading-[1.45] text-ink/80 md:text-2xl"
+              className="max-w-[56ch] text-lg leading-[1.6] text-text/75"
             >
               {sessionQuickWin.body}
             </motion.p>
@@ -324,34 +326,31 @@ function ForMsps() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden bg-ink py-28 text-paper md:py-40"
+      className="relative overflow-hidden border-t border-hairline bg-surface py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
-          For MSPs
-        </p>
+        <p className="label">for MSPs</p>
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.9 }}
-          className="font-display mt-6 max-w-[22ch] leading-[0.95] tracking-tight"
-          style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
+          className="font-display mt-6 max-w-[20ch] leading-[0.96]"
+          style={{ fontSize: "clamp(2.5rem, 6vw, 5.5rem)" }}
         >
           You do not have to{" "}
-          <em className="italic text-[#f9a71d]">become the trainer.</em>
+          <span className="text-brand-amber">become the trainer.</span>
         </motion.h2>
 
-        <div className="mt-12 grid gap-12 md:grid-cols-12">
-          <p className="font-serif-text md:col-span-7 max-w-[60ch] text-xl italic leading-[1.4] text-paper/85 md:text-2xl">
+        <div className="mt-12 grid gap-x-10 gap-y-8 md:grid-cols-12">
+          <p className="md:col-span-7 max-w-[58ch] text-lg leading-[1.6] text-text/80 md:text-xl">
             {sessionForMsps.body}
           </p>
           <div className="md:col-span-4 md:col-start-9 md:pt-2">
             <Link
               href={sessionForMsps.cta.href}
-              className="ignite inline-flex items-center gap-3 rounded-full border border-[#f9a71d]/60 bg-transparent px-6 py-3.5 text-[13px] uppercase tracking-[0.18em] text-[#f9a71d] transition hover:border-[#f55e09] hover:bg-[#f55e09] hover:text-white"
+              className="btn btn-secondary ignite"
             >
               {sessionForMsps.cta.label}
-              <span aria-hidden>→</span>
             </Link>
           </div>
         </div>
@@ -370,17 +369,17 @@ function Proof() {
     <section
       id="proof"
       ref={ref}
-      className="relative overflow-hidden bg-paper py-28 md:py-40"
+      className="relative overflow-hidden bg-ground py-28 md:py-40"
     >
       <div className="mx-auto grid max-w-[1400px] gap-16 px-6 md:grid-cols-12 md:gap-12 md:px-10">
         <div className="md:col-span-5">
           <SessionVideo
             clip={media.caseStudy}
             variant="portrait"
-            className="rounded-sm"
+            className="rounded-lg"
             label="Interview, just out of frame"
           />
-          <p className="font-ui mt-4 text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          <p className="mt-4 font-mono text-[12px] text-text-muted">
             {sessionProof.testimonialPlaceholder}
           </p>
         </div>
@@ -391,44 +390,38 @@ function Proof() {
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.9 }}
           >
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-              Proof
-            </p>
+            <p className="label">proof</p>
 
             <h2
-              className="font-display mt-6 leading-[0.95]"
+              className="font-display mt-6 leading-[0.96]"
               style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
             >
               The difference is{" "}
-              <em className="italic text-[#f55e09]">the delivery.</em>
+              <span className="text-brand-orange">the delivery.</span>
             </h2>
 
-            <p className="font-serif-text mt-8 max-w-[48ch] text-xl italic leading-[1.4] text-ink/80 md:text-2xl">
+            <p className="mt-8 max-w-[48ch] text-lg leading-[1.6] text-text/80 md:text-xl">
               {sessionProof.body}
             </p>
 
-            <div
-              className="font-display mt-12 leading-[0.92]"
-              style={{
-                fontSize: "clamp(4rem, 11vw, 11rem)",
-                color: "#f55e09",
-                fontVariationSettings: '"opsz" 144',
-              }}
-              title={statTooltip}
-            >
-              {headlineNumber.value}
+            <div className="mt-12">
+              <StatMeter
+                value={STAT}
+                label="copilot adoption"
+                caption={sessionProof.pullFigure}
+                tooltip={statTooltip}
+                fontSize="clamp(4rem, 9vw, 8rem)"
+                meterMaxWidth="400px"
+              />
             </div>
-            <p className="font-serif-text mt-2 max-w-[40ch] text-lg italic leading-[1.35] text-ink/75">
-              {sessionProof.pullFigure}
-            </p>
 
             <div className="mt-12">
               <Link
                 href={sessionProof.cta.href}
-                className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+                className="btn btn-primary btn-lg ignite"
               >
+                <span aria-hidden className="btn-switch" />
                 {sessionProof.cta.label}
-                <span aria-hidden>→</span>
               </Link>
             </div>
           </motion.div>
@@ -450,80 +443,48 @@ function Close() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden bg-paper py-28 md:py-40"
+      className="relative overflow-hidden border-t border-hairline bg-ground py-28 md:py-40"
     >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-          Close
-        </p>
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-20%", left: "20%", width: "60%", height: "140%" }}
+      />
+      <div className="relative mx-auto max-w-[1400px] px-6 text-center md:px-10">
+        <p className="label">close</p>
         <motion.h2
           style={{ y }}
-          className="font-display mt-6 max-w-[18ch] leading-[0.92] tracking-tight"
+          className="font-display mx-auto mt-6 max-w-[16ch] leading-[0.94]"
         >
           <span
-            className="block text-ink"
+            className="block"
             style={{ fontSize: "clamp(2.75rem, 7vw, 7rem)" }}
           >
-            Let's turn those licences
+            Let&apos;s turn those licences
           </span>
           <span
-            className="block italic text-[#f55e09]"
+            className="block text-brand-orange"
             style={{ fontSize: "clamp(2.75rem, 7vw, 7rem)" }}
           >
             into something useful.
           </span>
         </motion.h2>
-        <p className="font-serif-text mt-10 max-w-[48ch] text-2xl italic leading-[1.3] text-ink/80">
+        <p className="mx-auto mt-10 max-w-[46ch] text-lg leading-[1.6] text-text/75 md:text-xl">
           {sessionClose.body}
         </p>
-        <div className="mt-12 flex flex-wrap items-center gap-6">
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
           <Link
             href={sessionClose.primaryCta.href}
-            className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
+            className="btn btn-primary btn-lg ignite"
           >
+            <span aria-hidden className="btn-switch" />
             {sessionClose.primaryCta.label}
-            <span aria-hidden>→</span>
           </Link>
-          <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          <span className="font-mono text-[12px] text-text-muted">
             {microcopy.lightsHintKeyboard}
           </span>
         </div>
       </div>
     </section>
-  );
-}
-
-/* ---------------- Helpers ---------------- */
-
-// Counts from the industry baseline (30) up to the headline number on
-// mount. Reduced motion goes straight to the final value.
-function HeroNumber() {
-  const reduce = useReducedMotion();
-  const finalValue = parseInt(headlineNumber.value, 10) || 82;
-  const [count, setCount] = useState(30);
-
-  useEffect(() => {
-    if (reduce) return;
-    const start = performance.now();
-    const duration = 1500;
-    const begin = 30;
-    let raf = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      const e = 1 - Math.pow(1 - t, 3);
-      setCount(Math.round(begin + (finalValue - begin) * e));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [reduce, finalValue]);
-
-  const display = reduce ? finalValue : count;
-
-  return (
-    <span aria-label={`${finalValue} per cent`}>
-      {display}
-      <span>%</span>
-    </span>
   );
 }

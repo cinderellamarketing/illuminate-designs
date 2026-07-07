@@ -4,21 +4,24 @@ import Link from "next/link";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { PageHero } from "@/app/_components/PageHero";
+import { StatMeter } from "@/app/_components/StatMeter";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { SiteNav } from "@/app/_components/SiteNav";
 import { headlineNumber, proof, statTooltip } from "@/lib/copy";
 
+const STAT = parseInt(headlineNumber.value, 10) || 82;
+
 export function ProofPage() {
   return (
-    <main className="font-ui min-h-dvh bg-paper text-ink">
+    <main className="font-sans min-h-dvh bg-ground text-text">
       <SiteNav />
 
       <PageHero
-        eyebrow="Proof"
+        eyebrow="proof"
         headline={
           <>
             The proof is{" "}
-            <em className="italic text-[#f55e09]">in the room.</em>
+            <span className="text-brand-orange">in the room.</span>
           </>
         }
         body={proof.body}
@@ -39,38 +42,29 @@ function Pull() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden border-t border-ink/10 bg-ink py-28 text-paper md:py-40"
+      className="relative overflow-hidden border-t border-hairline bg-surface py-28 md:py-40"
     >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-paper/55">
-          Pull figure
-        </p>
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-20%", left: "-4%", width: "55%", height: "140%" }}
+      />
+      <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
+        <p className="label">pull figure</p>
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.9 }}
-          title={statTooltip}
-          className="mt-8"
+          className="mt-10"
         >
-          <div
-            className="font-display leading-[0.78] tracking-tight"
-            style={{
-              color: "#f55e09",
-              fontSize: "clamp(7rem, 22vw, 22rem)",
-              fontVariationSettings: '"opsz" 144',
-            }}
-          >
-            {headlineNumber.value}
-          </div>
+          <StatMeter
+            value={STAT}
+            caption={proof.pullFigure}
+            tooltip={statTooltip}
+            fontSize="clamp(6rem, 18vw, 16rem)"
+            meterMaxWidth="min(90vw, 620px)"
+          />
         </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : undefined}
-          transition={{ duration: 0.9, delay: 0.2 }}
-          className="font-serif-text mt-6 max-w-[56ch] text-2xl italic leading-[1.3] text-paper/85"
-        >
-          {proof.pullFigure}
-        </motion.p>
       </div>
     </section>
   );
@@ -82,29 +76,27 @@ function Sample() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden bg-paper py-28 md:py-40"
+      className="relative overflow-hidden bg-ground py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-              {proof.sampleHeading}
-            </p>
+            <p className="label">{proof.sampleHeading}</p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8 }}
-              className="font-display mt-6 leading-[0.95] tracking-tight"
+              className="font-display mt-6 leading-[0.98]"
               style={{ fontSize: "clamp(2.25rem, 5vw, 4.5rem)" }}
             >
               See a session,{" "}
-              <em className="italic text-[#f55e09]">before you book.</em>
+              <span className="text-brand-orange">before you book.</span>
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : undefined}
               transition={{ duration: 0.9, delay: 0.15 }}
-              className="font-serif-text mt-8 max-w-[44ch] text-xl italic leading-[1.4] text-ink/80"
+              className="mt-8 max-w-[44ch] text-lg leading-[1.6] text-text/75 md:text-xl"
             >
               {proof.sampleBody}
             </motion.p>
@@ -115,17 +107,17 @@ function Sample() {
               initial={{ opacity: 0, scale: 0.97 }}
               animate={inView ? { opacity: 1, scale: 1 } : undefined}
               transition={{ duration: 0.9, delay: 0.1 }}
-              className="relative aspect-video overflow-hidden rounded-sm border border-ink/15 bg-[#0a0907] text-paper"
+              className="relative aspect-video overflow-hidden rounded-lg border border-hairline bg-surface-2"
             >
               <div
                 aria-hidden
-                className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_30%,rgba(249,167,29,0.16)_0%,rgba(10,9,7,0)_55%)]"
+                className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_30%,rgba(249,167,29,0.16)_0%,rgba(13,11,9,0)_55%)]"
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="font-ui text-[10px] uppercase tracking-[0.28em] text-[#f9a71d]/80">
-                  Sample clip
+                <span className="label uppercase tracking-[0.14em] text-brand-amber">
+                  sample clip
                 </span>
-                <span className="font-serif-text mt-4 max-w-[28ch] text-xl italic leading-[1.35] text-paper/80">
+                <span className="mt-4 max-w-[28ch] font-mono text-[13px] leading-[1.5] text-text/70">
                   {proof.samplePlaceholder}
                 </span>
               </div>
@@ -134,14 +126,11 @@ function Sample() {
         </div>
 
         <div className="mt-16 flex flex-wrap items-center gap-6">
-          <Link
-            href={proof.primaryCta.href}
-            className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
-          >
+          <Link href={proof.primaryCta.href} className="btn btn-primary btn-lg ignite">
+            <span aria-hidden className="btn-switch" />
             {proof.primaryCta.label}
-            <span aria-hidden>→</span>
           </Link>
-          <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          <span className="font-mono text-[12px] text-text-muted">
             Or talk to us first
           </span>
         </div>
@@ -152,26 +141,24 @@ function Sample() {
 
 function Placeholders() {
   return (
-    <section className="relative border-t border-ink/10 bg-paper py-28 md:py-40">
+    <section className="relative border-t border-hairline bg-surface py-28 md:py-40">
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-6">
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-              Case studies
-            </p>
-            <h2 className="font-display mt-6 text-3xl leading-[1.05] tracking-tight md:text-4xl">
-              <em className="italic text-[#f55e09]">Client. Challenge. Result.</em>
+            <p className="label">case studies</p>
+            <h2 className="font-display mt-6 text-3xl leading-[1.05] md:text-4xl">
+              Client. Challenge. <span className="text-brand-orange">Result.</span>
             </h2>
             <div className="mt-8 space-y-4">
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="rounded-sm border border-ink/15 bg-paper/60 p-6"
+                  className="rounded-lg border border-hairline bg-ground/50 p-6"
                 >
-                  <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-ink/45">
+                  <p className="font-mono text-[11px] tracking-[0.04em] text-text-muted">
                     Case study 0{i + 1}
                   </p>
-                  <p className="font-serif-text mt-3 text-lg italic leading-[1.4] text-ink/65">
+                  <p className="mt-3 leading-[1.6] text-text/60">
                     {proof.caseStudyPlaceholder}
                   </p>
                 </div>
@@ -180,22 +167,20 @@ function Placeholders() {
           </div>
 
           <div className="md:col-span-5 md:col-start-8">
-            <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-              Testimonials
-            </p>
-            <h2 className="font-display mt-6 text-3xl leading-[1.05] tracking-tight md:text-4xl">
-              <em className="italic text-[#f55e09]">In their words.</em>
+            <p className="label">testimonials</p>
+            <h2 className="font-display mt-6 text-3xl leading-[1.05] md:text-4xl">
+              In <span className="text-brand-orange">their words.</span>
             </h2>
             <div className="mt-8 space-y-4">
               {[0, 1].map((i) => (
                 <div
                   key={i}
-                  className="rounded-sm border border-ink/15 bg-paper/60 p-6"
+                  className="rounded-lg border border-hairline bg-ground/50 p-6"
                 >
-                  <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-ink/45">
+                  <p className="font-mono text-[11px] tracking-[0.04em] text-text-muted">
                     Testimonial 0{i + 1}
                   </p>
-                  <p className="font-serif-text mt-3 text-lg italic leading-[1.4] text-ink/65">
+                  <p className="mt-3 leading-[1.6] text-text/60">
                     {proof.testimonialPlaceholder}
                   </p>
                 </div>

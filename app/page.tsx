@@ -29,59 +29,67 @@ const directions = [
 
 export default function IndexPage() {
   return (
-    <main className="font-ui min-h-dvh bg-paper text-ink">
-      <header className="border-b border-ink/10">
+    <main className="font-sans min-h-dvh bg-ground text-text">
+      <header className="border-b border-hairline">
         <div className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-8 md:px-10 md:py-10">
-          <span className="font-display text-2xl italic tracking-tight">
+          <span className="font-display text-xl tracking-tight">
             Illuminate
           </span>
-          <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          <span className="font-mono text-[11px] tracking-[0.04em] text-text-muted">
             Two homepage directions · {company.location}
           </span>
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1400px] px-6 pt-20 pb-12 md:px-10 md:pt-28">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
-          The organising idea
-        </p>
-        <h1
-          className="font-display mt-6 max-w-[18ch] leading-[0.92] tracking-tight"
-          style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
-        >
-          You are in the <em className="text-[#f55e09]">room.</em>
-        </h1>
-        <p className="font-serif-text mt-10 max-w-[58ch] text-2xl italic leading-[1.3] text-ink/80">
-          Both directions recreate the feeling of sitting in on a live Illuminate
-          training session. Real footage and real faces, the same hero number
-          ({headlineNumber.value} Copilot adoption), interpreted at two
-          different levels of risk.
-        </p>
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="light-pool"
+          style={{ top: "-40%", left: "10%", width: "60%", height: "160%" }}
+        />
+        <div className="relative mx-auto max-w-[1400px] px-6 pt-20 pb-12 md:px-10 md:pt-28">
+          <p className="label">the organising idea</p>
+          <h1
+            className="font-display mt-6 max-w-[16ch] leading-[0.92]"
+            style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
+          >
+            You are in the <span className="text-brand-orange">room.</span>
+          </h1>
+          <p className="mt-10 max-w-[58ch] text-lg leading-[1.6] text-text/80 md:text-xl">
+            Both directions recreate the feeling of sitting in on a live
+            Illuminate training session. Real footage and real faces, the same
+            hero number ({headlineNumber.value} Copilot adoption), interpreted
+            at two different levels of risk.
+          </p>
+        </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1400px] gap-0 px-6 pb-32 md:grid-cols-2 md:gap-px md:bg-ink/10 md:px-10">
+      <section className="mx-auto grid max-w-[1400px] divide-y divide-hairline border-y border-hairline md:grid-cols-2 md:divide-x md:divide-y-0">
         {directions.map((d) => (
           <Link
             key={d.href}
             href={d.href}
-            className="group relative block bg-paper p-10 md:p-14 transition-colors hover:bg-ink hover:text-paper"
+            className="group relative block bg-ground p-10 transition-colors hover:bg-surface md:p-14"
           >
-            <div className="flex items-baseline justify-between text-[11px] uppercase tracking-[0.22em] text-current/55">
+            <div className="flex items-baseline justify-between font-mono text-[11px] tracking-[0.04em] text-text-muted">
               <span>{d.label}</span>
-              <span className="text-[#f55e09]">{d.role}</span>
+              <span className="text-brand-orange">{d.role}</span>
             </div>
             <h2
-              className="font-display mt-12 leading-[0.95]"
+              className="font-display mt-12 leading-[0.98]"
               style={{ fontSize: "clamp(2.75rem, 5vw, 4.5rem)" }}
             >
               {d.title}
             </h2>
-            <p className="font-serif-text mt-6 max-w-[36ch] text-lg italic leading-[1.45]">
+            <p className="mt-6 max-w-[36ch] text-lg leading-[1.6] text-text/75">
               {d.summary}
             </p>
-            <span className="font-ui mt-14 inline-flex items-center gap-3 text-[12px] uppercase tracking-[0.22em] text-[#f55e09]">
+            <span className="mt-14 inline-flex items-center gap-3 font-mono text-[12px] text-brand-orange">
               Open
-              <span aria-hidden className="transition-transform group-hover:translate-x-1">
+              <span
+                aria-hidden
+                className="transition-transform group-hover:translate-x-1"
+              >
                 →
               </span>
             </span>
@@ -89,10 +97,15 @@ export default function IndexPage() {
         ))}
       </section>
 
-      <footer className="border-t border-ink/10">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-baseline justify-between gap-4 px-6 py-10 text-[11px] uppercase tracking-[0.22em] text-ink/55 md:px-10">
-          <span>{company.name} · {company.location}</span>
-          <a href={`mailto:${company.email}`} className="hover:text-[#f55e09]">
+      <footer className="border-t border-hairline">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-baseline justify-between gap-4 px-6 py-10 font-mono text-[11px] tracking-[0.04em] text-text-muted md:px-10">
+          <span>
+            {company.name} · {company.location}
+          </span>
+          <a
+            href={`mailto:${company.email}`}
+            className="ignite-text hover:text-brand-orange"
+          >
             {company.email}
           </a>
         </div>

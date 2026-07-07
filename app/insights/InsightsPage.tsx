@@ -10,15 +10,15 @@ import { insights } from "@/lib/copy";
 
 export function InsightsPage() {
   return (
-    <main className="font-ui min-h-dvh bg-paper text-ink">
+    <main className="font-sans min-h-dvh bg-ground text-text">
       <SiteNav />
 
       <PageHero
-        eyebrow="Insights"
+        eyebrow="insights"
         headline={
           <>
             Things worth knowing about Copilot, adoption{" "}
-            <em className="italic text-[#f55e09]">and the channel.</em>
+            <span className="text-brand-orange">and the channel.</span>
           </>
         }
         body={insights.body}
@@ -37,7 +37,7 @@ function Sections() {
   return (
     <section
       ref={ref}
-      className="relative bg-paper border-t border-ink/10 py-28 md:py-40"
+      className="relative border-t border-hairline bg-ground py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         {insights.sections.map((section, i) => (
@@ -47,39 +47,37 @@ function Sections() {
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.8, delay: 0.15 + i * 0.1 }}
             className={`grid gap-10 md:grid-cols-12 ${
-              i > 0 ? "mt-20 border-t border-ink/10 pt-20" : ""
+              i > 0 ? "mt-20 border-t border-hairline pt-20" : ""
             }`}
           >
             <div className="md:col-span-4">
-              <p className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
-                Section 0{i + 1}
-              </p>
+              <p className="label">Section 0{i + 1}</p>
               <h2
-                className="font-display mt-6 leading-[0.95] tracking-tight"
+                className="font-display mt-6 leading-[0.98]"
                 style={{ fontSize: "clamp(2.25rem, 4.5vw, 4rem)" }}
               >
-                <em className="italic text-[#f55e09]">{section.title}</em>
+                <span className="text-brand-orange">{section.title}</span>
               </h2>
             </div>
             <div className="md:col-span-7 md:col-start-6">
-              <p className="font-serif-text max-w-[60ch] text-xl italic leading-[1.45] text-ink/75 md:text-2xl">
+              <p className="max-w-[60ch] text-lg leading-[1.65] text-text/75 md:text-xl">
                 {section.body}
               </p>
               <div className="mt-10 grid gap-4 sm:grid-cols-2">
                 {[0, 1, 2, 3].map((j) => (
                   <div
                     key={j}
-                    className="ignite rounded-sm border border-ink/15 bg-paper/60 p-6"
+                    className="ignite rounded-lg border border-hairline bg-surface p-6"
                   >
-                    <p className="font-ui text-[10px] uppercase tracking-[0.28em] text-ink/45">
+                    <p className="font-mono text-[11px] tracking-[0.04em] text-text-muted">
                       {section.title} · 0{j + 1}
                     </p>
-                    <p className="font-serif-text mt-3 text-lg italic leading-[1.4] text-ink/65">
+                    <p className="mt-3 leading-[1.6] text-text/65">
                       [Title to follow.]
                     </p>
                     <Link
                       href={insights.cta.href}
-                      className="ignite-text mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-[#f55e09]"
+                      className="ignite-text mt-4 inline-flex items-center gap-2 font-mono text-[12px] text-brand-orange"
                     >
                       {insights.cta.label}
                       <span aria-hidden>→</span>

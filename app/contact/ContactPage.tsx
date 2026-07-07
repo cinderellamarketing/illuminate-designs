@@ -9,15 +9,15 @@ import { company, contact } from "@/lib/copy";
 
 export function ContactPage() {
   return (
-    <main className="font-ui min-h-dvh bg-paper text-ink">
+    <main className="font-sans min-h-dvh bg-ground text-text">
       <SiteNav />
 
       <PageHero
-        eyebrow="Contact"
+        eyebrow="contact"
         headline={
           <>
             Tell us what your team{" "}
-            <em className="italic text-[#f55e09]">is stuck on.</em>
+            <span className="text-brand-orange">is stuck on.</span>
           </>
         }
         body={contact.body}
@@ -35,9 +35,8 @@ function FormSection() {
   const inView = useInView(ref, { once: true, margin: "-15%" });
   const [sent, setSent] = useState(false);
 
-  // We don't have a backend on the review build. The form opens a
-  // mailto: link with the collected fields so Jen can still see real
-  // submissions land.
+  // No backend on the review build. The form opens a mailto: link with the
+  // collected fields so Jen can still see real submissions land.
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -65,7 +64,7 @@ function FormSection() {
   return (
     <section
       ref={ref}
-      className="relative border-t border-ink/10 bg-paper py-24 md:py-32"
+      className="relative border-t border-hairline bg-ground py-24 md:py-32"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-12 md:grid-cols-12">
@@ -74,19 +73,20 @@ function FormSection() {
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8 }}
-              className="font-display leading-[0.95] tracking-tight"
+              className="font-display leading-[0.98]"
               style={{ fontSize: "clamp(2rem, 4.5vw, 4rem)" }}
             >
               No pitch.{" "}
-              <em className="italic text-[#f55e09]">Just tell us.</em>
+              <span className="text-brand-orange">Just tell us.</span>
             </motion.h2>
-            <p className="font-serif-text mt-8 max-w-[40ch] text-lg italic leading-[1.4] text-ink/75">
+            <p className="mt-8 max-w-[40ch] text-lg leading-[1.6] text-text/75">
               {contact.bookingLine}
             </p>
-            <p className="mt-4 text-sm leading-[1.5] text-ink/60">
-              Prefer email? <a
+            <p className="mt-4 font-mono text-[13px] leading-[1.6] text-text-muted">
+              Prefer email?{" "}
+              <a
                 href={`mailto:${company.email}`}
-                className="ignite-text text-[#f55e09] underline decoration-[#f55e09]/40 decoration-2 underline-offset-4"
+                className="ignite-text text-brand-orange"
               >
                 {company.email}
               </a>
@@ -95,12 +95,12 @@ function FormSection() {
 
           <form
             onSubmit={onSubmit}
-            className="md:col-span-7 grid gap-6 rounded-sm border border-ink/15 bg-paper/60 p-6 md:p-10"
+            className="md:col-span-7 grid gap-6 rounded-lg border border-hairline bg-surface p-6 md:p-10"
             aria-live="polite"
           >
             {contact.fields.map((field) => (
               <label key={field.name} className="flex flex-col gap-2">
-                <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-ink/55">
+                <span className="label">
                   {field.label}
                   {field.required ? "" : " · optional"}
                 </span>
@@ -109,32 +109,37 @@ function FormSection() {
                     name={field.name}
                     required={field.required}
                     rows={5}
-                    placeholder={"placeholder" in field ? String(field.placeholder ?? "") : ""}
-                    className="ignite font-serif-text rounded-sm border border-ink/20 bg-paper/80 px-4 py-3 text-base italic leading-[1.45] text-ink placeholder:text-ink/40 focus:border-[#f55e09] focus:outline-none"
+                    placeholder={
+                      "placeholder" in field
+                        ? String(field.placeholder ?? "")
+                        : ""
+                    }
+                    className="ignite rounded-md border border-hairline bg-surface-2 px-4 py-3 leading-[1.55] text-text placeholder:text-text-muted focus:border-brand-orange focus:outline-none"
                   />
                 ) : (
                   <input
                     name={field.name}
                     type={field.type}
                     required={field.required}
-                    placeholder={"placeholder" in field ? String(field.placeholder ?? "") : ""}
-                    className="ignite font-ui rounded-sm border border-ink/20 bg-paper/80 px-4 py-3 text-base text-ink placeholder:text-ink/40 focus:border-[#f55e09] focus:outline-none"
+                    placeholder={
+                      "placeholder" in field
+                        ? String(field.placeholder ?? "")
+                        : ""
+                    }
+                    className="ignite rounded-md border border-hairline bg-surface-2 px-4 py-3 text-text placeholder:text-text-muted focus:border-brand-orange focus:outline-none"
                   />
                 )}
               </label>
             ))}
 
             <div className="mt-2 flex flex-wrap items-center gap-5">
-              <button
-                type="submit"
-                className="ignite inline-flex items-center gap-3 rounded-full bg-[#f55e09] px-7 py-3.5 text-[13px] uppercase tracking-[0.18em] text-white transition hover:bg-[#d24f06]"
-              >
+              <button type="submit" className="btn btn-primary btn-lg ignite">
+                <span aria-hidden className="btn-switch" />
                 {contact.primaryCta.label}
-                <span aria-hidden>→</span>
               </button>
               {sent && (
-                <span className="font-ui text-[11px] uppercase tracking-[0.22em] text-[#f55e09]">
-                  Email window opening. If it didn't, we are at {company.email}.
+                <span className="font-mono text-[12px] text-brand-amber">
+                  Email window opening. If it didn&apos;t, we are at {company.email}.
                 </span>
               )}
             </div>

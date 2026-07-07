@@ -162,7 +162,7 @@ export function SessionVideo({
             v.muted = !v.muted;
             setMuted(v.muted);
           }}
-          className="font-ui pointer-events-auto absolute bottom-5 right-5 z-30 flex items-center gap-2 rounded-full border border-white/30 bg-black/30 px-3.5 py-1.5 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur transition hover:bg-black/50"
+          className="pointer-events-auto absolute bottom-5 right-5 z-30 flex items-center gap-2 rounded-md border border-white/25 bg-black/30 px-3.5 py-1.5 font-mono text-[11px] tracking-[0.02em] text-white backdrop-blur transition hover:bg-black/50"
           aria-pressed={!muted}
           aria-label={muted ? "Unmute session footage" : "Mute session footage"}
         >
@@ -180,14 +180,22 @@ export function SessionVideo({
 
 function Placeholder({ label, variant }: { label: string; variant: Variant }) {
   return (
-    <div className="film-grain absolute inset-0">
-      {/* Subtle gradient gives the panel depth, not flat black. */}
+    <div className="absolute inset-0">
+      {/* Warm light pool gives the panel depth, consistent with the room. */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 80% at 30% 30%, #1a1612 0%, #0b0a08 60%, #050403 100%)",
+            "radial-gradient(120% 90% at 35% 25%, #241c13 0%, #16120d 55%, #0b0907 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 35% 30%, rgba(249,167,29,0.12) 0%, rgba(13,11,9,0) 60%)",
         }}
       />
 
@@ -195,8 +203,8 @@ function Placeholder({ label, variant }: { label: string; variant: Variant }) {
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           aria-hidden
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-white/25 backdrop-blur-sm"
-          style={{ background: "rgba(245,94,9,0.08)" }}
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 backdrop-blur-sm"
+          style={{ background: "rgba(245,94,9,0.1)" }}
         >
           <svg
             width="18"
@@ -212,17 +220,13 @@ function Placeholder({ label, variant }: { label: string; variant: Variant }) {
       </div>
 
       {/* Top-left small label. */}
-      <div className="font-ui absolute left-4 top-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/70">
-        <span
-          aria-hidden
-          className="inline-block h-1.5 w-1.5 rounded-full bg-[#f9a71d]"
-        />
+      <div className="absolute left-4 top-4 font-mono text-[10.5px] tracking-[0.04em] text-white/70">
         {variant === "portrait" ? "Portrait to follow" : label}
       </div>
 
       {/* Bottom-right timecode-style detail to feel intentional. */}
-      <div className="font-ui absolute bottom-4 right-4 text-[10px] uppercase tracking-[0.2em] text-white/45">
-        REEL · 01
+      <div className="absolute bottom-4 right-4 font-mono text-[10.5px] tracking-[0.04em] text-white/45">
+        reel · 01
       </div>
     </div>
   );

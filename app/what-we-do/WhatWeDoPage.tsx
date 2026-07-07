@@ -10,23 +10,22 @@ import { whatWeDo } from "@/lib/copy";
 
 export function WhatWeDoPage() {
   return (
-    <main className="font-ui min-h-dvh bg-paper text-ink">
+    <main className="font-sans min-h-dvh bg-ground text-text">
       <SiteNav />
 
       <PageHero
-        eyebrow="What we do"
+        eyebrow="what we do"
         headline={
           <>
             Training people{" "}
-            <em className="italic text-[#f55e09]">want to be in.</em>
+            <span className="text-brand-orange">want to be in.</span>
           </>
         }
         body={whatWeDo.body}
       />
 
-      {/* Editorial services, never an equal row. Each is its own full
-          section with alternating layouts and a clear rule between
-          them. The eyebrow numbers tie them together. */}
+      {/* Each service holds its own full section, alternating ground and
+          raised surface, tied together by mono index labels. */}
       {whatWeDo.services.map((service, i) => (
         <ServiceSection key={service.key} service={service} index={i} />
       ))}
@@ -45,12 +44,10 @@ function ServiceSection({
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
-  const dark = index === 1;
+  const raised = index % 2 === 1;
   const reverse = index % 2 === 1;
+  const accent = raised ? "text-brand-amber" : "text-brand-orange";
 
-  // Text on the left for odd-indexed sections, right for even. The
-  // accent panel takes the opposite side. Achieved via col-start so
-  // we don't fight with RTL.
   const textColClass = reverse
     ? "md:col-span-7 md:col-start-6"
     : "md:col-span-7 md:col-start-1";
@@ -62,10 +59,8 @@ function ServiceSection({
     <section
       ref={ref}
       id={service.key}
-      className={`relative overflow-hidden border-t ${
-        dark
-          ? "border-paper/10 bg-ink text-paper"
-          : "border-ink/10 bg-paper text-ink"
+      className={`relative overflow-hidden border-t border-hairline ${
+        raised ? "bg-surface" : "bg-ground"
       }`}
     >
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
@@ -75,36 +70,32 @@ function ServiceSection({
               initial={{ opacity: 0, y: 8 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.6 }}
-              className={`font-ui text-[11px] uppercase tracking-[0.22em] ${
-                dark ? "text-paper/55" : "text-ink/55"
-              }`}
+              className="label"
             >
               {service.eyebrow} · {service.title}
             </motion.p>
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={inView ? { opacity: 1, scaleX: 1 } : undefined}
+              transition={{ duration: 0.7, delay: 0.05 }}
+              className={`mt-6 h-1 w-12 origin-left ${
+                raised ? "bg-brand-amber" : "bg-brand-orange"
+              }`}
+            />
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8 }}
-              className="font-display mt-6 max-w-[18ch] leading-[0.95] tracking-tight"
-              style={{ fontSize: "clamp(2.25rem, 5.5vw, 5.5rem)" }}
+              className="font-display mt-7 max-w-[18ch] leading-[0.98]"
+              style={{ fontSize: "clamp(2.25rem, 5.5vw, 5rem)" }}
             >
-              <em
-                className={
-                  dark
-                    ? "italic text-[#f9a71d]"
-                    : "italic text-[#f55e09]"
-                }
-              >
-                {service.headline}
-              </em>
+              {service.headline}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : undefined}
               transition={{ duration: 0.9, delay: 0.2 }}
-              className={`font-serif-text mt-8 max-w-[58ch] text-xl italic leading-[1.4] md:text-2xl ${
-                dark ? "text-paper/85" : "text-ink/80"
-              }`}
+              className="mt-8 max-w-[58ch] text-lg leading-[1.6] text-text/75 md:text-xl"
             >
               {service.body}
             </motion.p>
@@ -114,16 +105,8 @@ function ServiceSection({
               transition={{ duration: 0.9, delay: 0.3 }}
               className="mt-10"
             >
-              <Link
-                href={service.cta.href}
-                className={`ignite inline-flex items-center gap-3 rounded-full px-6 py-3 text-[12px] uppercase tracking-[0.18em] transition ${
-                  dark
-                    ? "bg-[#f9a71d] text-ink hover:bg-[#fbbe4d]"
-                    : "bg-[#f55e09] text-white hover:bg-[#d24f06]"
-                }`}
-              >
+              <Link href={service.cta.href} className="btn btn-primary ignite">
                 {service.cta.label}
-                <span aria-hidden>→</span>
               </Link>
             </motion.div>
           </div>
@@ -133,36 +116,20 @@ function ServiceSection({
               initial={{ opacity: 0, scale: 0.96 }}
               animate={inView ? { opacity: 1, scale: 1 } : undefined}
               transition={{ duration: 0.9, delay: 0.15 }}
-              className={`relative aspect-[3/4] overflow-hidden rounded-sm ${
-                dark ? "bg-[#0c0a07]" : "bg-[#efe7d7]"
-              }`}
+              className="relative aspect-[3/4] overflow-hidden rounded-lg border border-hairline bg-surface-2"
             >
               <div
                 aria-hidden
-                className={`absolute inset-0 ${
-                  dark
-                    ? "bg-[radial-gradient(120%_120%_at_70%_30%,rgba(249,167,29,0.22)_0%,rgba(11,10,8,0)_60%)]"
-                    : "bg-[radial-gradient(120%_120%_at_70%_30%,rgba(245,94,9,0.18)_0%,rgba(244,237,224,0)_60%)]"
-                }`}
+                className="absolute inset-0 bg-[radial-gradient(120%_120%_at_70%_25%,rgba(249,167,29,0.22)_0%,rgba(13,11,9,0)_60%)]"
               />
               <div className="absolute inset-6 flex flex-col justify-between">
                 <span
-                  className="font-display leading-[0.82] tracking-tight"
-                  style={{
-                    fontSize: "clamp(4.5rem, 9vw, 9rem)",
-                    color: dark
-                      ? "rgba(244, 237, 224, 0.18)"
-                      : "rgba(11, 10, 8, 0.18)",
-                    fontVariationSettings: '"opsz" 144',
-                  }}
+                  className={`font-mono font-semibold leading-[0.82] tabular-nums ${accent} opacity-30`}
+                  style={{ fontSize: "clamp(4.5rem, 9vw, 9rem)" }}
                 >
                   0{index + 1}
                 </span>
-                <span
-                  className={`text-[10px] uppercase tracking-[0.28em] ${
-                    dark ? "text-paper/60" : "text-ink/55"
-                  }`}
-                >
+                <span className="font-mono text-[11px] tracking-[0.06em] text-text-muted">
                   {service.title}
                 </span>
               </div>

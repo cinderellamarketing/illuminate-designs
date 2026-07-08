@@ -13,6 +13,11 @@ type SessionVideoProps = {
   className?: string;
   // Override the placeholder label
   label?: string;
+  // How the media fills its frame. `contain` keeps an honest screen
+  // recording whole — never cropped or stretched — letterboxing into the
+  // charcoal frame if the aspect differs. `cover` (default) fills the frame
+  // and is kept for the ambient /session footage.
+  fit?: "cover" | "contain";
   // Lazy-load: only mount video element when within viewport (cheap).
   eager?: boolean;
   // When true, the clip waits for hover/focus before playing on devices
@@ -44,10 +49,12 @@ function PosterLayer({
   clip,
   eager,
   errored,
+  fit = "cover",
 }: {
   clip: MediaClip;
   eager: boolean;
   errored: boolean;
+  fit?: "cover" | "contain";
 }) {
   if (!clip.poster || errored) return null;
   return (
@@ -55,7 +62,9 @@ function PosterLayer({
       src={clip.poster}
       alt=""
       aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${
+        fit === "contain" ? "object-contain" : "object-cover"
+      }`}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
     />
@@ -82,6 +91,7 @@ function PlainVideo({
   label,
   eager = false,
   playOnHover = false,
+  fit = "cover",
 }: SessionVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -152,7 +162,7 @@ function PlainVideo({
       onFocus={handlePlay}
       onBlur={handlePause}
     >
-      <PosterLayer clip={clip} eager={eager} errored={errored} />
+      <PosterLayer clip={clip} eager={eager} errored={errored} fit={fit} />
       {showVideo ? (
         <video
           ref={videoRef}
@@ -167,7 +177,9 @@ function PlainVideo({
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full ${
+            fit === "contain" ? "object-contain" : "object-cover"
+          }`}
         />
       ) : !clip.src || errored ? (
         <Placeholder label={labelText} variant={variant} />
@@ -224,6 +236,7 @@ function ManagedVideo({
   className = "",
   label,
   eager = false,
+  fit = "cover",
 }: SessionVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -401,7 +414,7 @@ function ManagedVideo({
       ref={wrapRef}
       className={`relative overflow-hidden bg-[#0b0a08] text-[#f4ede0] ${aspectClass(variant)} ${className}`}
     >
-      <PosterLayer clip={clip} eager={eager} errored={errored} />
+      <PosterLayer clip={clip} eager={eager} errored={errored} fit={fit} />
 
       {showVideo && (
         <video
@@ -415,7 +428,9 @@ function ManagedVideo({
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full ${
+            fit === "contain" ? "object-contain" : "object-cover"
+          }`}
         />
       )}
 

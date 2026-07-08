@@ -168,46 +168,14 @@ export const sessionClose = {
 export const roomMeta = {
   title: "Step into the room | Illuminate Learning",
   description:
-    "What Copilot training actually looks like when it works. Illuminate Learning gets teams to 82% adoption in eight weeks.",
+    "What Copilot training looks like when it works. Illuminate Learning gets teams to 82% adoption in eight weeks.",
 } as const;
 
-// The /room sample session, authored as nine beats. Footage leads and the
-// lights-on / lights-off metaphor authors the rhythm. Text stays minimal.
-// Caption slots live with the footage in app/room/scenes.ts; the proof
-// beats stay labelled placeholders until testimonials are cleared. Nothing
-// here is invented.
-export const roomBeats = {
-  // 1 — Enter. Lights coming up over full-bleed footage.
-  enter: {
-    line: "Take a seat. The session is about to start.",
-    cue: "Scroll to begin",
-  },
-  // 2 — The room before. Lights low, sparse.
-  before: {
-    lead: "Nearly everyone here has a Copilot licence.",
-    tail: "Most have barely touched it.",
-  },
-  // 4 — Proof beat one. A single client line, lit in the dark.
-  proofOne: {
-    placeholder: "[Testimonial slot, with permission]",
-    note: "Testimonial slot. Cleared with the client before it goes up.",
-  },
-  // 6 — The number. The one gauge on the page: 82 against 30.
-  number: {
-    line: "82% adoption in eight weeks. The industry sits around 30%.",
-  },
-  // 7 — Proof beat two. A result or an outsider's reaction, lit in the dark.
-  proofTwo: {
-    placeholder: "[Result or reaction slot, with permission]",
-    note: "Result or reaction slot. Added once it is cleared to share.",
-  },
-  // 9 — Close. Lights up fully. One primary CTA.
-  close: {
-    line: "That is a session.",
-    tail: "Book one for your team.",
-    cta: { label: "Book a session", href: "/contact" },
-  },
-} as const;
+// The /room sample session is authored as ten beats. Its copy — every
+// caption, note and CTA — lives with the footage manifest in
+// app/room/scenes.ts, so the beats and their words stay in one place. The
+// proof beats hold labelled placeholders until real quotes are cleared;
+// nothing is invented.
 
 /* ---------------- Inner pages ---------------- */
 

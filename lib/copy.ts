@@ -11,8 +11,6 @@ export const company = {
 // Used by the hero count-up and the various pull-out numbers.
 export const headlineNumber = {
   value: "82%",
-  label: "Copilot adoption",
-  industry: "Industry average sits closer to 30%.",
 } as const;
 
 // Tooltip on the 82% number, per the playful microcopy block.
@@ -52,18 +50,10 @@ export const footer = {
 
 // Playful microcopy block (the bits we want surfaced in UI chrome).
 export const microcopy = {
-  statTooltip,
-  lightsHintHover: "Go on, flick it.",
   lightsHintKeyboard: "Press L for the lights.",
-  notFound: "The lights are off. Flip the switch, or head back home.",
-  loading: "Switching the lights on.",
-  reelCaptionExample: "Finance team, week one. Nobody fell asleep.",
   contactPlaceholder:
     "No pitch, just tell us what your team is stuck on.",
 } as const;
-
-export const consoleGreeting =
-  "Poking about in here? Good instinct. The bulb in the corner is clickable, and L turns the lights off. We like people who look under the bonnet. If that's you, and you train Microsoft tools for a living, we should probably talk. There's a contact page for that.";
 
 /* ---------------- Homepage A: /session ---------------- */
 
@@ -77,7 +67,6 @@ export const sessionHero = {
   eyebrow: "Microsoft Copilot training",
   headline: "Every team has the tools. Far fewer have the skills.",
   sub: "Copilot is sitting in your clients' Microsoft 365 right now, mostly unused. We turn it into something people reach for every day.",
-  statValue: "82%",
   statCaption:
     "adoption in eight weeks, against an industry average of 30%.",
   primaryCta: { label: "Book a session", href: "/contact" },
@@ -86,9 +75,8 @@ export const sessionHero = {
 
 export const sessionGap = {
   heading: "A licence is not a skill.",
-  body: "Most rollouts stop at the switch being flicked. The software is on, the welcome email is sent, and then nothing changes. People carry on exactly as before, because nobody showed them how Copilot fits the job they do. The cost is real and recurring. The value only shows up when habits change.",
-  // Verbatim tail of the body. The gap section runs sparse, so it carries
-  // one strong line and this single quiet line, nothing more.
+  // The gap section runs sparse, so it carries one strong line and this
+  // single quiet line, nothing more.
   pull: "The value only shows up when habits change.",
 } as const;
 
@@ -119,10 +107,9 @@ export const sessionWhatWeDo = {
 
 export const sessionQuickWin = {
   heading: "They are already paying for the safe option.",
-  body: "There are two Copilots. Copilot Premium, the paid licence, lives inside Word, Excel and Teams and reads company data. But Copilot Basic, a secure AI chat under Microsoft's enterprise data protection, comes included with Business Premium and most Microsoft 365 plans at no extra cost. Their people are pasting work into free consumer chatbots because nobody told them there was a safe option already in the licence. That is the easiest place to start.",
-  // The body broken out verbatim so the section can render as an actual
-  // two-side comparison. Copilot Basic is the included tier; Copilot
-  // Premium is the paid licence. Keep that distinction exact.
+  // The section renders as an actual two-side comparison. Copilot Basic is
+  // the included tier; Copilot Premium is the paid licence. Keep that
+  // distinction exact.
   intro: "There are two Copilots.",
   compare: {
     premium: {
@@ -149,7 +136,6 @@ export const sessionForMsps = {
 
 export const sessionProof = {
   heading: "The difference is the delivery.",
-  body: "The thing clients ask to see before they commit is what the training is like.",
   // The adoption figure renders once, as the gauge on the /session hero.
   // Here the proof section stays visual-led, footage carrying it, so this
   // line speaks to the delivery rather than repeating the number.
@@ -192,7 +178,6 @@ export const whatWeDo = {
   services: [
     {
       key: "sales-enablement",
-      eyebrow: "Service 01",
       title: "Sales enablement",
       headline: "Sell Copilot like you use it.",
       body: "It is hard to sell something convincingly when your own team has barely touched it. We get your sales and account people fluent, so they can talk about Copilot with confidence, answer the awkward client questions, and use it to do their own jobs faster. Customer zero, done properly.",
@@ -200,7 +185,6 @@ export const whatWeDo = {
     },
     {
       key: "technical-training",
-      eyebrow: "Service 02",
       title: "Technical training",
       headline: "The hands-on skills, security included.",
       body: "Your engineers need more than a demo. We cover the practical setup and day-to-day use, and we fold in the security and data side, because the first question a sensible client asks about AI is where their data goes. Pitched at technical teams, without talking down to them.",
@@ -208,7 +192,6 @@ export const whatWeDo = {
     },
     {
       key: "ai-adoption",
-      eyebrow: "Service 03",
       title: "AI adoption",
       headline: "Where licences become habits.",
       body: "This is the end-user work, and it is where adoption is won or lost. We start from real tasks, Monday-morning jobs people already have, and show where Copilot takes ten minutes off them. We measure usage at two weeks, four weeks and three months, because that is where you see what stuck.",
@@ -244,7 +227,6 @@ export const forMsps = {
       body: "You handle the technical setup, we run the training alongside you.",
     },
   ],
-  whyHeading: "Why it pays",
   whyBody:
     "There is direct margin on the training and the setup around it. There is stickiness, because a client who gets real adoption credits you with the outcome and is far slower to move. And depending on your Microsoft programme status, or any co-op or MDF funds you have to spend, some of the cost can often be funded, so it is worth checking what you qualify for.",
   cta: { label: "Partner with us", href: "/contact" },
@@ -348,10 +330,8 @@ export const proof = {
   headline: "The proof is in the room.",
   body: "Two things decide whether anyone buys training: the results, and what the training is like to be in.",
   pullFigure: "Adoption that holds, measured in the weeks after we leave the room.",
-  sampleHeading: "Sample block",
   sampleBody:
     "The single most requested thing before anyone commits is a sample of the session.",
-  samplePlaceholder: "[Embed sample training clip once produced.]",
   caseStudyPlaceholder:
     "[Case study slots, with permission: client, challenge, result.]",
   testimonialPlaceholder: "[Testimonial slots, with permission.]",
@@ -370,7 +350,6 @@ export const about = {
   body: "Illuminate Learning was founded by [Jen Wilson], who spent [years] inside Microsoft before deciding that the gap worth fixing was adoption: getting people to use the technology they already had. We know the channel, we know the pressure MSPs are under, and we know that the difference between training that lands and training that washes over a room is almost always the delivery.",
   personality:
     "We work with big companies, but we are not a stiff one. We are a bit nerdy, we like the people we work with, and we think training should be the opposite of dull.",
-  teamIntro: "Team",
   teamNote: "[Confirm bios and titles.]",
   team: [
     {
@@ -438,38 +417,3 @@ export const contact = {
   bookingLine: "Or: Book a session directly [booking link]",
   primaryCta: { label: "Book a session", href: "/contact" },
 } as const;
-
-/* ---------------- Backwards-compatible exports ---------------- */
-// Older components still reference these; keep their shape stable.
-
-export const problemStatement = {
-  big: "Every team has the tools.",
-  contrast: "Far fewer have the skills.",
-  body: sessionGap.body,
-} as const;
-
-export const credibilityLine =
-  "Built by the team that trained the first wave of UK Microsoft Copilot partners.";
-
-export const caseStudy = {
-  number: headlineNumber.value,
-  blurb:
-    "Copilot adoption in eight weeks. The industry average sits around 30%.",
-  quote: "[Testimonial slot, with permission.]",
-  attribution: "[Attribution to follow]",
-} as const;
-
-export const approachMoments = [
-  {
-    eyebrow: "Role-specific",
-    body: "A finance director and a field engineer do not need the same Copilot session. We build the session around the actual job.",
-  },
-  {
-    eyebrow: "Real work",
-    body: "We start from Monday-morning tasks people already have, and show where Copilot takes ten minutes off them.",
-  },
-  {
-    eyebrow: "Follow-up",
-    body: "Measured at two weeks, four weeks and three months, because that is where you see what stuck.",
-  },
-] as const;

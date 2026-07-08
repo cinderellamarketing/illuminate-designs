@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { company, headlineNumber } from "@/lib/copy";
+import { company } from "@/lib/copy";
 
 export const metadata: Metadata = {
   title: "Two directions, in the room",
@@ -58,8 +58,7 @@ export default function IndexPage() {
           <p className="mt-10 max-w-[58ch] text-lg leading-[1.6] text-text/80 md:text-xl">
             Both directions recreate the feeling of sitting in on a live
             Illuminate training session. Real footage and real faces, the same
-            hero number ({headlineNumber.value} Copilot adoption), interpreted
-            at two different levels of risk.
+            story, interpreted at two different levels of risk.
           </p>
         </div>
       </section>

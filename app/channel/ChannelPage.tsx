@@ -40,7 +40,7 @@ export function ChannelPage() {
 
       <Enablement />
       <Credibility />
-      <EdVideo />
+      <EddVideo />
       <Proof />
       <Close />
 
@@ -185,7 +185,7 @@ function Credibility() {
 // clip at a time. Empty slots paint the styled placeholder until footage
 // lands (see ./videos.ts).
 
-function EdVideo() {
+function EddVideo() {
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
   return (

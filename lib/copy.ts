@@ -150,11 +150,10 @@ export const sessionForMsps = {
 export const sessionProof = {
   heading: "The difference is the delivery.",
   body: "The thing clients ask to see before they commit is what the training is like.",
-  pullFigure: "82% adoption in eight weeks.",
-  // The stat gauge lives once, in the hero. Here the figure is woven into
-  // a line so the proof section can stay visual-led, footage carrying it.
-  figureLine:
-    "82% adoption in eight weeks, against an industry average around 30%.",
+  // The adoption figure renders once, as the gauge on the /session hero.
+  // Here the proof section stays visual-led, footage carrying it, so this
+  // line speaks to the delivery rather than repeating the number.
+  figureLine: "Get the delivery right and the adoption follows.",
   testimonialPlaceholder: "[Testimonial slot, with permission]",
   cta: { label: "See a sample session", href: "/room" },
 } as const;
@@ -348,7 +347,7 @@ export const proofMeta = {
 export const proof = {
   headline: "The proof is in the room.",
   body: "Two things decide whether anyone buys training: the results, and what the training is like to be in.",
-  pullFigure: "82% adoption in eight weeks, against an industry average around 30%.",
+  pullFigure: "Adoption that holds, measured in the weeks after we leave the room.",
   sampleHeading: "Sample block",
   sampleBody:
     "The single most requested thing before anyone commits is a sample of the session.",

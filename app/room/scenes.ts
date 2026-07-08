@@ -137,14 +137,16 @@ export const scenes = {
     caption: "What the green shield protects.",
   },
 
-  // 7 — The number. Stated plainly as a quiet caption beat, no gauge. The
-  // 82-against-30 stat carries its one gauge on the /session hero.
+  // 7 — The result. A quiet beat that states the outcome plainly, with no
+  // figure and no gauge. The 82-against-30 gauge lives once, on the
+  // /session hero.
   number: {
     id: "number",
     kind: "number",
     source: "",
     poster: "",
-    caption: "82% adoption in eight weeks. The industry sits near 30%.",
+    caption:
+      "By week eight, Copilot is part of how the team works. Most rollouts never get there.",
   },
 
   // 8 — Value. Turning time saved into money.

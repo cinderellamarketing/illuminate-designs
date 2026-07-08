@@ -84,8 +84,9 @@ export function RoomPage() {
 }
 
 /* ---------------- Nav ---------------- */
-// Full site nav, hidden during the opening beat so the room fills the
-// frame, fading in once the visitor has scrolled in.
+// Persistent site nav: the wordmark and menu toggle stay visible from the
+// very top of the page and throughout the scroll. Only the bar's background
+// fades in once the visitor scrolls past the opening beat.
 
 function EmergingNav({
   scrolled,
@@ -313,7 +314,6 @@ function Method() {
           lightsOn ? "is-on" : ""
         }`}
       >
-        <Kicker className="justify-center">In the room</Kicker>
         <div className="mt-8 flex w-full justify-center">
           <RoomFrame
             scene={scenes.method}
@@ -345,7 +345,6 @@ function ProofMcpin() {
         style={{ top: "-14%", left: "4%", width: "66%", height: "146%" }}
       />
       <div className="relative mx-auto w-full max-w-[1500px] px-6 py-28 md:px-10 md:py-40">
-        <Kicker>From the room</Kicker>
         <QuoteSlot className="mt-8 max-w-[24ch]" note={scenes.proofMcpin.note} />
       </div>
     </section>
@@ -368,7 +367,6 @@ function Task() {
         }`}
       >
         <div className="md:col-span-5">
-          <Kicker>The task</Kicker>
           <p
             className="font-display mt-5 leading-[1.06]"
             style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.9rem)" }}
@@ -424,7 +422,6 @@ function Security() {
           />
         </div>
         <div className="md:order-2 md:col-span-5">
-          <Kicker>Security</Kicker>
           <p
             className="font-display mt-5 leading-[1.06]"
             style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.9rem)" }}
@@ -452,7 +449,7 @@ function TheNumber() {
         style={{ top: "2%", left: "22%", width: "56%", height: "116%" }}
       />
       <div className="relative mx-auto w-full max-w-[820px] px-6 md:px-10">
-        <Kicker className="justify-center">The number</Kicker>
+        <Kicker className="justify-center">The result</Kicker>
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 18 }}
           whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
@@ -484,7 +481,6 @@ function Value() {
           lightsOn ? "is-on" : ""
         }`}
       >
-        <Kicker className="justify-center">What it is worth</Kicker>
         <div className="mt-8 flex w-full justify-center">
           <RoomFrame
             scene={scenes.value}
@@ -523,7 +519,6 @@ function ProofLymphoma() {
       />
       <div className="relative mx-auto w-full max-w-[1500px] px-6 py-28 md:px-10 md:py-40">
         <div className="ml-auto max-w-[26ch] text-right">
-          <Kicker className="justify-end">A result</Kicker>
           <QuoteSlot
             className="mt-8"
             align="right"

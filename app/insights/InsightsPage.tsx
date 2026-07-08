@@ -17,8 +17,8 @@ export function InsightsPage() {
         eyebrow="insights"
         headline={
           <>
-            Things worth knowing about Copilot, adoption{" "}
-            <span className="text-brand-orange">and the channel.</span>
+            {insights.headline.lead}{" "}
+            <span className="text-brand-orange">{insights.headline.accent}</span>
           </>
         }
         body={insights.body}

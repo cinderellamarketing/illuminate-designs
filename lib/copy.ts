@@ -65,7 +65,13 @@ export const sessionMeta = {
 
 export const sessionHero = {
   eyebrow: "Microsoft Copilot training",
-  headline: "Every team has the tools. Far fewer have the skills.",
+  // Rendered as a two-part heading: lead in plain text, accent in the
+  // orange span. Joined they read "Every team has the tools. Far fewer
+  // have the skills."
+  headline: {
+    lead: "Every team has the tools.",
+    accent: "Far fewer have the skills.",
+  },
   sub: "Copilot is sitting in your clients' Microsoft 365 right now, mostly unused. We turn it into something people reach for every day.",
   statCaption:
     "adoption in eight weeks, against an industry average of 30%.",
@@ -74,7 +80,9 @@ export const sessionHero = {
 } as const;
 
 export const sessionGap = {
-  heading: "A licence is not a skill.",
+  // lead + accent render as one heading, the accent under the hl-underline
+  // span: "A licence is not a skill."
+  heading: { lead: "A licence is", accent: "not a skill." },
   // The gap section runs sparse, so it carries one strong line and this
   // single quiet line, nothing more.
   pull: "The value only shows up when habits change.",
@@ -173,7 +181,9 @@ export const whatWeDoMeta = {
 } as const;
 
 export const whatWeDo = {
-  headline: "Training people want to be in.",
+  // lead + accent render as the two-part hero heading: "Training people
+  // want to be in."
+  headline: { lead: "Training people", accent: "want to be in." },
   body: "We do one thing well. We get teams from owning Microsoft Copilot to using it every day. The content matters, but the delivery is what makes it land. We keep the room awake, a long way from a slide deck droned at people who have stopped listening. Sessions built around the work people already do, run in small groups, with follow-up so the new habits hold.",
   services: [
     {
@@ -207,7 +217,9 @@ export const forMspsMeta = {
 } as const;
 
 export const forMsps = {
-  headline: "Partner with us, don't become us.",
+  // lead + accent render as the two-part hero heading: "Partner with us,
+  // don't become us."
+  headline: { lead: "Partner with us,", accent: "don't become us." },
   body: "Clients now expect their MSP to have a view on Copilot, roll it out, train their people and show value, all on top of keeping everything else running. Becoming a genuine training specialist takes months you do not have. The smarter move is to stay the trusted advisor and bring in a specialist for the delivery.",
   modelsIntro: "Three ways to work together:",
   models: [
@@ -327,7 +339,9 @@ export const proofMeta = {
 } as const;
 
 export const proof = {
-  headline: "The proof is in the room.",
+  // lead + accent render as the two-part hero heading: "The proof is in
+  // the room."
+  headline: { lead: "The proof is", accent: "in the room." },
   body: "Two things decide whether anyone buys training: the results, and what the training is like to be in.",
   pullFigure: "Adoption that holds, measured in the weeks after we leave the room.",
   sampleBody:
@@ -346,7 +360,12 @@ export const aboutMeta = {
 } as const;
 
 export const about = {
-  headline: "We are the bit between the licence and the light bulb going on.",
+  // lead + accent render as the two-part hero heading: "We are the bit
+  // between the licence and the light bulb going on."
+  headline: {
+    lead: "We are the bit between the licence and",
+    accent: "the light bulb going on.",
+  },
   body: "Illuminate Learning was founded by [Jen Wilson], who spent [years] inside Microsoft before deciding that the gap worth fixing was adoption: getting people to use the technology they already had. We know the channel, we know the pressure MSPs are under, and we know that the difference between training that lands and training that washes over a room is almost always the delivery.",
   personality:
     "We work with big companies, but we are not a stiff one. We are a bit nerdy, we like the people we work with, and we think training should be the opposite of dull.",
@@ -375,8 +394,12 @@ export const insightsMeta = {
 } as const;
 
 export const insights = {
-  headline:
-    "Things worth knowing about Copilot, adoption and the channel.",
+  // lead + accent render as the two-part hero heading: "Things worth
+  // knowing about Copilot, adoption and the channel."
+  headline: {
+    lead: "Things worth knowing about Copilot, adoption",
+    accent: "and the channel.",
+  },
   body: "Plain, useful writing on getting Copilot from a licence to real use, the MSP opportunity, and the bits Microsoft does not spell out.",
   sections: [
     {
@@ -400,7 +423,9 @@ export const contactMeta = {
 } as const;
 
 export const contact = {
-  headline: "Tell us what your team is stuck on.",
+  // lead + accent render as the two-part hero heading: "Tell us what your
+  // team is stuck on."
+  headline: { lead: "Tell us what your team", accent: "is stuck on." },
   body: "No pitch. Tell us where Copilot is not landing, for your team or your clients', and we will tell you whether we can help.",
   fields: [
     { name: "name", label: "Name", type: "text", required: true },

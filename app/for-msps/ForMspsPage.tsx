@@ -17,8 +17,8 @@ export function ForMspsPage() {
         eyebrow="for MSPs"
         headline={
           <>
-            Partner with us,{" "}
-            <span className="text-brand-orange">don&apos;t become us.</span>
+            {forMsps.headline.lead}{" "}
+            <span className="text-brand-orange">{forMsps.headline.accent}</span>
           </>
         }
         body={forMsps.body}

@@ -20,8 +20,8 @@ export function WhatWeDoPage() {
         eyebrow="what we do"
         headline={
           <>
-            Training people{" "}
-            <span className="text-brand-orange">want to be in.</span>
+            {whatWeDo.headline.lead}{" "}
+            <span className="text-brand-orange">{whatWeDo.headline.accent}</span>
           </>
         }
         body={whatWeDo.body}

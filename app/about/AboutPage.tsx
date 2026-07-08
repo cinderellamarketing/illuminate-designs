@@ -17,8 +17,8 @@ export function AboutPage() {
         eyebrow="about"
         headline={
           <>
-            We are the bit between the licence and{" "}
-            <span className="text-brand-orange">the light bulb going on.</span>
+            {about.headline.lead}{" "}
+            <span className="text-brand-orange">{about.headline.accent}</span>
           </>
         }
       />

@@ -100,9 +100,9 @@ function Hero() {
               className="font-display mt-6 max-w-[16ch] leading-[0.94] text-text"
               style={{ fontSize: "clamp(2.6rem, 6vw, 5.6rem)" }}
             >
-              Every team has the tools.{" "}
+              {sessionHero.headline.lead}{" "}
               <span className="text-brand-orange">
-                Far fewer have the skills.
+                {sessionHero.headline.accent}
               </span>
             </motion.h1>
 
@@ -182,7 +182,8 @@ function Gap() {
           className="font-display max-w-[16ch] leading-[0.9]"
           style={{ fontSize: "clamp(3rem, 9vw, 8.5rem)" }}
         >
-          A licence is <span className="hl-underline">not a skill.</span>
+          {sessionGap.heading.lead + " "}
+          <span className="hl-underline">{sessionGap.heading.accent}</span>
         </motion.h2>
         <motion.p
           initial={reduce ? false : { opacity: 0 }}
@@ -225,7 +226,7 @@ function WhatWeDo() {
               className="font-display mt-5 leading-[0.96]"
               style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
             >
-              We build each session around the role.
+              {sessionWhatWeDo.heading}
             </h2>
           </div>
           <p className="max-w-[46ch] self-end leading-[1.6] text-text/75 md:col-span-5">
@@ -297,7 +298,7 @@ function QuickWin() {
           className="font-display max-w-[22ch] leading-[0.98]"
           style={{ fontSize: "clamp(2.25rem, 5vw, 4.25rem)" }}
         >
-          They are already paying for the safe option.
+          {sessionQuickWin.heading}
         </h2>
 
         <p className="mt-12 font-mono text-[12px] tracking-[0.08em] text-brand-amber">
@@ -376,7 +377,7 @@ function ForMsps() {
               className="font-display max-w-[18ch] leading-[1.0]"
               style={{ fontSize: "clamp(2rem, 4.5vw, 3.75rem)" }}
             >
-              You do not have to become the trainer.
+              {sessionForMsps.heading}
             </motion.h2>
           </div>
           <div className="md:col-span-5 md:col-start-8">
@@ -446,7 +447,7 @@ function Proof() {
               className="font-display leading-[1.0]"
               style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}
             >
-              The difference is the delivery.
+              {sessionProof.heading}
             </h2>
             <p className="mt-4 font-mono text-[13px] leading-[1.5] text-text-muted">
               {sessionProof.figureLine}
@@ -487,7 +488,7 @@ function Close() {
           className="font-display mx-auto max-w-[18ch] leading-[0.96]"
           style={{ fontSize: "clamp(2.75rem, 7vw, 6.5rem)" }}
         >
-          Let&apos;s turn those licences into something useful.
+          {sessionClose.heading}
         </motion.h2>
         <p className="mx-auto mt-8 max-w-[44ch] text-lg leading-[1.6] text-text/75 md:text-xl">
           {sessionClose.body}

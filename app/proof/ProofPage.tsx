@@ -17,8 +17,8 @@ export function ProofPage() {
         eyebrow="proof"
         headline={
           <>
-            The proof is{" "}
-            <span className="text-brand-orange">in the room.</span>
+            {proof.headline.lead}{" "}
+            <span className="text-brand-orange">{proof.headline.accent}</span>
           </>
         }
         body={proof.body}

@@ -16,8 +16,8 @@ export function ContactPage() {
         eyebrow="contact"
         headline={
           <>
-            Tell us what your team{" "}
-            <span className="text-brand-orange">is stuck on.</span>
+            {contact.headline.lead}{" "}
+            <span className="text-brand-orange">{contact.headline.accent}</span>
           </>
         }
         body={contact.body}

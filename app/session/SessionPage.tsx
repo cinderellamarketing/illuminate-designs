@@ -368,13 +368,12 @@ function ForMsps() {
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid items-center gap-x-12 gap-y-8 md:grid-cols-12">
           <div className="md:col-span-6">
-            <p className="label">for MSPs</p>
             <motion.h2
               initial={reduce ? false : { opacity: 0, y: 18 }}
               whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-15%" }}
               transition={{ duration: 0.8 }}
-              className="font-display mt-4 max-w-[18ch] leading-[1.0]"
+              className="font-display max-w-[18ch] leading-[1.0]"
               style={{ fontSize: "clamp(2rem, 4.5vw, 3.75rem)" }}
             >
               You do not have to become the trainer.

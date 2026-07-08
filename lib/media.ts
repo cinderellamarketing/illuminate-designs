@@ -147,7 +147,7 @@ export const media = {
     {
       id: "portrait-ed",
       src: null,
-      caption: "Ed",
+      caption: "Edd",
       context: "Portrait placeholder",
     },
     {

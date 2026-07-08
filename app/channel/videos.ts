@@ -1,4 +1,4 @@
-// Framed video slots for /channel — Ed's clips.
+// Framed video slots for /channel — Edd's clips.
 //
 // Host-agnostic, Mux assumed. Paste a Mux playback id (or a full HLS .m3u8
 // URL) into a slot's `source` to go live; nothing else changes. Until then
@@ -52,23 +52,23 @@ export function toClip(video: ChannelVideo): MediaClip {
 export const channelVideos = {
   edd_intro: {
     id: "edd_intro",
-    // TODO: paste Mux playback id — Ed on how he works with the channel
+    // TODO: paste Mux playback id — Edd on how he works with the channel
     source: "",
     poster: "",
-    label: "Ed on how he works with the channel",
+    label: "Edd on how he works with the channel",
   },
   edd_sales_enablement: {
     id: "edd_sales_enablement",
-    // TODO: paste Mux playback id — Ed on sales enablement
+    // TODO: paste Mux playback id — Edd on sales enablement
     source: "",
     poster: "",
-    label: "Ed on sales enablement",
+    label: "Edd on sales enablement",
   },
   edd_partnership: {
     id: "edd_partnership",
-    // TODO: paste Mux playback id — Ed on the TD SYNNEX partnership
+    // TODO: paste Mux playback id — Edd on the TD SYNNEX partnership
     source: "",
     poster: "",
-    label: "Ed on the partnership",
+    label: "Edd on the partnership",
   },
 } satisfies Record<string, ChannelVideo>;

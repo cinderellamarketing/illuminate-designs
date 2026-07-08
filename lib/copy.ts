@@ -149,7 +149,7 @@ export const sessionForMsps = {
 
 export const sessionProof = {
   heading: "The difference is the delivery.",
-  body: "The thing clients ask to see before they commit is what the training is like. So that is the thing we make easy to see.",
+  body: "The thing clients ask to see before they commit is what the training is like.",
   pullFigure: "82% adoption in eight weeks.",
   // The stat gauge lives once, in the hero. Here the figure is woven into
   // a line so the proof section can stay visual-led, footage carrying it.
@@ -251,7 +251,7 @@ export const forMsps = {
   cta: { label: "Partner with us", href: "/contact" },
 } as const;
 
-/* ---------------- For the channel (Ed's page) ---------------- */
+/* ---------------- For the channel (Edd's page) ---------------- */
 // Audience: Microsoft distributors and resellers, the layer above MSPs
 // (the TD SYNNEX kind of relationship). They sell Copilot and the wider
 // Microsoft stack to MSPs and end customers. This is not generic sales
@@ -271,13 +271,13 @@ export const channel = {
     eyebrow: "for the channel",
     headlineLead: "Your partners are selling Copilot",
     headlineAccent: "faster than their teams can learn it.",
-    body: "You move Microsoft licences at volume, and Copilot is the line everyone wants to grow. The pressure lands on your partners' sales teams, who are expected to pitch Microsoft 365 Copilot, answer the security and licensing questions and tie it to a business case, often before they have used it much themselves. That distance between the target and the fluency is where deals stall. Ed's enablement is built to close it.",
+    body: "You move Microsoft licences at volume, and Copilot is the line everyone wants to grow. The pressure lands on your partners' sales teams, who are expected to pitch Microsoft 365 Copilot, answer the security and licensing questions and tie it to a business case, often before they have used it much themselves. That distance between the target and the fluency is where deals stall. Edd's enablement is built to close it.",
   },
 
-  // Four distinct strands of what Ed's enablement does for a partner.
+  // Four distinct strands of what Edd's enablement does for a partner.
   enablement: {
     heading: "What the enablement does for a partner.",
-    lead: "Ed works alongside your partners' sales and technical teams, the people who take Copilot to MSPs and end customers. Four strands, shaped to how each partner already goes to market.",
+    lead: "Edd works alongside your partners' sales and technical teams, the people who take Copilot to MSPs and end customers. Four strands, shaped to how each partner already goes to market.",
     strands: [
       {
         key: "sales-enablement",
@@ -316,8 +316,8 @@ export const channel = {
   },
 
   video: {
-    heading: "Meet Ed.",
-    body: "Ed leads channel and sales enablement at Illuminate Learning. He works with distributors and their partners on positioning, objection handling and technical depth. Clips to follow once filmed.",
+    heading: "Meet Edd.",
+    body: "Edd leads channel and sales enablement at Illuminate Learning. He works with distributors and their partners on positioning, objection handling and technical depth. Clips to follow once filmed.",
   },
 
   // TD SYNNEX partnership and the Sabs endorsement. Held as labelled
@@ -383,7 +383,7 @@ export const about = {
       role: "In-the-room training: adoption, technical and security.",
     },
     {
-      name: "[Ed]",
+      name: "[Edd]",
       role: "Sales enablement and the channel.",
     },
   ],

@@ -52,7 +52,7 @@ export function RoomPage() {
   return (
     <main className="font-sans min-h-dvh bg-ground text-text">
       <EmergingNav
-        visible={navVisible}
+        scrolled={navVisible}
         onBulb={handleBulb}
         bulbBlown={bulbBlown}
       />
@@ -88,22 +88,29 @@ export function RoomPage() {
 // frame, fading in once the visitor has scrolled in.
 
 function EmergingNav({
-  visible,
+  scrolled,
   onBulb,
   bulbBlown = false,
 }: {
-  visible: boolean;
+  scrolled: boolean;
   onBulb?: () => void;
   bulbBlown?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // A persistent, understated way out of the immersive scroll. The wordmark
+  // (back to /session) and the menu toggle stay visible from the very top and
+  // throughout the scroll, both keyboard reachable with a visible focus ring.
+  // The bar is transparent over the opening footage and gains a blurred ground
+  // once the visitor scrolls in, or whenever the menu is open.
+  const solid = scrolled || menuOpen;
+
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 border-b border-hairline bg-ground/85 backdrop-blur-md transition-all duration-500 supports-[backdrop-filter]:bg-ground/70 ${
-        visible
-          ? "translate-y-0 opacity-100"
-          : "pointer-events-none -translate-y-2 opacity-0"
+      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${
+        solid
+          ? "border-b border-hairline bg-ground/85 backdrop-blur-md supports-[backdrop-filter]:bg-ground/70"
+          : "border-b border-transparent bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-6 px-6 py-4 md:px-10 md:py-5">
@@ -119,61 +126,52 @@ function EmergingNav({
             }
           />
           <Link
-            href="/"
-            className="font-display ignite-text text-lg tracking-tight text-text"
+            href="/session"
+            aria-label="Illuminate Learning, home"
+            className="font-display ignite-text rounded-sm text-lg tracking-tight text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
           >
             Illuminate
           </Link>
         </div>
 
-        <nav className="hidden items-center gap-7 font-mono text-[12.5px] text-text-muted md:flex">
-          {nav.links
-            .filter((l) => l.href !== "/")
-            .map((l) => (
-              <Link key={l.label} href={l.href} className="ignite-text">
-                {l.label}
-              </Link>
-            ))}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href={nav.primaryCta.href}
-            className="btn btn-primary btn-sm ignite"
-          >
-            {nav.primaryCta.label}
-          </Link>
-          <button
-            type="button"
-            aria-expanded={menuOpen}
-            aria-controls="room-nav-mobile"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMenuOpen((v) => !v)}
-            className="ignite inline-flex h-10 w-10 items-center justify-center rounded-md border border-hairline text-text md:hidden"
-          >
-            <span aria-hidden className="text-base leading-none">
-              {menuOpen ? "×" : "≡"}
-            </span>
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="room-nav-menu"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMenuOpen((v) => !v)}
+          className="ignite inline-flex h-10 items-center gap-2 rounded-md border border-hairline px-3.5 font-mono text-[12px] tracking-[0.04em] text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+        >
+          <span aria-hidden className="text-base leading-none">
+            {menuOpen ? "×" : "≡"}
+          </span>
+          Menu
+        </button>
       </div>
 
       <div
-        id="room-nav-mobile"
+        id="room-nav-menu"
         hidden={!menuOpen}
-        className="border-t border-hairline md:hidden"
+        className="border-t border-hairline bg-ground/95 backdrop-blur-md"
       >
-        <nav className="mx-auto flex max-w-[1500px] flex-col gap-1 px-6 py-4 text-text">
+        <nav className="mx-auto flex max-w-[1500px] flex-col gap-1 px-6 py-5 text-text md:px-10">
           {nav.links.map((l) => (
             <Link
               key={l.label}
-              href={l.href}
+              href={l.href === "/" ? "/session" : l.href}
               onClick={() => setMenuOpen(false)}
-              className="ignite-text rounded-md py-2 font-mono text-[13px]"
+              className="ignite-text rounded-md py-2 font-mono text-[13px] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-amber"
             >
               {l.label}
             </Link>
           ))}
+          <Link
+            href={nav.primaryCta.href}
+            onClick={() => setMenuOpen(false)}
+            className="btn btn-primary btn-sm ignite mt-3 self-start"
+          >
+            {nav.primaryCta.label}
+          </Link>
         </nav>
       </div>
     </header>
@@ -198,16 +196,6 @@ function Enter() {
       ref={ref}
       className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-ground px-6 py-20 md:px-10"
     >
-      {/* Minimal chrome: a small mono label, top-left. */}
-      <div className="absolute left-6 top-6 z-20 flex items-center gap-2 font-mono text-[11px] tracking-[0.04em] text-text/75 md:left-10 md:top-8">
-        <span
-          aria-hidden
-          className="inline-block h-1.5 w-1.5 rounded-full bg-brand-amber"
-          style={{ boxShadow: "0 0 8px rgba(249,167,29,0.8)" }}
-        />
-        Illuminate · sample session
-      </div>
-
       <div className="relative z-10 flex w-full max-w-[1500px] flex-col items-center">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 18 }}

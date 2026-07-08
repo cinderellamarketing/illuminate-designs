@@ -10,10 +10,10 @@ import { SiteNav } from "@/app/_components/SiteNav";
 import { channel } from "@/lib/copy";
 import { channelVideos, toClip, type ChannelVideo } from "./videos";
 
-// /channel — Ed's page. It speaks to the layer above MSPs: Microsoft
+// /channel — Edd's page. It speaks to the layer above MSPs: Microsoft
 // distributors and resellers (the TD SYNNEX kind of relationship) who sell
 // Copilot and the wider Microsoft stack to MSPs and end customers. Its job
-// is to make the case for Ed's channel and sales enablement, distinct from
+// is to make the case for Edd's channel and sales enablement, distinct from
 // /for-msps, which speaks to MSPs directly.
 //
 // Section shapes are deliberately varied: a split heading over a numbered
@@ -178,7 +178,7 @@ function Credibility() {
   );
 }
 
-/* ---------------- Ed on video ---------------- */
+/* ---------------- Edd on video ---------------- */
 // The framed video moment. edd_intro leads as the feature frame beside a
 // short heading; edd_sales_enablement follows as a secondary frame. Both use
 // the managed SessionVideo treatment: poster-first, lazy-loaded, muted, one
@@ -228,6 +228,7 @@ function EdVideo() {
             >
               <ChannelFrame
                 video={channelVideos.edd_intro}
+                reelNo={1}
                 poolStyle={{
                   top: "-16%",
                   left: "-10%",
@@ -250,6 +251,7 @@ function EdVideo() {
           >
             <ChannelFrame
               video={channelVideos.edd_sales_enablement}
+              reelNo={2}
               poolStyle={{
                 top: "-16%",
                 right: "-10%",
@@ -295,6 +297,7 @@ function Proof() {
           >
             <ChannelFrame
               video={channelVideos.edd_partnership}
+              reelNo={3}
               poolStyle={{
                 top: "-16%",
                 left: "-10%",
@@ -411,10 +414,12 @@ function ChannelFrame({
   video,
   poolStyle,
   className = "",
+  reelNo = 1,
 }: {
   video: ChannelVideo;
   poolStyle?: React.CSSProperties;
   className?: string;
+  reelNo?: number;
 }) {
   return (
     <div className={`relative ${className}`}>
@@ -434,6 +439,7 @@ function ChannelFrame({
             clip={toClip(video)}
             variant="fill"
             managed
+            reelNo={reelNo}
             className="h-full w-full"
             label={video.label}
           />

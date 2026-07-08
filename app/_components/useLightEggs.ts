@@ -53,7 +53,7 @@ export function useLightEggs(): LightEggs {
   const closeMaze = useCallback(() => setMazeOpen(false), []);
 
   // Konami code. Window-level listener. Arrows are prevented from
-  // scrolling so the typist can actually finish. Auto-repeat ignored.
+  // scrolling so the typist can finish. Auto-repeat ignored.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const buffer: string[] = [];

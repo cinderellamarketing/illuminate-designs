@@ -28,6 +28,9 @@ type SessionVideoProps = {
   // the viewport, and falls back to tap-to-play on mobile or when
   // prefers-reduced-data / prefers-reduced-motion is set.
   managed?: boolean;
+  // The reel index shown in the placeholder's timecode detail (01, 02, ...),
+  // so sibling frames read as a sequence rather than all "reel · 01".
+  reelNo?: number;
 };
 
 // Shared: the aspect-ratio class for a variant. hero / fill are sized by
@@ -92,6 +95,7 @@ function PlainVideo({
   eager = false,
   playOnHover = false,
   fit = "cover",
+  reelNo = 1,
 }: SessionVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -182,7 +186,7 @@ function PlainVideo({
           }`}
         />
       ) : !clip.src || errored ? (
-        <Placeholder label={labelText} variant={variant} />
+        <Placeholder label={labelText} variant={variant} reelNo={reelNo} />
       ) : null}
 
       {/* Darkening over the hero video for legibility of overlay content. */}
@@ -237,6 +241,7 @@ function ManagedVideo({
   label,
   eager = false,
   fit = "cover",
+  reelNo = 1,
 }: SessionVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -305,7 +310,7 @@ function ManagedVideo({
 
   // Attach the source once the element is mounted and near. Safari / iOS
   // play the .m3u8 natively; everywhere else we lazily import hls.js — so
-  // it only ever loads for a clip that genuinely needs it, and never while
+  // it only ever loads for a clip that needs it, and never while
   // sources are still empty. A plain file (mp4) just sets src.
   useEffect(() => {
     const v = videoRef.current;
@@ -434,7 +439,7 @@ function ManagedVideo({
         />
       )}
 
-      {/* Hero legibility scrim, only while the video is actually painting. */}
+      {/* Hero legibility scrim, only while the video is painting. */}
       {showVideo && playing && variant === "hero" && (
         <div
           aria-hidden
@@ -476,11 +481,12 @@ function ManagedVideo({
         </button>
       )}
 
-      {/* Styled placeholder only when there is genuinely nothing to paint. */}
+      {/* Styled placeholder only when there is nothing to paint. */}
       {!hasVideo && !clip.poster && (
         <Placeholder
           label={label ?? "Session footage to follow"}
           variant={variant}
+          reelNo={reelNo}
         />
       )}
 
@@ -526,7 +532,15 @@ function MuteToggle({
   );
 }
 
-function Placeholder({ label, variant }: { label: string; variant: Variant }) {
+function Placeholder({
+  label,
+  variant,
+  reelNo = 1,
+}: {
+  label: string;
+  variant: Variant;
+  reelNo?: number;
+}) {
   return (
     <div className="absolute inset-0">
       {/* Warm light pool gives the panel depth, consistent with the room. */}
@@ -574,7 +588,7 @@ function Placeholder({ label, variant }: { label: string; variant: Variant }) {
 
       {/* Bottom-right timecode-style detail to feel intentional. */}
       <div className="absolute bottom-4 right-4 font-mono text-[10.5px] tracking-[0.04em] text-white/45">
-        reel · 01
+        reel · {String(reelNo).padStart(2, "0")}
       </div>
     </div>
   );

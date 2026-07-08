@@ -10,7 +10,6 @@ import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
 import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { SiteNav } from "@/app/_components/SiteNav";
-import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useLightEggs } from "@/app/_components/useLightEggs";
 import { media } from "@/lib/media";
 import {
@@ -36,7 +35,6 @@ const STAT = parseInt(headlineNumber.value, 10) || 82;
 // partner band, a footage-led proof, cleared client voices lit on the dark
 // ground, a warm close. The 82% gauge appears once, in the hero.
 export function SessionPage() {
-  useDeclareVariant("session");
   const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
     useLightEggs();
 

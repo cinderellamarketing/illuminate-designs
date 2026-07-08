@@ -4,8 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://illuminate-designs.vercel.app";
   const lastModified = new Date();
   const paths: Array<{ url: string; priority: number }> = [
-    { url: "/", priority: 0.5 },
-    { url: "/session", priority: 1 },
+    { url: "/", priority: 1 },
     { url: "/room", priority: 1 },
     { url: "/what-we-do", priority: 0.8 },
     { url: "/for-msps", priority: 0.8 },

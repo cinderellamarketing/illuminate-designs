@@ -14,7 +14,6 @@ import { LightMaze } from "@/app/_components/LightMaze";
 import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
 import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
 import { SiteFooter } from "@/app/_components/SiteFooter";
-import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useLightEggs } from "@/app/_components/useLightEggs";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { scenes, toClip, type Scene } from "./scenes";
@@ -40,7 +39,6 @@ import { nav } from "@/lib/copy";
 // NOTE: the Edd sales-enablement section is a separate, pending piece. Its
 // placement is not yet decided and it is deliberately NOT built into /room.
 export function RoomPage() {
-  useDeclareVariant("room");
   const [navVisible, setNavVisible] = useState(false);
   const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
     useLightEggs();
@@ -100,8 +98,9 @@ function EmergingNav({
   const [menuOpen, setMenuOpen] = useState(false);
 
   // A persistent, understated way out of the immersive scroll. The wordmark
-  // (back to /session) and the menu toggle stay visible from the very top and
-  // throughout the scroll, both keyboard reachable with a visible focus ring.
+  // (back to the homepage at "/") and the menu toggle stay visible from the
+  // very top and throughout the scroll, both keyboard reachable with a visible
+  // focus ring.
   // The bar is transparent over the opening footage and gains a blurred ground
   // once the visitor scrolls in, or whenever the menu is open.
   const solid = scrolled || menuOpen;
@@ -127,7 +126,7 @@ function EmergingNav({
             }
           />
           <Link
-            href="/session"
+            href="/"
             aria-label="Illuminate Learning, home"
             className="font-display ignite-text rounded-sm text-lg tracking-tight text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
           >
@@ -159,7 +158,7 @@ function EmergingNav({
           {nav.links.map((l) => (
             <Link
               key={l.label}
-              href={l.href === "/" ? "/session" : l.href}
+              href={l.href}
               onClick={() => setMenuOpen(false)}
               className="ignite-text rounded-md py-2 font-mono text-[13px] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-amber"
             >

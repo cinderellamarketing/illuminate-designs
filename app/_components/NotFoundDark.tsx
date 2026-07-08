@@ -78,7 +78,7 @@ export function NotFoundDark() {
             }`}
             aria-hidden={!lit}
           >
-            <Link href="/session" className="btn btn-primary btn-lg ignite">
+            <Link href="/" className="btn btn-primary btn-lg ignite">
               <span aria-hidden className="btn-switch" />
               Back into the session
             </Link>

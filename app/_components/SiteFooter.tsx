@@ -2,17 +2,12 @@
 
 import Link from "next/link";
 import { StudioSpotlight } from "@/app/_components/StudioSpotlight";
-import { useVariant } from "@/app/_components/useVariant";
 import { company, footer, nav } from "@/lib/copy";
 
 // Shared site footer. Carries the cursor-tracked wordmark spotlight
 // (untouched behaviour), the navigation columns from the copy file, and
-// the signoff. The Home link routes back to whichever homepage the
-// visitor entered through.
+// the signoff. The Home link routes back to the homepage at "/".
 export function SiteFooter() {
-  const variant = useVariant();
-  const homeHref = variant === "room" ? "/room" : "/session";
-
   return (
     <footer className="border-t border-hairline bg-ground text-text">
       <div className="mx-auto max-w-[1500px] px-6 pt-20 pb-10 md:px-10 md:pt-24 md:pb-14">
@@ -40,7 +35,7 @@ export function SiteFooter() {
             aria-label="Footer"
             className="md:col-span-4 md:col-start-7 grid grid-cols-2 gap-x-6 gap-y-3 font-mono text-[13px] text-text-muted"
           >
-            <Link href={homeHref} className="ignite-text">
+            <Link href="/" className="ignite-text">
               Home
             </Link>
             {footer.columns.map((c) => (

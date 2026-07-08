@@ -4,13 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BulbMark } from "@/app/_components/BulbMark";
-import { useVariant } from "@/app/_components/useVariant";
 import { nav } from "@/lib/copy";
 
 // Shared site nav used on every inner page. Sits on the dark ground as a
 // translucent surface panel with a hairline underline: a clickable bulb
-// glyph, mono links that ignite on hover, and a Home link that returns to
-// whichever homepage the visitor entered through.
+// glyph, mono links that ignite on hover, and a Home link (bulb, wordmark
+// and the "Home" item) that returns to the homepage at "/".
 //
 // `tone` is kept for call-site compatibility; the whole site is lit-dark
 // now, so both tones resolve to the same charcoal treatment.
@@ -25,17 +24,14 @@ export function SiteNav({
   bulbBlown?: boolean;
   hideHomeLink?: boolean;
 }) {
-  const variant = useVariant();
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const homeHref = variant === "room" ? "/room" : "/session";
 
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-ground/85 backdrop-blur supports-[backdrop-filter]:bg-ground/70">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-4 md:px-10 md:py-5">
         <Link
-          href={homeHref}
+          href="/"
           className="group flex items-center gap-3 text-text"
           aria-label="Illuminate Learning, home"
         >
@@ -58,15 +54,11 @@ export function SiteNav({
           {nav.links
             .filter((l) => !(hideHomeLink && l.href === "/"))
             .map((l) => {
-              const href = l.href === "/" ? homeHref : l.href;
-              const active =
-                l.href === "/"
-                  ? pathname === "/session" || pathname === "/room"
-                  : pathname === l.href;
+              const active = pathname === l.href;
               return (
                 <Link
                   key={l.label}
-                  href={href}
+                  href={l.href}
                   className={`ignite-text ${active ? "text-brand-orange" : ""}`}
                 >
                   {l.label}
@@ -104,19 +96,16 @@ export function SiteNav({
         className="border-t border-hairline md:hidden"
       >
         <nav className="mx-auto flex max-w-[1400px] flex-col gap-1 px-6 py-4 text-text">
-          {nav.links.map((l) => {
-            const href = l.href === "/" ? homeHref : l.href;
-            return (
-              <Link
-                key={l.label}
-                href={href}
-                onClick={() => setMenuOpen(false)}
-                className="ignite-text rounded-md py-2 font-mono text-[13px]"
-              >
-                {l.label}
-              </Link>
-            );
-          })}
+          {nav.links.map((l) => (
+            <Link
+              key={l.label}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              className="ignite-text rounded-md py-2 font-mono text-[13px]"
+            >
+              {l.label}
+            </Link>
+          ))}
         </nav>
       </div>
     </header>

@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/room", priority: 1 },
     { url: "/what-we-do", priority: 0.8 },
     { url: "/for-msps", priority: 0.8 },
+    { url: "/channel", priority: 0.8 },
     { url: "/proof", priority: 0.8 },
     { url: "/about", priority: 0.7 },
     { url: "/insights", priority: 0.7 },

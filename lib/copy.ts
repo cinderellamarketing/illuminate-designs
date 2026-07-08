@@ -25,6 +25,7 @@ export const nav = {
     { label: "Home", href: "/" },
     { label: "What we do", href: "/what-we-do" },
     { label: "For MSPs", href: "/for-msps" },
+    { label: "For the channel", href: "/channel" },
     { label: "Proof", href: "/proof" },
     { label: "About", href: "/about" },
     { label: "Insights", href: "/insights" },
@@ -39,6 +40,7 @@ export const footer = {
   columns: [
     { label: "What we do", href: "/what-we-do" },
     { label: "For MSPs", href: "/for-msps" },
+    { label: "For the channel", href: "/channel" },
     { label: "Proof", href: "/proof" },
     { label: "About", href: "/about" },
     { label: "Insights", href: "/insights" },
@@ -247,6 +249,94 @@ export const forMsps = {
   whyBody:
     "There is direct margin on the training and the setup around it. There is stickiness, because a client who gets real adoption credits you with the outcome and is far slower to move. And depending on your Microsoft programme status, or any co-op or MDF funds you have to spend, some of the cost can often be funded, so it is worth checking what you qualify for.",
   cta: { label: "Partner with us", href: "/contact" },
+} as const;
+
+/* ---------------- For the channel (Ed's page) ---------------- */
+// Audience: Microsoft distributors and resellers, the layer above MSPs
+// (the TD SYNNEX kind of relationship). They sell Copilot and the wider
+// Microsoft stack to MSPs and end customers. This is not generic sales
+// training and is deliberately distinct from /for-msps: /for-msps speaks
+// to MSPs directly, /channel speaks to the distributors and resellers who
+// enable them. Copy is plain British English, no em dashes, sentence case.
+
+export const channelMeta = {
+  title:
+    "For the channel | Copilot enablement for Microsoft distributors and resellers",
+  description:
+    "Sales and technical enablement for Microsoft distributors and resellers. We get partner sales teams fluent in Microsoft 365 Copilot, so they can position it, handle objections and build pipeline.",
+} as const;
+
+export const channel = {
+  hero: {
+    eyebrow: "for the channel",
+    headlineLead: "Your partners are selling Copilot",
+    headlineAccent: "faster than their teams can learn it.",
+    body: "You move Microsoft licences at volume, and Copilot is the line everyone wants to grow. The pressure lands on your partners' sales teams, who are expected to pitch Microsoft 365 Copilot, answer the security and licensing questions and tie it to a business case, often before they have used it much themselves. That distance between the target and the fluency is where deals stall. Ed's enablement is built to close it.",
+  },
+
+  // Four distinct strands of what Ed's enablement does for a partner.
+  enablement: {
+    heading: "What the enablement does for a partner.",
+    lead: "Ed works alongside your partners' sales and technical teams, the people who take Copilot to MSPs and end customers. Four strands, shaped to how each partner already goes to market.",
+    strands: [
+      {
+        key: "sales-enablement",
+        title: "Sales enablement",
+        body: "We get partner sales and account teams fluent in Microsoft 365 Copilot. They learn it by using it on their own accounts, which is what makes them credible when they get in front of a customer.",
+      },
+      {
+        key: "positioning",
+        title: "Positioning and objection handling",
+        body: "The questions that stall a Copilot deal are consistent: licensing, data security, and whether it earns its cost. We give teams clear answers and a way to frame Copilot around the customer's business outcomes, so a hesitant call keeps moving.",
+      },
+      {
+        key: "technical",
+        title: "Technical enablement and certifications",
+        body: "For the teams who need depth, we cover the technical side of Copilot and the wider Microsoft stack, including the setup and data questions customers raise first. Where it helps a partner, we line the enablement up with the relevant Microsoft certifications and role-based credentials.",
+      },
+      {
+        key: "webinars",
+        title: "End-customer webinars that build pipeline",
+        body: "We run Copilot webinars for your partners' end customers, under the partner's name or alongside their team. Each one gives the sales team warm conversations to follow up, so the enablement turns into pipeline they can work.",
+      },
+    ],
+    // Kept strictly conditional: only for partners in the right Microsoft
+    // programme or with existing co-op / MDF funds. Never universal.
+    funding:
+      "Where a partner is in the right Microsoft programme, or has co-op or MDF funds to spend, some of this can often be funded. Worth checking what they qualify for.",
+  },
+
+  // Credibility, stated as fact and not embellished.
+  credibility: {
+    facts: [
+      { label: "Microsoft Learning", fact: "Official Microsoft Learning partner." },
+      { label: "The team", fact: "Built by an ex-Microsoft team." },
+      { label: "Coverage", fact: "Copilot and the wider Microsoft stack." },
+    ],
+  },
+
+  video: {
+    heading: "Meet Ed.",
+    body: "Ed leads channel and sales enablement at Illuminate Learning. He works with distributors and their partners on positioning, objection handling and technical depth. Clips to follow once filmed.",
+  },
+
+  // TD SYNNEX partnership and the Sabs endorsement. Held as labelled
+  // placeholders until Jen and TD SYNNEX have cleared the wording. Nothing
+  // here is invented.
+  proof: {
+    heading: "The TD SYNNEX partnership.",
+    body: "This is where the partnership and Sabs's endorsement will sit. We are holding the space until Jen and TD SYNNEX have signed off the wording, so nothing here is invented.",
+    endorsementPlaceholder:
+      "[Endorsement from Sabs, TD SYNNEX. Added once cleared to share.]",
+    partnershipPlaceholder: "[TD SYNNEX partnership detail, pending sign-off.]",
+  },
+
+  close: {
+    headlineLead: "Let's talk about enabling",
+    headlineAccent: "your channel.",
+    body: "Tell us how your partners are selling Copilot today, and where their teams get stuck. We will show you what the enablement would add.",
+    cta: { label: "Talk about channel enablement", href: "/contact" },
+  },
 } as const;
 
 export const proofMeta = {

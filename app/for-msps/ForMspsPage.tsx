@@ -100,12 +100,11 @@ function WhyItPays() {
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-x-10 gap-y-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="label">why it pays</p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8 }}
-              className="font-display mt-6 leading-[0.98]"
+              className="font-display leading-[0.98]"
               style={{ fontSize: "clamp(2.5rem, 6vw, 5.5rem)" }}
             >
               Margin.{" "}

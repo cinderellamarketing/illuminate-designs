@@ -36,7 +36,7 @@ export const nav = {
 
 export const footer = {
   brand: company.name,
-  tagline: "We turn Microsoft licences into skills people actually use.",
+  tagline: "We turn Microsoft licences into skills people use.",
   columns: [
     { label: "What we do", href: "/what-we-do" },
     { label: "For MSPs", href: "/for-msps" },
@@ -86,7 +86,7 @@ export const sessionHero = {
 
 export const sessionGap = {
   heading: "A licence is not a skill.",
-  body: "Most rollouts stop at the switch being flicked. The software is on, the welcome email is sent, and then nothing changes. People carry on exactly as before, because nobody showed them how Copilot fits the job they actually do. The cost is real and recurring. The value only shows up when habits change.",
+  body: "Most rollouts stop at the switch being flicked. The software is on, the welcome email is sent, and then nothing changes. People carry on exactly as before, because nobody showed them how Copilot fits the job they do. The cost is real and recurring. The value only shows up when habits change.",
   // Verbatim tail of the body. The gap section runs sparse, so it carries
   // one strong line and this single quiet line, nothing more.
   pull: "The value only shows up when habits change.",
@@ -111,7 +111,7 @@ export const sessionWhatWeDo = {
     {
       role: "Finance manager",
       title: "AI adoption.",
-      body: "End users who actually change how they work.",
+      body: "End users who change how they work.",
     },
   ],
   link: { label: "What we do", href: "/what-we-do" },
@@ -149,7 +149,7 @@ export const sessionForMsps = {
 
 export const sessionProof = {
   heading: "The difference is the delivery.",
-  body: "The thing clients ask to see before they commit is what the training is actually like. So that is the thing we make easy to see.",
+  body: "The thing clients ask to see before they commit is what the training is like. So that is the thing we make easy to see.",
   pullFigure: "82% adoption in eight weeks.",
   // The stat gauge lives once, in the hero. Here the figure is woven into
   // a line so the proof section can stay visual-led, footage carrying it.
@@ -161,7 +161,7 @@ export const sessionProof = {
 
 export const sessionClose = {
   heading: "Let's turn those licences into something useful.",
-  body: "Tell us what your team, or your clients' teams, are stuck on. No pitch.",
+  body: "Tell us what your team, or your clients' teams, are stuck on.",
   primaryCta: { label: "Book a session", href: "/contact" },
 } as const;
 
@@ -196,7 +196,7 @@ export const whatWeDo = {
       eyebrow: "Service 01",
       title: "Sales enablement",
       headline: "Sell Copilot like you use it.",
-      body: "It is hard to sell something convincingly when your own team has barely touched it. We get your sales and account people genuinely fluent, so they can talk about Copilot with confidence, answer the awkward client questions, and use it to do their own jobs faster. Customer zero, done properly.",
+      body: "It is hard to sell something convincingly when your own team has barely touched it. We get your sales and account people fluent, so they can talk about Copilot with confidence, answer the awkward client questions, and use it to do their own jobs faster. Customer zero, done properly.",
       cta: { label: "Book a session", href: "/contact" },
     },
     {
@@ -212,7 +212,7 @@ export const whatWeDo = {
       eyebrow: "Service 03",
       title: "AI adoption",
       headline: "Where licences become habits.",
-      body: "This is the end-user work, and it is where adoption is won or lost. We start from real tasks, Monday-morning jobs people already have, and show where Copilot takes ten minutes off them. We measure usage at two weeks, four weeks and three months, because that is where you see what actually stuck.",
+      body: "This is the end-user work, and it is where adoption is won or lost. We start from real tasks, Monday-morning jobs people already have, and show where Copilot takes ten minutes off them. We measure usage at two weeks, four weeks and three months, because that is where you see what stuck.",
       cta: { label: "Book a session", href: "/contact" },
     },
   ],
@@ -342,7 +342,7 @@ export const channel = {
 export const proofMeta = {
   title: "Proof | Results and what good looks like | Illuminate Learning",
   description:
-    "82% Copilot adoption in eight weeks. See what Illuminate Learning's training delivers and what a session actually looks like.",
+    "82% Copilot adoption in eight weeks. See what Illuminate Learning's training delivers and what a session looks like.",
 } as const;
 
 export const proof = {
@@ -363,7 +363,7 @@ export const proof = {
 export const aboutMeta = {
   title: "About | Illuminate Learning",
   description:
-    "Founded by [Jen Wilson], ex-Microsoft, Illuminate Learning makes Microsoft Copilot training that people actually want to be in.",
+    "Founded by [Jen Wilson], ex-Microsoft, Illuminate Learning makes Microsoft Copilot training that people want to be in.",
 } as const;
 
 export const about = {
@@ -376,7 +376,7 @@ export const about = {
   team: [
     {
       name: "[Jen Wilson]",
-      role: "Founder. Client-facing and relationships. Does not deliver training.",
+      role: "Founder, client-facing and relationships. Does not deliver training.",
     },
     {
       name: "[James]",
@@ -399,7 +399,7 @@ export const insightsMeta = {
 export const insights = {
   headline:
     "Things worth knowing about Copilot, adoption and the channel.",
-  body: "Plain, useful writing on getting Copilot from a licence to real use, the MSP opportunity, and the bits Microsoft does not spell out. No fluff.",
+  body: "Plain, useful writing on getting Copilot from a licence to real use, the MSP opportunity, and the bits Microsoft does not spell out.",
   sections: [
     {
       key: "articles",
@@ -423,7 +423,7 @@ export const contactMeta = {
 
 export const contact = {
   headline: "Tell us what your team is stuck on.",
-  body: "No pitch. Tell us where Copilot is not landing, for your team or your clients', and we will tell you honestly whether we can help.",
+  body: "No pitch. Tell us where Copilot is not landing, for your team or your clients', and we will tell you whether we can help.",
   fields: [
     { name: "name", label: "Name", type: "text", required: true },
     { name: "email", label: "Work email", type: "email", required: true },

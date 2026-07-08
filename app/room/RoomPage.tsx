@@ -9,7 +9,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SessionVideo } from "@/app/_components/SessionVideo";
-import { StatMeter } from "@/app/_components/StatMeter";
 import { BulbMark } from "@/app/_components/BulbMark";
 import { LightMaze } from "@/app/_components/LightMaze";
 import { LightSwitchGate } from "@/app/_components/LightSwitchGate";
@@ -19,7 +18,7 @@ import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useLightEggs } from "@/app/_components/useLightEggs";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { scenes, toClip, type Scene } from "./scenes";
-import { nav, statTooltip } from "@/lib/copy";
+import { nav } from "@/lib/copy";
 
 // /room is the standalone sample session. Its one job is to make the visitor
 // feel sat in one of our live training rooms, with James delivering and
@@ -451,10 +450,12 @@ function Security() {
 }
 
 /* ---------------- Beat 7 · The number ---------------- */
-// Its own quiet instrument beat, lights low. The 82-against-30 gauge, once
-// on the page.
+// Its own quiet beat, lights low. The stat is stated plainly as a caption,
+// no gauge. The 82-against-30 gauge lives once, on the /session hero.
 
 function TheNumber() {
+  const reduce = useReducedMotion();
+  const [lead, tail] = splitTwo(scenes.number.caption);
   return (
     <section className="relative flex min-h-[86svh] flex-col items-center justify-center overflow-hidden border-t border-hairline bg-ground py-24 text-center md:py-32">
       <div
@@ -462,21 +463,19 @@ function TheNumber() {
         className="light-pool"
         style={{ top: "2%", left: "22%", width: "56%", height: "116%" }}
       />
-      <div className="relative mx-auto w-full max-w-[760px] px-6 md:px-10">
+      <div className="relative mx-auto w-full max-w-[820px] px-6 md:px-10">
         <Kicker className="justify-center">The number</Kicker>
-        <div className="mt-10 flex justify-center">
-          <StatMeter
-            value={82}
-            from={30}
-            align="center"
-            fontSize="min(22vw, 32svh)"
-            meterMaxWidth="min(74vw, 420px)"
-            tooltip={statTooltip}
-          />
-        </div>
-        <p className="mx-auto mt-12 max-w-[38ch] font-mono text-[13.5px] leading-[1.7] tracking-[0.02em] text-text/80">
-          {scenes.number.caption}
-        </p>
+        <motion.p
+          initial={reduce ? false : { opacity: 0, y: 18 }}
+          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1] }}
+          className="font-display mt-10 leading-[1.08]"
+          style={{ fontSize: "clamp(1.6rem, 3.6vw, 2.9rem)" }}
+        >
+          <span className="block">{lead}</span>
+          {tail && <span className="block text-text-muted">{tail}</span>}
+        </motion.p>
       </div>
     </section>
   );

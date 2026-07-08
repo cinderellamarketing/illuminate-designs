@@ -9,7 +9,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://illuminate-designs.vercel.app"),
   title: {
-    default: "Illuminate Learning — Microsoft Copilot training that sticks",
+    default: "Illuminate Learning: Microsoft Copilot training that sticks",
     template: "%s · Illuminate Learning",
   },
   description:
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_GB",
-    title: "Illuminate Learning — Microsoft Copilot training that sticks",
+    title: "Illuminate Learning: Microsoft Copilot training that sticks",
     description:
       "You are in the room. Role-specific Copilot training, 82% adoption versus an industry norm of 30%.",
     siteName: "Illuminate Learning",

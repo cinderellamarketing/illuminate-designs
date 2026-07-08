@@ -134,10 +134,11 @@ export const scenes = {
     // TODO: paste Mux playback id — security (what the green shield protects)
     source: "",
     poster: "/poster-facesClose.jpg",
-    caption: "What the green shield actually protects.",
+    caption: "What the green shield protects.",
   },
 
-  // 7 — The number. The 82-against-30 gauge, once on the page.
+  // 7 — The number. Stated plainly as a quiet caption beat, no gauge. The
+  // 82-against-30 stat carries its one gauge on the /session hero.
   number: {
     id: "number",
     kind: "number",

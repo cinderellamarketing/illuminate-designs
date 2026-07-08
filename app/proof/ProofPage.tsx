@@ -4,12 +4,9 @@ import Link from "next/link";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { PageHero } from "@/app/_components/PageHero";
-import { StatMeter } from "@/app/_components/StatMeter";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { SiteNav } from "@/app/_components/SiteNav";
-import { headlineNumber, proof, statTooltip } from "@/lib/copy";
-
-const STAT = parseInt(headlineNumber.value, 10) || 82;
+import { proof } from "@/lib/copy";
 
 export function ProofPage() {
   return (
@@ -50,19 +47,15 @@ function Pull() {
         style={{ top: "-20%", left: "-4%", width: "55%", height: "140%" }}
       />
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
-        <motion.div
+        <motion.h2
           initial={{ opacity: 0, y: 32 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.9 }}
+          className="font-display max-w-[24ch] leading-[1.02]"
+          style={{ fontSize: "clamp(2rem, 4.6vw, 3.75rem)" }}
         >
-          <StatMeter
-            value={STAT}
-            caption={proof.pullFigure}
-            tooltip={statTooltip}
-            fontSize="clamp(6rem, 18vw, 16rem)"
-            meterMaxWidth="min(90vw, 620px)"
-          />
-        </motion.div>
+          {proof.pullFigure}
+        </motion.h2>
       </div>
     </section>
   );

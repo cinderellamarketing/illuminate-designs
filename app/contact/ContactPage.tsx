@@ -112,124 +112,129 @@ function FormSection() {
     <section
       ref={ref}
       data-sent={status === "sent" ? "true" : undefined}
-      className="cf-section relative border-t border-hairline bg-ground py-24 md:py-32"
+      className="cf-section relative bg-ground pb-24 pt-2 md:pb-32"
     >
-      {/* Warm wash that comes up when the enquiry lands. */}
-      <div aria-hidden className="cf-section__warm" />
-
       <div className="relative z-10 mx-auto w-full max-w-[760px] px-6 md:px-8">
-        {status === "sent" ? (
-          <Confirmation reduce={reduce} onAgain={onAgain} />
-        ) : (
-          <motion.form
-            ref={formRef}
-            onSubmit={onSubmit}
-            noValidate
-            initial={reduce ? false : { opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7 }}
-            className="grid gap-10"
-          >
-            {/* Honeypot. Formspree silently drops any submission that fills
-                this, so it stays in the DOM but out of sight and out of the
-                tab order and the accessibility tree. */}
-            <div className="cf-hp" aria-hidden>
-              <label>
-                Do not fill this in if you are human
+        {/* One contained panel, sitting straight under the subheading so the
+            intro and the form read as a single block. A subtle raised
+            surface holds the fields; the warm wash blooms inside it on send. */}
+        <div className="cf-panel">
+          <div aria-hidden className="cf-section__warm" />
+
+          <div className="cf-panel__inner">
+            {status === "sent" ? (
+              <Confirmation reduce={reduce} onAgain={onAgain} />
+            ) : (
+              <motion.form
+                ref={formRef}
+                onSubmit={onSubmit}
+                noValidate
+                initial={reduce ? false : { opacity: 0, y: 24 }}
+                animate={inView ? { opacity: 1, y: 0 } : undefined}
+                transition={{ duration: 0.7 }}
+                className="grid gap-10"
+              >
+                {/* Honeypot. Formspree silently drops any submission that
+                    fills this, so it stays in the DOM but out of sight and out
+                    of the tab order and the accessibility tree. */}
+                <div className="cf-hp" aria-hidden>
+                  <label>
+                    Do not fill this in if you are human
+                    <input
+                      type="text"
+                      name="_gotcha"
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </label>
+                </div>
+
                 <input
-                  type="text"
-                  name="_gotcha"
-                  tabIndex={-1}
-                  autoComplete="off"
+                  type="hidden"
+                  name="_subject"
+                  value="New enquiry from the Illuminate site"
                 />
-              </label>
-            </div>
 
-            <input
-              type="hidden"
-              name="_subject"
-              value="New enquiry from the Illuminate site"
-            />
+                <Field
+                  multiline
+                  rows={5}
+                  id="cf-message"
+                  name={f.message.name}
+                  label={f.message.label}
+                  required
+                  error={errors.message ? f.validation.message : undefined}
+                  disabled={sending}
+                />
 
-            <Field
-              hero
-              multiline
-              id="cf-message"
-              name={f.hero.name}
-              label={f.hero.label}
-              placeholder={f.hero.placeholder}
-              required
-              error={errors.message ? f.validation.message : undefined}
-              disabled={sending}
-            />
+                <div className="grid gap-10 sm:grid-cols-2">
+                  <Field
+                    id="cf-name"
+                    name={f.name.name}
+                    label={f.name.label}
+                    autoComplete="name"
+                    required
+                    error={errors.name ? f.validation.name : undefined}
+                    disabled={sending}
+                  />
+                  <Field
+                    id="cf-email"
+                    name={f.email.name}
+                    label={f.email.label}
+                    type="email"
+                    autoComplete="email"
+                    required
+                    error={errors.email ? f.validation.email : undefined}
+                    disabled={sending}
+                  />
+                </div>
 
-            <div className="grid gap-10 sm:grid-cols-2">
-              <Field
-                id="cf-name"
-                name={f.name.name}
-                label={f.name.label}
-                autoComplete="name"
-                required
-                error={errors.name ? f.validation.name : undefined}
-                disabled={sending}
-              />
-              <Field
-                id="cf-email"
-                name={f.email.name}
-                label={f.email.label}
-                type="email"
-                autoComplete="email"
-                required
-                error={errors.email ? f.validation.email : undefined}
-                disabled={sending}
-              />
-            </div>
+                <Field
+                  id="cf-company"
+                  name={f.company.name}
+                  label={f.company.label}
+                  optional={f.company.optional}
+                  autoComplete="organization"
+                  disabled={sending}
+                />
 
-            <Field
-              id="cf-company"
-              name={f.company.name}
-              label={f.company.label}
-              optional={f.company.optional}
-              autoComplete="organization"
-              disabled={sending}
-            />
+                <div className="mt-2 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    type="submit"
+                    className="cf-switch ignite"
+                    data-state={sending ? "sending" : "idle"}
+                    disabled={sending}
+                    aria-busy={sending}
+                  >
+                    <span aria-hidden className="cf-switch__track">
+                      <span className="cf-switch__paddle" />
+                    </span>
+                    <span>{sending ? f.sending : f.send}</span>
+                  </button>
 
-            <div className="mt-2 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                type="submit"
-                className="cf-switch ignite"
-                data-state={sending ? "sending" : "idle"}
-                disabled={sending}
-                aria-busy={sending}
-              >
-                <span aria-hidden className="cf-switch__track">
-                  <span className="cf-switch__paddle" />
-                </span>
-                <span>{sending ? f.sending : f.send}</span>
-              </button>
+                  <p className="font-mono text-[12px] leading-[1.6] text-text-muted">
+                    {f.privacy}
+                  </p>
+                </div>
 
-              <p className="font-mono text-[12px] leading-[1.6] text-text-muted">
-                {f.privacy}
-              </p>
-            </div>
-
-            {status === "error" && (
-              <p
-                role="alert"
-                className="cf-error font-mono text-[13px] leading-[1.6]"
-              >
-                {f.error.lead}{" "}
-                <a
-                  href={`mailto:${f.error.email}`}
-                  className="ignite-text text-brand-orange"
-                >
-                  {f.error.email}
-                </a>
-                .
-              </p>
+                {status === "error" && (
+                  <p
+                    role="alert"
+                    className="cf-error font-mono text-[13px] leading-[1.6]"
+                  >
+                    {f.error.lead}{" "}
+                    <a
+                      href={`mailto:${f.error.email}`}
+                      className="ignite-text text-brand-orange"
+                    >
+                      {f.error.email}
+                    </a>
+                    .
+                  </p>
+                )}
+              </motion.form>
             )}
-          </motion.form>
-        )}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -277,7 +282,7 @@ function Field({
   placeholder,
   type = "text",
   multiline = false,
-  hero = false,
+  rows = 3,
   optional,
   autoComplete,
   required = false,
@@ -290,7 +295,7 @@ function Field({
   placeholder?: string;
   type?: string;
   multiline?: boolean;
-  hero?: boolean;
+  rows?: number;
   optional?: string;
   autoComplete?: string;
   required?: boolean;
@@ -298,7 +303,7 @@ function Field({
   disabled?: boolean;
 }) {
   const errorId = error ? `${id}-error` : undefined;
-  const className = `cf-input${hero ? " cf-input--hero" : ""}`;
+  const className = "cf-input";
   const shared = {
     id,
     name,
@@ -318,7 +323,7 @@ function Field({
         {optional && <span className="cf-field__optional"> · {optional}</span>}
       </label>
       {multiline ? (
-        <textarea {...shared} rows={3} />
+        <textarea {...shared} rows={rows} />
       ) : (
         <input {...shared} type={type} autoComplete={autoComplete} />
       )}

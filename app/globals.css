@@ -983,6 +983,31 @@ body.lights-off * {
   opacity: 1;
 }
 
+/* One contained block. The form sits inside a subtly raised warm surface,
+   lifted off the ground with a hairline edge and a soft drop, so the intro
+   and the fields read as a single unit rather than a bordered form card. The
+   warm wash lives inside it, clipped to the rounded corners. */
+.cf-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface) 100%
+  );
+  border: 1px solid var(--color-hairline);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 30px 60px -34px rgba(0, 0, 0, 0.75);
+}
+
+.cf-panel__inner {
+  position: relative;
+  z-index: 1;
+  padding: clamp(1.75rem, 4.5vw, 3.25rem);
+}
+
 .cf-field {
   position: relative;
   display: flex;
@@ -1067,20 +1092,10 @@ body.lights-off * {
   cursor: not-allowed;
 }
 
-/* Hero field: the ask, set large in the display face and given room. */
-.cf-input--hero {
-  font-family: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
-  font-weight: 700;
-  font-variation-settings: "wght" 680, "wdth" 108;
-  letter-spacing: -0.01em;
-  font-size: clamp(1.5rem, 3.4vw, 2.4rem);
-  line-height: 1.16;
-  padding-top: 4px;
+/* The message box is a plain multi-line field: same body face and underline
+   as the rest, just taller. Only vertical resize so it can't break the row. */
+textarea.cf-input {
   resize: vertical;
-}
-
-.cf-input--hero::placeholder {
-  color: rgba(244, 237, 224, 0.32);
 }
 
 .cf-field__error {

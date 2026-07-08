@@ -51,8 +51,6 @@ export const footer = {
 // Playful microcopy block (the bits we want surfaced in UI chrome).
 export const microcopy = {
   lightsHintKeyboard: "Press L for the lights.",
-  contactPlaceholder:
-    "No pitch, just tell us what your team is stuck on.",
 } as const;
 
 /* ---------------- Homepage A: /session ---------------- */
@@ -431,12 +429,11 @@ export const contact = {
   // The real enquiry form, posted client-side to Formspree. The `name`
   // values below are the Formspree field keys and must not change: an input
   // named exactly "email" makes Formspree set reply-to to the sender, so a
-  // reply lands back with the prospect. "message" is the hero field.
+  // reply lands back with the prospect. "message" is the enquiry field.
   form: {
-    hero: {
+    message: {
       name: "message",
-      label: "What you're stuck on",
-      placeholder: microcopy.contactPlaceholder,
+      label: "Your message",
     },
     name: { name: "name", label: "Name" },
     email: { name: "email", label: "Work email" },

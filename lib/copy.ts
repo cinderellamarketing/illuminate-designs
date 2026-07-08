@@ -171,52 +171,43 @@ export const roomMeta = {
     "What Copilot training actually looks like when it works. Illuminate Learning gets teams to 82% adoption in eight weeks.",
 } as const;
 
-// Seven cinematic scenes, copy lifted from the docx.
-export const roomScenes = [
-  {
-    key: "01",
-    eyebrow: "Scene 01",
-    line: "Most Copilot rollouts happen in the dark.",
-    sub: "Everyone has access. Nobody is using it.",
+// The /room sample session, authored as nine beats. Footage leads and the
+// lights-on / lights-off metaphor authors the rhythm. Text stays minimal.
+// Caption slots live with the footage in app/room/scenes.ts; the proof
+// beats stay labelled placeholders until testimonials are cleared. Nothing
+// here is invented.
+export const roomBeats = {
+  // 1 — Enter. Lights coming up over full-bleed footage.
+  enter: {
+    line: "Take a seat. The session is about to start.",
+    cue: "Scroll to begin",
   },
-  {
-    key: "02",
-    eyebrow: "Scene 02",
-    line: "Every team has the tools.",
-    line2: "Far fewer have the skills.",
+  // 2 — The room before. Lights low, sparse.
+  before: {
+    lead: "Nearly everyone here has a Copilot licence.",
+    tail: "Most have barely touched it.",
   },
-  {
-    key: "03",
-    eyebrow: "Scene 03",
-    line: "This is what it looks like when the lights come on.",
-    sub: "Real sessions. Real teams. The moment it clicks.",
+  // 4 — Proof beat one. A single client line, lit in the dark.
+  proofOne: {
+    placeholder: "[Testimonial slot, with permission]",
+    note: "Testimonial slot. Cleared with the client before it goes up.",
   },
-  {
-    key: "04",
-    eyebrow: "Scene 04",
-    line: "We train the role, not the feature list.",
-    sub: "Small groups. Real work. Follow-up so it sticks.",
+  // 6 — The number. The one gauge on the page: 82 against 30.
+  number: {
+    line: "82% adoption in eight weeks. The industry sits around 30%.",
   },
-  {
-    key: "05",
-    eyebrow: "Scene 05",
-    line: "82% adoption in eight weeks.",
-    sub: "The industry average is about 30%.",
+  // 7 — Proof beat two. A result or an outsider's reaction, lit in the dark.
+  proofTwo: {
+    placeholder: "[Result or reaction slot, with permission]",
+    note: "Result or reaction slot. Added once it is cleared to share.",
   },
-  {
-    key: "06",
-    eyebrow: "Scene 06",
-    line: "MSPs, you do not have to become the trainer.",
-    sub: "Stay the trusted advisor. Bring us in for the delivery.",
+  // 9 — Close. Lights up fully. One primary CTA.
+  close: {
+    line: "That is a session.",
+    tail: "Book one for your team.",
+    cta: { label: "Book a session", href: "/contact" },
   },
-  {
-    key: "07",
-    eyebrow: "Scene 07",
-    line: "Ready to switch the lights on?",
-    primaryCta: { label: "Book a session", href: "/contact" },
-    secondaryCta: { label: "See a sample session", href: "/proof" },
-  },
-] as const;
+} as const;
 
 /* ---------------- Inner pages ---------------- */
 

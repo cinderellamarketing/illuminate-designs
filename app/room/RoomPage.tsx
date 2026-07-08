@@ -17,15 +17,19 @@ import { KonamiFlourish } from "@/app/_components/KonamiFlourish";
 import { SiteFooter } from "@/app/_components/SiteFooter";
 import { useDeclareVariant } from "@/app/_components/useVariant";
 import { useLightEggs } from "@/app/_components/useLightEggs";
-import { media } from "@/lib/media";
-import { company, headlineNumber, nav, roomScenes, statTooltip } from "@/lib/copy";
+import { useReducedMotion } from "@/lib/useReducedMotion";
+import { scenes, toClip } from "./scenes";
+import { company, nav, roomBeats, statTooltip } from "@/lib/copy";
 
-const STAT = parseInt(headlineNumber.value, 10) || 82;
+const STAT = 82;
 
-// /room is the cinematic homepage. The shared light-switch gate handles
-// the first-visit intro; the maze lives on as an easter egg from the nav
-// bulb or the Konami code, matching /session. The hero parallax-lifts the
-// 82% stat and the seven docx scenes play out in contained 100svh shells.
+// /room is a standalone sample session. Its one job is to make the visitor
+// feel sat in one of our training rooms. Footage leads; text stays minimal.
+// Nine authored beats, their shapes varied by the lights-on / lights-off
+// metaphor: the room comes up, dims for a quiet line, brightens for a
+// training moment, and so on, to a fully lit close. Video is referenced,
+// not stored — see app/room/scenes.ts. Every egg (light switch gate, nav
+// bulb, Konami, maze) and the shared nav / footer carry over.
 export function RoomPage() {
   useDeclareVariant("room");
   const [navVisible, setNavVisible] = useState(false);
@@ -43,15 +47,19 @@ export function RoomPage() {
         onBulb={handleBulb}
         bulbBlown={bulbBlown}
       />
-      <Hero />
-      <Scene01 />
-      <Scene02 />
-      <Scene03 />
-      <Scene04 />
-      <Scene05 />
-      <Scene06 />
-      <Scene07 />
+
+      <Enter />
+      <RoomBefore />
+      <TrainingOne />
+      <ProofOne />
+      <TrainingTwo />
+      <TheNumber />
+      <ProofTwo />
+      <HowItSticks />
+      <Close />
+
       <SiteFooter />
+
       <LightMaze
         open={mazeOpen}
         onClose={closeMaze}
@@ -65,8 +73,10 @@ export function RoomPage() {
   );
 }
 
-// Full site nav, hidden during the hero so the cinematic frame is
-// uninterrupted, fading in once the visitor has scrolled past it.
+/* ---------------- Nav ---------------- */
+// Full site nav, hidden during the opening beat so the room fills the
+// frame, fading in once the visitor has scrolled in.
+
 function EmergingNav({
   visible,
   onBulb,
@@ -160,225 +170,238 @@ function EmergingNav({
   );
 }
 
-/* ---------------- Hero ---------------- */
+/* ---------------- Beat 1 · Enter ---------------- */
+// Full-bleed footage, lights coming up, minimal chrome. One line and a
+// scroll cue.
 
-function Hero() {
+function Enter() {
+  const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const numberScale = useTransform(scrollYProgress, [0, 0.35], [0.9, 1]);
-  const numberOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85], [0, 1, 1]);
-  const numberY = useTransform(scrollYProgress, [0, 1], [20, -40]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
-    <section ref={ref} className="relative h-[140svh] w-full bg-ground">
-      <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-        <SessionVideo
-          clip={media.roomHero}
-          variant="hero"
-          eager
-          showMuteToggle
-          className="h-full w-full"
+    <section
+      ref={ref}
+      className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-black"
+    >
+      <SessionVideo
+        clip={toClip(scenes.enter)}
+        variant="hero"
+        managed
+        eager
+        showMuteToggle
+        className="h-full w-full"
+        label="the session starting"
+      />
+
+      {/* Lights coming up: a dark veil lifts on entry. Skipped for reduced
+          motion, which starts already lit. */}
+      {!reduce && (
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1.7, ease: [0.2, 0.7, 0.2, 1] }}
+          className="pointer-events-none absolute inset-0 z-20 bg-[#050403]"
         />
+      )}
 
-        {/* Top-left status chrome — a live indicator, mono. */}
-        <div className="absolute left-6 top-6 z-10 flex items-center gap-2 font-mono text-[11px] tracking-[0.04em] text-text/80 md:left-10 md:top-8">
-          <span
-            aria-hidden
-            className="inline-block h-1.5 w-1.5 rounded-full bg-brand-amber"
-            style={{ boxShadow: "0 0 8px rgba(249,167,29,0.8)" }}
-          />
-          Illuminate · session in progress
+      {/* Bottom scrim so the line stays legible over the still or footage. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(5,4,3,0) 40%, rgba(5,4,3,0.4) 72%, rgba(5,4,3,0.82) 100%)",
+        }}
+      />
+
+      {/* Minimal chrome: a live indicator, mono. */}
+      <div className="absolute left-6 top-6 z-30 flex items-center gap-2 font-mono text-[11px] tracking-[0.04em] text-text/80 md:left-10 md:top-8">
+        <span
+          aria-hidden
+          className="inline-block h-1.5 w-1.5 rounded-full bg-brand-amber"
+          style={{ boxShadow: "0 0 8px rgba(249,167,29,0.8)" }}
+        />
+        Illuminate · session starting
+      </div>
+
+      {/* One line, low in frame. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pb-24 md:px-10 md:pb-28">
+        <div className="mx-auto w-full max-w-[1500px]">
+          <motion.h1
+            initial={reduce ? false : { opacity: 0, y: 22 }}
+            animate={reduce ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1], delay: 0.9 }}
+            className="font-display max-w-[18ch] leading-[1.0] text-text"
+            style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}
+          >
+            {roomBeats.enter.line}
+          </motion.h1>
         </div>
+      </div>
 
-        {/* The 82% reveal, as a mono gauge. Non-interactive wrapper keeps
-            the unmute control underneath clickable. */}
-        <motion.div
-          style={{ scale: numberScale, opacity: numberOpacity, y: numberY }}
-          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
-        >
-          <StatMeter
-            value={STAT}
-            align="center"
-            caption="Copilot adoption in eight weeks."
-            tooltip={statTooltip}
-            fontSize="min(24vw, 40svh)"
-            meterMaxWidth="min(70vw, 440px)"
-          />
-        </motion.div>
+      {/* Scroll cue. */}
+      <motion.div
+        style={{ opacity: reduce ? 1 : cueOpacity }}
+        className="absolute inset-x-0 bottom-7 z-30 flex justify-center font-mono text-[11px] tracking-[0.08em] text-text/70"
+      >
+        <span className="flex items-center gap-3">
+          <span aria-hidden>↓</span>
+          {roomBeats.enter.cue}
+        </span>
+      </motion.div>
+    </section>
+  );
+}
 
-        {/* Scroll cue */}
-        <motion.div
-          style={{ opacity: cueOpacity }}
-          className="absolute inset-x-0 bottom-6 z-10 flex justify-center font-mono text-[11px] tracking-[0.08em] text-text/70"
+/* ---------------- Beat 2 · The room before ---------------- */
+// Lights low. Mostly dark, sparse, a single quiet still and one line.
+
+function RoomBefore() {
+  const reduce = useReducedMotion();
+  return (
+    <section className="relative flex min-h-[92svh] items-center overflow-hidden bg-ground">
+      {/* A single quiet still, dimmed right down — the room before the
+          lights. */}
+      <div aria-hidden className="absolute inset-0">
+        <img
+          src={scenes.before.poster}
+          alt=""
+          className="h-full w-full object-cover opacity-[0.18]"
+          loading="lazy"
+          decoding="async"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(13,11,9,0.96) 0%, rgba(13,11,9,0.82) 45%, rgba(13,11,9,0.6) 100%)",
+          }}
+        />
+      </div>
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-10%", left: "-14%", width: "62%", height: "130%" }}
+      />
+
+      <div className="relative mx-auto w-full max-w-[1500px] px-6 py-28 md:px-10 md:py-44">
+        <Kicker>Before</Kicker>
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1] }}
+          className="font-display mt-6 max-w-[20ch] leading-[1.02]"
+          style={{ fontSize: "clamp(1.9rem, 4.6vw, 3.6rem)" }}
         >
-          <span className="flex items-center gap-3">
-            <span aria-hidden>↓</span>
-            Scroll into the room
-          </span>
-        </motion.div>
+          <span className="block">{roomBeats.before.lead}</span>
+          <span className="block text-text-muted">{roomBeats.before.tail}</span>
+        </motion.h2>
       </div>
     </section>
   );
 }
 
-/* ---------------- Scene 01 ---------------- */
+/* ---------------- Beat 3 · Training one ---------------- */
+// Lights on. A contained frame, footage leading, a caption slot beneath.
 
-function Scene01() {
-  const scene = roomScenes[0];
-  return (
-    <Scene eyebrow={scene.eyebrow}>
-      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-6">
-          <Statement>
-            Most Copilot rollouts{" "}
-            <span className="text-brand-amber">happen in the dark.</span>
-          </Statement>
-          <Body className="mt-6">{scene.sub}</Body>
-        </div>
-        <div className="md:col-span-6">
-          <SceneVideoFrame>
-            <SessionVideo
-              clip={media.roomScenes.room}
-              variant="fill"
-              className="h-full w-full"
-              label="Wide of the room, give it a sec"
-            />
-          </SceneVideoFrame>
-        </div>
-      </div>
-    </Scene>
-  );
-}
-
-/* ---------------- Scene 02 ---------------- */
-
-function Scene02() {
-  const scene = roomScenes[1];
-  return (
-    <Scene eyebrow={scene.eyebrow}>
-      <Statement size="xl">
-        <span className="block">{scene.line}</span>
-        <span className="block text-brand-orange">
-          {"line2" in scene ? scene.line2 : ""}
-        </span>
-      </Statement>
-    </Scene>
-  );
-}
-
-/* ---------------- Scene 03 ---------------- */
-
-function Scene03() {
-  const scene = roomScenes[2];
-  return (
-    <Scene eyebrow={scene.eyebrow}>
-      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-5">
-          <Statement size="lg">
-            <span className="block">This is what it looks like</span>
-            <span className="block text-brand-amber">
-              when the lights come on.
-            </span>
-          </Statement>
-          <Body className="mt-6">{scene.sub}</Body>
-        </div>
-        <div className="md:col-span-7">
-          <SceneVideoFrame>
-            <SessionVideo
-              clip={media.roomScenes.breakthrough}
-              variant="fill"
-              className="h-full w-full"
-              label="Real footage, warming up"
-            />
-          </SceneVideoFrame>
-          <p className="mt-3 font-mono text-[11px] tracking-[0.04em] text-text-muted">
-            Real footage plays here.
-          </p>
-        </div>
-      </div>
-    </Scene>
-  );
-}
-
-/* ---------------- Scene 04 ---------------- */
-
-function Scene04() {
-  const scene = roomScenes[3];
-  return (
-    <Scene eyebrow={scene.eyebrow}>
-      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-7">
-          <Statement size="lg">
-            We train the role,{" "}
-            <span className="text-brand-amber">not the feature list.</span>
-          </Statement>
-          <Body className="mt-6">{scene.sub}</Body>
-        </div>
-        <div className="md:col-span-5">
-          <SceneVideoFrame>
-            <SessionVideo
-              clip={media.roomScenes.problem}
-              variant="fill"
-              className="h-full w-full"
-              label="The room, mid-session"
-            />
-          </SceneVideoFrame>
-        </div>
-      </div>
-    </Scene>
-  );
-}
-
-/* ---------------- Scene 05 ---------------- */
-
-function Scene05() {
-  const scene = roomScenes[4];
+function TrainingOne() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const inner = useRef<HTMLDivElement | null>(null);
-  const lightsOn = useSceneLights(inner);
-
+  const lightsOn = useSceneLights(ref);
   return (
-    <section
-      ref={ref}
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-ground py-14 md:py-16"
-    >
+    <section className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden border-t border-hairline bg-surface py-16 md:py-20">
       <div
-        ref={inner}
+        ref={ref}
         className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
           lightsOn ? "is-on" : ""
         }`}
       >
-        <span className="font-mono text-[11px] tracking-[0.04em] text-brand-amber">
-          {scene.eyebrow}
-        </span>
-
-        <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-12 md:gap-12">
-          <div className="md:col-span-6">
-            <StatMeter
-              value={STAT}
-              caption="adoption in eight weeks."
-              tooltip={statTooltip}
-              fontSize="min(20vw, 34svh)"
-              meterMaxWidth="380px"
+        <Kicker>In the room</Kicker>
+        <div className="mt-7 md:mt-9">
+          <SceneFrame>
+            <SessionVideo
+              clip={toClip(scenes.taskOnScreen)}
+              variant="fill"
+              managed
+              className="h-full w-full"
+              label="a task on screen"
             />
-          </div>
+          </SceneFrame>
+          <SlotCaption
+            className="mx-auto max-w-[calc(52svh*16/9)]"
+            text={scenes.taskOnScreen.caption}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          <div className="md:col-span-6">
-            <SceneVideoFrame>
+/* ---------------- Beat 4 · Proof one ---------------- */
+// Lights low. A single client line, lit in the dark. Labelled slot.
+
+function ProofOne() {
+  return (
+    <section className="relative flex min-h-[80svh] items-center overflow-hidden bg-ground">
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-15%", left: "6%", width: "70%", height: "150%" }}
+      />
+      <div className="relative mx-auto w-full max-w-[1500px] px-6 py-28 md:px-10 md:py-40">
+        <Kicker>From the room</Kicker>
+        <ProofSlot
+          className="mt-8 max-w-[24ch]"
+          quote={roomBeats.proofOne.placeholder}
+          note={roomBeats.proofOne.note}
+        />
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Beat 5 · Training two ---------------- */
+// Lights on, reframed from beat three: footage one side, the line the
+// other.
+
+function TrainingTwo() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const lightsOn = useSceneLights(ref);
+  return (
+    <section className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden border-t border-hairline bg-surface py-16 md:py-20">
+      <div
+        ref={ref}
+        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
+          lightsOn ? "is-on" : ""
+        }`}
+      >
+        <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
+          <div className="md:col-span-7">
+            <SceneFrame align="left">
               <SessionVideo
-                clip={media.roomScenes.result}
+                clip={toClip(scenes.learnerReaction)}
                 variant="fill"
+                managed
                 className="h-full w-full"
-                label="Eight weeks later, cuppa optional"
+                label="a reaction in the room"
               />
-            </SceneVideoFrame>
-            <p className="mt-5 max-w-[44ch] leading-[1.6] text-text/80">
-              {scene.sub}
+            </SceneFrame>
+          </div>
+          <div className="md:col-span-5">
+            <Kicker>The turn</Kicker>
+            <p
+              className="font-display mt-5 leading-[1.04]"
+              style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.9rem)" }}
+            >
+              {scenes.learnerReaction.caption}
             </p>
+            <SlotTag className="mt-6" />
           </div>
         </div>
       </div>
@@ -386,106 +409,137 @@ function Scene05() {
   );
 }
 
-/* ---------------- Scene 06 ---------------- */
+/* ---------------- Beat 6 · The number ---------------- */
+// Its own quiet instrument beat. The 82-against-30 gauge, once on the page.
 
-function Scene06() {
-  const scene = roomScenes[5];
+function TheNumber() {
   return (
-    <Scene eyebrow={scene.eyebrow}>
-      <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-7">
-          <Statement size="lg">
-            <span className="block">MSPs, you do not have to</span>
-            <span className="block text-brand-amber">become the trainer.</span>
-          </Statement>
-          <Body className="mt-6">{scene.sub}</Body>
-          <div className="mt-6">
-            <Link
-              href="/for-msps"
-              className="ignite-text inline-flex items-center gap-3 font-mono text-[13px] text-brand-amber hover:text-brand-orange"
-            >
-              Partner with us
-              <span aria-hidden>→</span>
-            </Link>
-          </div>
-        </div>
-        <div className="md:col-span-5">
-          <SceneVideoFrame>
-            <SessionVideo
-              clip={media.roomScenes.breakthrough}
-              variant="fill"
-              className="h-full w-full"
-              label="Channel partner, day two"
-            />
-          </SceneVideoFrame>
-        </div>
-      </div>
-    </Scene>
-  );
-}
-
-/* ---------------- Scene 07 ---------------- */
-
-function Scene07() {
-  const scene = roomScenes[6];
-  const ref = useRef<HTMLDivElement | null>(null);
-  const inner = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end end"],
-  });
-  const lift = useTransform(scrollYProgress, [0, 1], [40, 0]);
-  const lightsOn = useSceneLights(inner);
-
-  // The final scene is the room with the lights fully up: a warmer raised
-  // surface with a strong resting light pool, rather than the cream flip.
-  return (
-    <section
-      ref={ref}
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden border-t border-hairline bg-surface-2 py-14 md:py-16"
-    >
+    <section className="relative flex min-h-[92svh] flex-col items-center justify-center overflow-hidden bg-ground py-24 text-center md:py-32">
       <div
         aria-hidden
         className="light-pool"
-        style={{ top: "-10%", left: "10%", width: "80%", height: "130%" }}
+        style={{ top: "0%", left: "20%", width: "60%", height: "120%" }}
       />
+      <div className="relative mx-auto w-full max-w-[760px] px-6 md:px-10">
+        <Kicker className="justify-center">The number</Kicker>
+        <div className="mt-10 flex justify-center">
+          <StatMeter
+            value={STAT}
+            from={30}
+            align="center"
+            fontSize="min(22vw, 34svh)"
+            meterMaxWidth="min(74vw, 420px)"
+            tooltip={statTooltip}
+          />
+        </div>
+        <p className="mx-auto mt-12 max-w-[36ch] font-mono text-[13.5px] leading-[1.7] tracking-[0.02em] text-text/80">
+          {roomBeats.number.line}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Beat 7 · Proof two ---------------- */
+// Lights low. A result or outsider's reaction, lit in the dark. Reframed
+// from beat four: aligned to the other edge, with a thin rule.
+
+function ProofTwo() {
+  return (
+    <section className="relative flex min-h-[80svh] items-center overflow-hidden border-t border-hairline bg-ground">
       <div
-        ref={inner}
-        className={`relative mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-15%", right: "4%", left: "auto", width: "68%", height: "150%" }}
+      />
+      <div className="relative mx-auto w-full max-w-[1500px] px-6 py-28 md:px-10 md:py-40">
+        <div className="ml-auto max-w-[26ch] text-right">
+          <Kicker className="justify-end">A result</Kicker>
+          <ProofSlot
+            className="mt-8"
+            align="right"
+            quote={roomBeats.proofTwo.placeholder}
+            note={roomBeats.proofTwo.note}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Beat 8 · How it sticks ---------------- */
+// Lights on, visual-led, minimal text. The delivery and the follow-up.
+
+function HowItSticks() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const lightsOn = useSceneLights(ref);
+  return (
+    <section className="relative overflow-hidden border-t border-hairline bg-surface py-16 md:py-24">
+      <div
+        ref={ref}
+        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
           lightsOn ? "is-on" : ""
         }`}
       >
-        <p className="font-mono text-[11px] tracking-[0.04em] text-brand-amber">
-          {scene.eyebrow}
-        </p>
-        <motion.div style={{ y: lift }}>
-          <h2
-            className="font-display mt-5 leading-[0.96]"
-            style={{ fontSize: "clamp(2.5rem, 7vw, 6.5rem)" }}
+        <Kicker>How it sticks</Kicker>
+        <div className="mt-7 md:mt-9">
+          <div
+            className="relative mx-auto overflow-hidden rounded-lg"
+            style={{ aspectRatio: "16 / 9", width: "100%", maxWidth: "min(100%, calc(64svh * 16 / 9))" }}
           >
-            <span className="block">Ready to switch</span>
-            <span className="block text-brand-orange">the lights on?</span>
-          </h2>
-        </motion.div>
+            <SessionVideo
+              clip={toClip(scenes.followUp)}
+              variant="fill"
+              managed
+              className="h-full w-full"
+              label="small-group delivery and follow-up"
+            />
+          </div>
+          <SlotCaption
+            className="mx-auto max-w-[min(100%,calc(64svh*16/9))]"
+            text={scenes.followUp.caption}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="mt-8 flex flex-wrap items-center gap-5">
-          {"primaryCta" in scene && scene.primaryCta && (
-            <Link
-              href={scene.primaryCta.href}
-              className="btn btn-primary btn-lg ignite"
-            >
-              <span aria-hidden className="btn-switch" />
-              {scene.primaryCta.label}
-            </Link>
-          )}
-          {"secondaryCta" in scene && scene.secondaryCta && (
-            <Link
-              href={scene.secondaryCta.href}
-              className="btn btn-secondary btn-lg ignite"
-            >
-              {scene.secondaryCta.label}
-            </Link>
-          )}
+/* ---------------- Beat 9 · Close ---------------- */
+// Lights up fully. One line, one primary CTA. Nav and footer carry the
+// visitor on into the rest of the site, so this standalone page is not a
+// dead end.
+
+function Close() {
+  const reduce = useReducedMotion();
+  return (
+    <section className="relative overflow-hidden border-t border-hairline bg-surface-2 py-28 md:py-40">
+      <div
+        aria-hidden
+        className="light-pool"
+        style={{ top: "-20%", left: "16%", width: "68%", height: "150%" }}
+      />
+      <div className="relative mx-auto w-full max-w-[1500px] px-6 md:px-10">
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+          className="font-display max-w-[16ch] leading-[0.98]"
+          style={{ fontSize: "clamp(2.5rem, 7vw, 6.5rem)" }}
+        >
+          <span className="block">{roomBeats.close.line}</span>
+          <span className="block text-brand-orange">{roomBeats.close.tail}</span>
+        </motion.h2>
+
+        <div className="mt-10 flex flex-wrap items-center gap-6">
+          <Link
+            href={roomBeats.close.cta.href}
+            className="btn btn-primary btn-lg ignite"
+          >
+            <span aria-hidden className="btn-switch" />
+            {roomBeats.close.cta.label}
+          </Link>
           <a
             href={`mailto:${company.email}`}
             className="ignite-text font-mono text-[13px] text-text-muted hover:text-brand-orange"
@@ -498,45 +552,10 @@ function Scene07() {
   );
 }
 
-/* ---------------- Shared scene primitives ---------------- */
+/* ---------------- Shared primitives ---------------- */
 
-function Scene({
-  eyebrow,
-  children,
-}: {
-  eyebrow: string;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 90%", "end 10%"],
-  });
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 1]);
-  const y = useTransform(scrollYProgress, [0, 0.25], [40, 0]);
-  const lightsOn = useSceneLights(ref);
-
-  return (
-    <section
-      ref={ref}
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-ground py-14 md:py-16"
-    >
-      <motion.div
-        style={{ opacity, y }}
-        className={`mx-auto w-full max-w-[1500px] px-6 md:px-10 scene-lights ${
-          lightsOn ? "is-on" : ""
-        }`}
-      >
-        <span className="font-mono text-[11px] tracking-[0.04em] text-brand-amber">
-          {eyebrow}
-        </span>
-        <div className="mt-6 md:mt-8">{children}</div>
-      </motion.div>
-    </section>
-  );
-}
-
-// Toggle the scene from dim to lit when it scrolls into view.
+// Toggle a section from dim to lit when it scrolls into view. Reduced
+// motion neutralises the brightness step in CSS, so this stays inert there.
 function useSceneLights(ref: React.RefObject<HTMLDivElement | null>) {
   const [on, setOn] = useState(false);
   useEffect(() => {
@@ -563,30 +582,7 @@ function useSceneLights(ref: React.RefObject<HTMLDivElement | null>) {
   return on;
 }
 
-function Statement({
-  children,
-  size = "md",
-}: {
-  children: React.ReactNode;
-  size?: "md" | "lg" | "xl";
-}) {
-  const fontSize =
-    size === "xl"
-      ? "clamp(2.5rem, 7vw, 6.5rem)"
-      : size === "lg"
-        ? "clamp(2rem, 5.2vw, 4.5rem)"
-        : "clamp(1.75rem, 4.4vw, 3.6rem)";
-  return (
-    <h2
-      className="font-display leading-[0.98]"
-      style={{ fontSize }}
-    >
-      {children}
-    </h2>
-  );
-}
-
-function Body({
+function Kicker({
   children,
   className = "",
 }: {
@@ -594,28 +590,106 @@ function Body({
   className?: string;
 }) {
   return (
-    <p
-      className={`max-w-[48ch] leading-[1.6] text-text/80 md:text-lg ${className}`}
+    <span
+      className={`flex items-center gap-2 font-mono text-[11px] tracking-[0.06em] text-brand-amber ${className}`}
+    >
+      <span
+        aria-hidden
+        className="inline-block h-1 w-1 rounded-full bg-brand-amber"
+      />
+      {children}
+    </span>
+  );
+}
+
+// A contained 16/9 frame so scene footage never escapes the beat. Centred
+// by default; align left when it shares a row with text.
+function SceneFrame({
+  children,
+  align = "center",
+}: {
+  children: React.ReactNode;
+  align?: "center" | "left";
+}) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-lg ${
+        align === "center" ? "mx-auto" : ""
+      }`}
+      style={{
+        aspectRatio: "16 / 9",
+        width: "100%",
+        maxWidth: "calc(52svh * 16 / 9)",
+      }}
     >
       {children}
+    </div>
+  );
+}
+
+// Small "slot" chip, marking a placeholder waiting on footage.
+function SlotTag({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-2 font-mono text-[10.5px] tracking-[0.1em] text-text-muted ${className}`}
+    >
+      <span className="rounded border border-hairline px-1.5 py-0.5 text-brand-amber">
+        slot
+      </span>
+      caption to follow with footage
+    </span>
+  );
+}
+
+// A caption slot beneath a scene frame: the intended example line, plainly
+// marked as a placeholder until footage is chosen.
+function SlotCaption({
+  text,
+  className = "",
+}: {
+  text?: string;
+  className?: string;
+}) {
+  return (
+    <p
+      className={`mt-4 flex flex-wrap items-center gap-3 font-mono text-[12.5px] leading-[1.5] tracking-[0.02em] text-text-muted ${className}`}
+    >
+      <span className="rounded border border-hairline px-1.5 py-0.5 text-[10.5px] tracking-[0.1em] text-brand-amber">
+        slot
+      </span>
+      <span>{text?.trim() ? text : "caption to follow with footage"}</span>
     </p>
   );
 }
 
-// Wrapper that constrains a scene video so it never escapes the 100dvh
-// frame. Fixed 16/9 ratio with a viewport-height cap; the video covers
-// within.
-function SceneVideoFrame({ children }: { children: React.ReactNode }) {
+// A proof beat: a client line lit in the dark, held as a labelled slot so
+// nothing is invented until a real quote is cleared.
+function ProofSlot({
+  quote,
+  note,
+  align = "left",
+  className = "",
+}: {
+  quote: string;
+  note: string;
+  align?: "left" | "right";
+  className?: string;
+}) {
   return (
-    <div
-      className="relative mx-auto overflow-hidden rounded-lg"
-      style={{
-        aspectRatio: "16 / 9",
-        width: "100%",
-        maxWidth: "calc(42svh * 16 / 9)",
-      }}
-    >
-      {children}
+    <div className={className}>
+      <p
+        className="font-display leading-[1.08] text-text/90"
+        style={{ fontSize: "clamp(1.6rem, 3.6vw, 3rem)" }}
+      >
+        {quote}
+      </p>
+      <p
+        className={`mt-6 font-mono text-[12px] leading-[1.6] text-text-muted ${
+          align === "right" ? "ml-auto" : ""
+        }`}
+      >
+        {note}
+      </p>
     </div>
   );
 }

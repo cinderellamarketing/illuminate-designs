@@ -51,9 +51,8 @@ function Sections() {
             }`}
           >
             <div className="md:col-span-4">
-              <p className="label">Section 0{i + 1}</p>
               <h2
-                className="font-display mt-6 leading-[0.98]"
+                className="font-display leading-[0.98]"
                 style={{ fontSize: "clamp(2.25rem, 4.5vw, 4rem)" }}
               >
                 <span className="text-brand-orange">{section.title}</span>

@@ -41,12 +41,11 @@ function ModelsSection() {
       className="relative overflow-hidden border-t border-hairline bg-surface py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        <p className="label">models</p>
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.8 }}
-          className="font-display mt-6 max-w-[22ch] leading-[0.98]"
+          className="font-display max-w-[22ch] leading-[0.98]"
           style={{ fontSize: "clamp(2.25rem, 5.5vw, 5rem)" }}
         >
           {forMsps.modelsIntro}

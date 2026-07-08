@@ -187,7 +187,7 @@ export const whatWeDoMeta = {
 
 export const whatWeDo = {
   headline: "Training people want to be in.",
-  body: "We do one thing well. We get teams from owning Microsoft Copilot to using it every day. The content matters, but the delivery is what makes it land. No death by PowerPoint, no features dumped on a quiet room. Sessions built around the work people already do, run in small groups, with follow-up so the new habits hold.",
+  body: "We do one thing well. We get teams from owning Microsoft Copilot to using it every day. The content matters, but the delivery is what makes it land. We keep the room awake, a long way from a slide deck droned at people who have stopped listening. Sessions built around the work people already do, run in small groups, with follow-up so the new habits hold.",
   services: [
     {
       key: "sales-enablement",
@@ -257,7 +257,7 @@ export const proofMeta = {
 
 export const proof = {
   headline: "The proof is in the room.",
-  body: "Two things decide whether anyone buys training. The results, and what the training is actually like to be in. So here are both.",
+  body: "Two things decide whether anyone buys training: the results, and what the training is like to be in.",
   pullFigure: "82% adoption in eight weeks, against an industry average around 30%.",
   sampleHeading: "Sample block",
   sampleBody:
@@ -266,7 +266,7 @@ export const proof = {
   caseStudyPlaceholder:
     "[Case study slots, with permission: client, challenge, result.]",
   testimonialPlaceholder: "[Testimonial slots, with permission.]",
-  cta: { label: "See a sample session", href: "/proof" },
+  cta: { label: "See a sample session", href: "/room" },
   primaryCta: { label: "Book a session", href: "/contact" },
 } as const;
 
@@ -278,7 +278,7 @@ export const aboutMeta = {
 
 export const about = {
   headline: "We are the bit between the licence and the light bulb going on.",
-  body: "Illuminate Learning was founded by [Jen Wilson], who spent [years] inside Microsoft before deciding that the gap worth fixing was not the technology, it was whether anyone used it. We know the channel, we know the pressure MSPs are under, and we know that the difference between training that lands and training that washes over a room is almost always the delivery.",
+  body: "Illuminate Learning was founded by [Jen Wilson], who spent [years] inside Microsoft before deciding that the gap worth fixing was adoption: getting people to use the technology they already had. We know the channel, we know the pressure MSPs are under, and we know that the difference between training that lands and training that washes over a room is almost always the delivery.",
   personality:
     "We work with big companies, but we are not a stiff one. We are a bit nerdy, we like the people we work with, and we think training should be the opposite of dull.",
   teamIntro: "Team",
@@ -286,15 +286,15 @@ export const about = {
   team: [
     {
       name: "[Jen Wilson]",
-      role: "Founder",
-    },
-    {
-      name: "[Ed]",
-      role: "Adoption and the in-the-room work.",
+      role: "Founder. Client-facing and relationships. Does not deliver training.",
     },
     {
       name: "[James]",
-      role: "Technical and security training.",
+      role: "In-the-room training: adoption, technical and security.",
+    },
+    {
+      name: "[Ed]",
+      role: "Sales enablement and the channel.",
     },
   ],
   cta: { label: "Talk to us", href: "/contact" },

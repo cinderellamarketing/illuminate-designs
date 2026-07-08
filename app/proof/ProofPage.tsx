@@ -50,12 +50,10 @@ function Pull() {
         style={{ top: "-20%", left: "-4%", width: "55%", height: "140%" }}
       />
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
-        <p className="label">pull figure</p>
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.9 }}
-          className="mt-10"
         >
           <StatMeter
             value={STAT}
@@ -81,12 +79,11 @@ function Sample() {
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="label">{proof.sampleHeading}</p>
             <motion.h2
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8 }}
-              className="font-display mt-6 leading-[0.98]"
+              className="font-display leading-[0.98]"
               style={{ fontSize: "clamp(2.25rem, 5vw, 4.5rem)" }}
             >
               See a session,{" "}
@@ -113,26 +110,38 @@ function Sample() {
                 aria-hidden
                 className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_30%,rgba(249,167,29,0.16)_0%,rgba(13,11,9,0)_55%)]"
               />
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="label uppercase tracking-[0.14em] text-brand-amber">
-                  sample clip
+              <Link
+                href={proof.cta.href}
+                aria-label="Watch a sample session in the room"
+                className="ignite absolute inset-0 flex flex-col items-center justify-center gap-4 text-center focus:outline-none"
+              >
+                <span
+                  aria-hidden
+                  className="flex h-16 w-16 items-center justify-center rounded-full border border-hairline bg-ground/60 text-brand-amber"
+                >
+                  <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor" aria-hidden>
+                    <path d="M0 0v22l20-11z" />
+                  </svg>
                 </span>
-                <span className="mt-4 max-w-[28ch] font-mono text-[13px] leading-[1.5] text-text/70">
-                  {proof.samplePlaceholder}
+                <span className="max-w-[26ch] font-mono text-[13px] leading-[1.5] text-text/75">
+                  Watch a sample session in the room
                 </span>
-              </div>
+              </Link>
             </motion.div>
           </div>
         </div>
 
         <div className="mt-16 flex flex-wrap items-center gap-6">
-          <Link href={proof.primaryCta.href} className="btn btn-primary btn-lg ignite">
+          <Link href={proof.cta.href} className="btn btn-primary btn-lg ignite">
             <span aria-hidden className="btn-switch" />
-            {proof.primaryCta.label}
+            {proof.cta.label}
           </Link>
-          <span className="font-mono text-[12px] text-text-muted">
-            Or talk to us first
-          </span>
+          <Link
+            href={proof.primaryCta.href}
+            className="ignite-text font-mono text-[12px] text-text-muted"
+          >
+            Or book a session
+          </Link>
         </div>
       </div>
     </section>
@@ -145,8 +154,7 @@ function Placeholders() {
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-6">
-            <p className="label">case studies</p>
-            <h2 className="font-display mt-6 text-3xl leading-[1.05] md:text-4xl">
+            <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">
               Client. Challenge. <span className="text-brand-orange">Result.</span>
             </h2>
             <div className="mt-8 space-y-4">
@@ -167,8 +175,7 @@ function Placeholders() {
           </div>
 
           <div className="md:col-span-5 md:col-start-8">
-            <p className="label">testimonials</p>
-            <h2 className="font-display mt-6 text-3xl leading-[1.05] md:text-4xl">
+            <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">
               In <span className="text-brand-orange">their words.</span>
             </h2>
             <div className="mt-8 space-y-4">

@@ -91,9 +91,8 @@ function Team() {
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="label">{about.teamIntro}</p>
             <h2
-              className="font-display mt-6 leading-[0.98]"
+              className="font-display leading-[0.98]"
               style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)" }}
             >
               The faces{" "}

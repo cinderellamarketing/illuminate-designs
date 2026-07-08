@@ -22,6 +22,7 @@ import {
   sessionHero,
   sessionProof,
   sessionQuickWin,
+  sessionVoices,
   sessionWhatWeDo,
   statTooltip,
 } from "@/lib/copy";
@@ -32,8 +33,8 @@ const STAT = parseInt(headlineNumber.value, 10) || 82;
 // section. Bright, dense, working sections (lights on) alternate with dark,
 // sparse, single-statement sections (lights off), each with its own shape:
 // a full-bleed line, a role-lane track, a two-side comparison, a quiet
-// partner band, a footage-led proof, a warm close. The 82% gauge appears
-// once, in the hero.
+// partner band, a footage-led proof, cleared client voices lit on the dark
+// ground, a warm close. The 82% gauge appears once, in the hero.
 export function SessionPage() {
   useDeclareVariant("session");
   const { mazeOpen, closeMaze, handleBulb, bulbBlown, flourishing } =
@@ -48,6 +49,7 @@ export function SessionPage() {
       <QuickWin />
       <ForMsps />
       <Proof />
+      <Voices />
       <Close />
       <SiteFooter />
       <LightMaze
@@ -460,6 +462,114 @@ function Proof() {
             <span aria-hidden className="btn-switch" />
             {sessionProof.cta.label}
           </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Voices ---------------- */
+// Cleared client quotes, treated as pull-quotes lit on the dark ground
+// rather than a row of identical cards. Each voice gets its own scale, face
+// and light: a large display lead with a warm pool and an orange quote mark,
+// a quieter body aside dropped lower on an orange rule, and a wider display
+// line pooled from the other side. Attribution sits beneath each in the mono
+// utility face, a visible to-confirm slot until Jen names the speakers. One
+// label for the whole section, no kicker per quote.
+
+function Voices() {
+  const reduce = useReducedMotion();
+  const [lead, aside, wide] = sessionVoices.quotes;
+
+  return (
+    <section
+      id="voices"
+      className="relative overflow-hidden border-t border-hairline bg-surface py-28 md:py-40"
+    >
+      <div className="relative mx-auto max-w-[1400px] px-6 md:px-10">
+        <p className="label">{sessionVoices.label}</p>
+
+        <div className="mt-14 grid gap-x-10 gap-y-16 md:mt-20 md:grid-cols-12 md:gap-y-24">
+          {/* Lead — the loudest voice. Display face, its own warm pool, a
+              large orange quote mark. */}
+          <motion.figure
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15%" }}
+            transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
+            className="relative m-0 md:col-span-7"
+          >
+            <div
+              aria-hidden
+              className="light-pool"
+              style={{ top: "-46%", left: "-14%", width: "108%", height: "180%" }}
+            />
+            <span
+              aria-hidden
+              className="font-display block leading-[0.5] text-brand-orange"
+              style={{ fontSize: "clamp(3.5rem, 7vw, 6rem)" }}
+            >
+              &ldquo;
+            </span>
+            <blockquote
+              className="font-display relative mt-3 max-w-[18ch] leading-[1.02]"
+              style={{ fontSize: "clamp(2rem, 4.6vw, 3.6rem)" }}
+            >
+              {lead.quote}
+            </blockquote>
+            <figcaption className="mt-7 font-mono text-[12px] tracking-[0.06em] text-text-muted">
+              {lead.attribution}
+            </figcaption>
+          </motion.figure>
+
+          {/* Aside — a quieter second voice in the body face, held on an
+              orange rule and dropped lower. No pool, so the silhouette
+              differs from the lead. */}
+          <motion.figure
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15%" }}
+            transition={{ duration: 0.8, delay: 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+            className="relative m-0 border-l border-brand-orange/45 pl-6 md:col-span-4 md:col-start-9 md:mt-20"
+          >
+            <blockquote className="max-w-[32ch] text-xl leading-[1.5] text-text/85 md:text-2xl">
+              {aside.quote}
+            </blockquote>
+            <figcaption className="mt-6 font-mono text-[12px] tracking-[0.06em] text-text-muted">
+              {aside.attribution}
+            </figcaption>
+          </motion.figure>
+
+          {/* Wide — the third voice returns to the display face, pooled from
+              the right and offset in from the edge. */}
+          <motion.figure
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15%" }}
+            transition={{ duration: 0.8, delay: 0.06, ease: [0.2, 0.7, 0.2, 1] }}
+            className="relative m-0 md:col-span-8 md:col-start-3"
+          >
+            <div
+              aria-hidden
+              className="light-pool"
+              style={{
+                top: "-40%",
+                right: "-12%",
+                left: "auto",
+                width: "96%",
+                height: "172%",
+              }}
+            />
+            <blockquote
+              className="font-display relative max-w-[24ch] leading-[1.06] text-text/90"
+              style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.7rem)" }}
+            >
+              {wide.quote}
+            </blockquote>
+            <figcaption className="mt-6 font-mono text-[12px] tracking-[0.06em] text-text-muted">
+              {wide.attribution}
+            </figcaption>
+          </motion.figure>
         </div>
       </div>
     </section>

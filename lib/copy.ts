@@ -150,6 +150,29 @@ export const sessionProof = {
   cta: { label: "See a sample session", href: "/room" },
 } as const;
 
+// Cleared client voices on the /session home. Real quotes, cleared to use.
+// The speakers are not yet named, so each carries a visible to-confirm
+// attribution slot for Jen to fill; nothing is invented, nothing is blank.
+export const sessionVoices = {
+  label: "in their words",
+  quotes: [
+    {
+      quote: "Excellent presentation skills and deep product knowledge.",
+      attribution: "[client and role, to confirm]",
+    },
+    {
+      quote:
+        "The session was extremely well received and proved to be highly impactful for the customer.",
+      attribution: "[client and role, to confirm]",
+    },
+    {
+      quote:
+        "Following the webinar we had lots of feedback from our clients on how much value they got.",
+      attribution: "[client and role, to confirm]",
+    },
+  ],
+} as const;
+
 export const sessionClose = {
   heading: "Let's turn those licences into something useful.",
   body: "Tell us what your team, or your clients' teams, are stuck on.",
@@ -311,15 +334,23 @@ export const channel = {
     body: "Edd leads channel and sales enablement at Illuminate Learning. He works with distributors and their partners on positioning, objection handling and technical depth. Clips to follow once filmed.",
   },
 
-  // TD SYNNEX partnership and the Sabs endorsement. Held as labelled
-  // placeholders until Jen and TD SYNNEX have cleared the wording. Nothing
-  // here is invented.
+  // The TD SYNNEX partnership, told through their own cleared words. Both
+  // quotes are attributed to TD SYNNEX; nothing is invented.
   proof: {
     heading: "The TD SYNNEX partnership.",
-    body: "This is where the partnership and Sabs's endorsement will sit. We are holding the space until Jen and TD SYNNEX have signed off the wording, so nothing here is invented.",
-    endorsementPlaceholder:
-      "[Endorsement from Sabs, TD SYNNEX. Added once cleared to share.]",
-    partnershipPlaceholder: "[TD SYNNEX partnership detail, pending sign-off.]",
+    body: "What working with us has been like, in TD SYNNEX's words.",
+    quotes: [
+      {
+        quote:
+          "We love working with you, and we always get really great feedback when we've put a partner in touch.",
+        attribution: "TD SYNNEX",
+      },
+      {
+        quote:
+          "James integrated with our team brilliantly, both before the webinar and on the day. We would gladly recommend and work with them again.",
+        attribution: "TD SYNNEX",
+      },
+    ],
   },
 
   close: {

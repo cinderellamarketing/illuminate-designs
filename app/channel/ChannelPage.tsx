@@ -18,7 +18,7 @@ import { channelVideos, toClip, type ChannelVideo } from "./videos";
 //
 // Section shapes are deliberately varied: a split heading over a numbered
 // list, a three-fact band with no heading, a framed video moment, a proof
-// split holding labelled placeholders, and a closing statement with a CTA.
+// split of cleared TD SYNNEX quotes, and a closing statement with a CTA.
 // A mono kicker sits only on the hero, not on every section.
 export function ChannelPage() {
   return (
@@ -269,9 +269,9 @@ function EddVideo() {
 }
 
 /* ---------------- Proof ---------------- */
-// The TD SYNNEX partnership and Sabs endorsement, held as labelled
-// placeholders. edd_partnership sits beside them as the framed clip. No
-// invented quote: the wording waits on Jen and TD SYNNEX.
+// The TD SYNNEX partnership, carried by two cleared quotes attributed to
+// TD SYNNEX. edd_partnership sits beside them as the framed clip. Nothing is
+// invented: both quotes are cleared to share and attributed to the company.
 
 function Proof() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -327,22 +327,27 @@ function Proof() {
               {proof.body}
             </motion.p>
 
-            <motion.figure
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : undefined}
-              transition={{ duration: 0.9, delay: 0.35 }}
-              className="mt-8 m-0 border-l border-hairline pl-5"
-            >
-              <blockquote
-                className="font-display leading-[1.15] text-text-muted"
-                style={{ fontSize: "clamp(1.3rem, 2.4vw, 1.9rem)" }}
-              >
-                {proof.endorsementPlaceholder}
-              </blockquote>
-              <figcaption className="mt-5 font-mono text-[12px] leading-[1.7] text-text-muted">
-                {proof.partnershipPlaceholder}
-              </figcaption>
-            </motion.figure>
+            <div className="mt-8 flex flex-col gap-8">
+              {proof.quotes.map((q, i) => (
+                <motion.figure
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={inView ? { opacity: 1, y: 0 } : undefined}
+                  transition={{ duration: 0.8, delay: 0.35 + i * 0.12 }}
+                  className="relative m-0 border-l-2 border-brand-orange/45 pl-5"
+                >
+                  <blockquote
+                    className="font-display leading-[1.16] text-text"
+                    style={{ fontSize: "clamp(1.2rem, 2.2vw, 1.75rem)" }}
+                  >
+                    {q.quote}
+                  </blockquote>
+                  <figcaption className="mt-4 font-mono text-[12px] tracking-[0.06em] text-brand-amber">
+                    {q.attribution}
+                  </figcaption>
+                </motion.figure>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -955,3 +955,243 @@ body.lights-off * {
     transition: none;
   }
 }
+
+/* ---------- Contact form ---------- */
+
+/* The enquiry form sits straight on the lit ground: underline fields, no
+   boxes. Focus blooms a warm pool behind the field, lights the rule orange
+   and brightens the mono label. On send the switch flicks on; on success
+   the whole panel warms. New, self-contained classes; the shared light
+   system above is untouched. */
+
+.cf-section__warm {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    68% 58% at 50% 32%,
+    rgba(249, 167, 29, 0.14) 0%,
+    rgba(245, 94, 9, 0.05) 42%,
+    rgba(13, 11, 9, 0) 74%
+  );
+  transition: opacity 640ms ease-out;
+}
+
+.cf-section[data-sent="true"] .cf-section__warm {
+  opacity: 1;
+}
+
+.cf-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Warm light pool behind a field. Hidden until the field is focused. */
+.cf-field__pool {
+  position: absolute;
+  z-index: 0;
+  inset: -34% -6% -30%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(249, 167, 29, 0.18) 0%,
+    rgba(245, 94, 9, 0.06) 46%,
+    rgba(13, 11, 9, 0) 78%
+  );
+  transition: opacity 340ms ease-out;
+}
+
+.cf-field:focus-within .cf-field__pool {
+  opacity: 1;
+}
+
+/* Keep the label, control and prompt above the pool. */
+.cf-field__label,
+.cf-field .cf-input,
+.cf-field__error {
+  position: relative;
+  z-index: 1;
+}
+
+.cf-field__label {
+  transition: color 220ms ease-out;
+}
+
+/* The mono label brightens from muted to full on focus. */
+.cf-field:focus-within .cf-field__label {
+  color: var(--color-text);
+}
+
+.cf-field__optional {
+  color: rgba(244, 237, 224, 0.4);
+}
+
+/* Underline field: no box, transparent, a single hairline rule that
+   lights orange on focus. */
+.cf-input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-hairline);
+  border-radius: 0;
+  padding: 8px 2px 10px;
+  color: var(--color-text);
+  font-family: var(--font-hanken), system-ui, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  transition:
+    border-color 240ms ease-out,
+    box-shadow 300ms ease-out,
+    opacity 240ms ease-out;
+}
+
+.cf-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.cf-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-brand-orange);
+  box-shadow:
+    0 1px 0 0 var(--color-brand-orange),
+    0 10px 30px -18px rgba(245, 94, 9, 0.7);
+}
+
+.cf-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Hero field: the ask, set large in the display face and given room. */
+.cf-input--hero {
+  font-family: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
+  font-weight: 700;
+  font-variation-settings: "wght" 680, "wdth" 108;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.5rem, 3.4vw, 2.4rem);
+  line-height: 1.16;
+  padding-top: 4px;
+  resize: vertical;
+}
+
+.cf-input--hero::placeholder {
+  color: rgba(244, 237, 224, 0.32);
+}
+
+.cf-field__error {
+  color: var(--color-brand-amber);
+}
+
+/* Send: a wall-style light switch. Flicks on with a warm glow while the
+   enquiry is on its way. Echoes the .btn-switch pip and the intro gate. */
+.cf-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  margin: -4px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--color-text);
+  font-family: var(--font-hanken), system-ui, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cf-switch:disabled {
+  cursor: progress;
+}
+
+.cf-switch:focus-visible {
+  outline: 2px solid var(--color-brand-orange);
+  outline-offset: 3px;
+}
+
+.cf-switch__track {
+  position: relative;
+  display: inline-flex;
+  height: 34px;
+  width: 62px;
+  flex: none;
+  border-radius: 9px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-hairline);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition:
+    background-color 260ms ease-out,
+    border-color 260ms ease-out,
+    box-shadow 320ms ease-out;
+}
+
+.cf-switch__paddle {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: 26px;
+  width: 26px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f1e8d8 0%, #d4c6ad 55%, #bdae93 100%);
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition:
+    transform 300ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 260ms ease-out,
+    box-shadow 260ms ease-out;
+}
+
+.cf-switch:hover .cf-switch__track,
+.cf-switch:focus-visible .cf-switch__track {
+  border-color: rgba(245, 94, 9, 0.5);
+}
+
+/* Flicked on: paddle slides, LED-warm glow, track lights orange. */
+.cf-switch[data-state="sending"] .cf-switch__track {
+  border-color: rgba(245, 94, 9, 0.6);
+  background: rgba(245, 94, 9, 0.14);
+  box-shadow:
+    inset 0 0 0 1px rgba(245, 94, 9, 0.4),
+    0 0 22px rgba(245, 94, 9, 0.45);
+}
+
+.cf-switch[data-state="sending"] .cf-switch__paddle {
+  transform: translateX(28px);
+  background: #fff2d6;
+  box-shadow: 0 0 10px rgba(255, 224, 160, 0.9);
+}
+
+/* Network error, in the lit style. */
+.cf-error {
+  color: var(--color-text);
+}
+
+/* Quiet "send another" control on the lights-up success state. */
+.cf-again:focus-visible {
+  outline: 2px solid var(--color-brand-orange);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Honeypot: kept in the DOM for Formspree, hidden from sight and from
+   assistive tech. */
+.cf-hp {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

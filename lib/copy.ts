@@ -427,18 +427,36 @@ export const contact = {
   // team is stuck on."
   headline: { lead: "Tell us what your team", accent: "is stuck on." },
   body: "No pitch. Tell us where Copilot is not landing, for your team or your clients', and we will tell you whether we can help.",
-  fields: [
-    { name: "name", label: "Name", type: "text", required: true },
-    { name: "email", label: "Work email", type: "email", required: true },
-    { name: "company", label: "Company", type: "text", required: false },
-    {
-      name: "stuck",
-      label: "What you are stuck on",
-      type: "textarea",
-      required: true,
+
+  // The real enquiry form, posted client-side to Formspree. The `name`
+  // values below are the Formspree field keys and must not change: an input
+  // named exactly "email" makes Formspree set reply-to to the sender, so a
+  // reply lands back with the prospect. "message" is the hero field.
+  form: {
+    hero: {
+      name: "message",
+      label: "What you're stuck on",
       placeholder: microcopy.contactPlaceholder,
     },
-  ],
-  bookingLine: "Or: Book a session directly [booking link]",
-  primaryCta: { label: "Book a session", href: "/contact" },
+    name: { name: "name", label: "Name" },
+    email: { name: "email", label: "Work email" },
+    company: { name: "company", label: "Company", optional: "optional" },
+    send: "Send",
+    sending: "Sending",
+    privacy: "We only use this to reply to you.",
+    validation: {
+      name: "Add your name so we know who we're talking to.",
+      email: "Add a work email so we can reply.",
+      message: "Tell us what you're stuck on.",
+    },
+    error: {
+      lead: "Something went wrong. Email us at",
+      email: "jen@illuminate-learning.co.uk",
+    },
+    success: {
+      heading: "That's on its way.",
+      body: "We'll come back to you.",
+      again: "Send another",
+    },
+  },
 } as const;
